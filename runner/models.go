@@ -21,10 +21,10 @@ type Language struct {
 	PackageTimeout time.Duration `json:"packageTimeout"`
 }
 
-var node12 = Language{
-	Name:           "node_v12_x",
-	Text:           "Javascript (Node v12.x)",
-	Tag:            "node:node_v12_x",
+var Node14 = Language{
+	Name:           "node_v14_x",
+	Text:           "Javascript (Node v14.x)",
+	Tag:            "node:node_v14_x",
 	InDevelopment:  false,
 	InMaintenance:  false,
 	Language:       "javascript",
@@ -34,7 +34,7 @@ var node12 = Language{
 	PackageTimeout: 60 * time.Second,
 }
 
-var nodeLts = Language{
+var NodeLts = Language{
 	Name:           "node_latest",
 	Text:           "Javascript (Node latest)",
 	Tag:            "node:node_latest",
@@ -47,7 +47,7 @@ var nodeLts = Language{
 	PackageTimeout: 60 * time.Second,
 }
 
-var goLang = Language{
+var GoLang = Language{
 	Name:           "go",
 	Text:           "Go v1.*.*",
 	Tag:            "go:go_v1_14_2",
@@ -60,7 +60,7 @@ var goLang = Language{
 	PackageTimeout: 60 * time.Second,
 }
 
-var python2 = Language{
+var Python2 = Language{
 	Name:           "python2",
 	Text:           "Python2",
 	Tag:            "python:python2",
@@ -73,7 +73,7 @@ var python2 = Language{
 	PackageTimeout: 60 * time.Second,
 }
 
-var python3 = Language{
+var Python3 = Language{
 	Name:           "python3",
 	Text:           "Python3",
 	Tag:            "python:python3",
@@ -86,7 +86,7 @@ var python3 = Language{
 	PackageTimeout: 60 * time.Second,
 }
 
-var ruby = Language{
+var Ruby = Language{
 	Name:           "ruby",
 	Text:           "Ruby 2.5.1",
 	Tag:            "ruby:ruby",
@@ -99,7 +99,7 @@ var ruby = Language{
 	PackageTimeout: 60 * time.Second,
 }
 
-var php74 = Language{
+var Php74 = Language{
 	Name:           "php74",
 	Text:           "PHP 7.4",
 	Tag:            "php:php7.4",
@@ -112,7 +112,7 @@ var php74 = Language{
 	PackageTimeout: 30 * time.Second,
 }
 
-var rust = Language{
+var Rust = Language{
 	Name:           "rust",
 	Text:           "Rust",
 	Tag:            "rust:rust",
@@ -125,7 +125,7 @@ var rust = Language{
 	PackageTimeout: 30 * time.Second,
 }
 
-var haskell = Language{
+var Haskell = Language{
 	Name:           "haskell",
 	Text:           "Haskell",
 	Tag:            "haskell:haskell",
@@ -138,7 +138,7 @@ var haskell = Language{
 	PackageTimeout: 30 * time.Second,
 }
 
-var c = Language{
+var CLang = Language{
 	Name:           "c",
 	Text:           "C",
 	Tag:            "c:c",
@@ -151,7 +151,7 @@ var c = Language{
 	PackageTimeout: 30 * time.Second,
 }
 
-var cPlus = Language{
+var CPlus = Language{
 	Name:           "c++",
 	Text:           "C++",
 	Tag:            "c-plus:c-plus",

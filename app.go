@@ -23,14 +23,16 @@ func LoadEnv(env string) {
 	}
 }
 
-func InitRequiredDirectories() {
+func InitRequiredDirectories(output bool) {
 	projectsDir := os.Getenv("PROJECTS_DIR")
 	directoriesExist := true
 	if _, err := os.Stat(projectsDir); os.IsNotExist(err) {
 		directoriesExist = false
 
-		fmt.Println("")
-		fmt.Println("Creating required directories...")
+		if output {
+			fmt.Println("")
+			fmt.Println("Creating required directories...")
+		}
 		fsErr := os.Mkdir(projectsDir, os.ModePerm)
 
 		if fsErr != nil {
@@ -57,20 +59,24 @@ func InitRequiredDirectories() {
 			}
 		}
 	} else {
-		fmt.Println("")
-		fmt.Println("Required directories already created! Skipping...")
-		fmt.Println("")
+		if output {
+			fmt.Println("")
+			fmt.Println("Required directories already created! Skipping...")
+			fmt.Println("")
+		}
 	}
 
 	if !directoriesExist {
-		fmt.Println("Required directories created!")
-		fmt.Println("")
+		if output {
+			fmt.Println("Required directories created!")
+			fmt.Println("")
+		}
 	}
 }
 
 func App() {
 	LoadEnv(staticTypes.APP_DEV_ENV)
-	InitRequiredDirectories()
+	InitRequiredDirectories(true)
 
 	singleFileExecution.InitService()
 

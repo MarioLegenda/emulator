@@ -25,7 +25,7 @@ func createSingleFileRunner() SingleFileRunFn {
 
 		commandFactory := RunCommandFactory{}
 
-		dockerRunCommand := commandFactory.CreateCommand(containerName, br.ExecutionDirectory, br.FileName, br.Environment, "state")
+		dockerRunCommand := commandFactory.CreateCommand(containerName, br.ExecutionDirectory, br.FileName, br.Environment, br.DirectoryName)
 
 		context := context.TODO()
 

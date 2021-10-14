@@ -3,6 +3,7 @@ package main
 import (
 	"net/http"
 	"therebelsource/emulator/httpUtil"
+	"therebelsource/emulator/runner"
 	"therebelsource/emulator/singleFileExecution"
 	"therebelsource/emulator/staticTypes"
 )
@@ -10,19 +11,19 @@ import (
 func getEnvironmentsHandler(w http.ResponseWriter, r *http.Request) {
 	cr := httpUtil.InitCurrentRequest(w, r)
 
-	var languages []Language
+	var languages []runner.Language
 
-	languages = append(languages, node12)
-	languages = append(languages, nodeLts)
-	languages = append(languages, haskell)
-	languages = append(languages, c)
-	languages = append(languages, cPlus)
-	languages = append(languages, goLang)
-	languages = append(languages, python2)
-	languages = append(languages, python3)
-	languages = append(languages, ruby)
-	languages = append(languages, php74)
-	languages = append(languages, rust)
+	languages = append(languages, runner.Node14)
+	languages = append(languages, runner.NodeLts)
+	languages = append(languages, runner.Haskell)
+	languages = append(languages, runner.CLang)
+	languages = append(languages, runner.CPlus)
+	languages = append(languages, runner.GoLang)
+	languages = append(languages, runner.Python2)
+	languages = append(languages, runner.Python3)
+	languages = append(languages, runner.Ruby)
+	languages = append(languages, runner.Php74)
+	languages = append(languages, runner.Rust)
 
 	apiResponse := httpUtil.CreateSuccessResponse(cr, staticTypes.RESPONSE_RESOURCE, languages, http.StatusOK, "An instance of file content")
 

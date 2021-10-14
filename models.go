@@ -21,10 +21,10 @@ type Language struct {
 	PackageTimeout time.Duration `json:"packageTimeout"`
 }
 
-var node12 = Language{
-	Name:           "node_v12_x",
-	Text:           "Javascript (Node v12.x)",
-	Tag:            "node:node_v12_x",
+var node14 = Language{
+	Name:           "node_v14_x",
+	Text:           "Javascript (Node v14.x)",
+	Tag:            "node:node_v14_x",
 	InDevelopment:  false,
 	InMaintenance:  false,
 	Language:       "javascript",

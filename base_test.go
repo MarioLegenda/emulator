@@ -34,7 +34,7 @@ func TestApi(t *testing.T) {
 
 func testPrepare() {
 	LoadEnv(staticTypes.APP_DEV_ENV)
-	InitRequiredDirectories()
+	InitRequiredDirectories(false)
 
 	singleFileExecution.InitService()
 
@@ -153,7 +153,7 @@ func testCreateCodeBlock(pageUuid string) map[string]interface{} {
 	return data
 }
 
-func testAddEmulatorToCodeBlock(pageUuid string, blockUuid string, code string) map[string]interface{} {
+func testAddEmulatorToCodeBlock(pageUuid string, blockUuid string, code string, lang runner.Language) map[string]interface{} {
 	url := fmt.Sprintf("%s/page/code-block", repository.CreateApiUrl())
 
 	client, err := httpClient.NewHttpClient(&tls.Config{
@@ -169,13 +169,13 @@ func testAddEmulatorToCodeBlock(pageUuid string, blockUuid string, code string) 
 		"blockUuid": blockUuid,
 		"text":      code,
 		"emulator": map[string]interface{}{
-			"name": node12.Name,
-			"text": node12.Text,
-			"tag": node12.Tag,
+			"name": lang.Name,
+			"text": lang.Text,
+			"tag": lang.Tag,
 			"inDevelopment": false,
 			"inMaintenance": false,
-			"language": node12.Language,
-			"extension": node12.Extension,
+			"language": lang.Language,
+			"extension": lang.Extension,
 			"output": "",
 			"defaultTimeout": 0,
 			"packageTimeout": 0,

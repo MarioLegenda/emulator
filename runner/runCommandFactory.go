@@ -17,6 +17,7 @@ func (cf *RunCommandFactory) CreateProjectNodeCommand(containerName string, proj
 		RemoveAfterFinished().
 		NewVolume(projectName, "rw").
 		Name(containerName).
+		Init().
 		Tag(string(lang.Tag)).
 		Shell("/bin/sh").
 		Exec(fmt.Sprintf("node %s &> output.txt", fileName)).
@@ -39,6 +40,7 @@ func (cf *RunCommandFactory) CreateCCommand(containerName string, projectName st
 		RemoveAfterFinished().
 		NewVolume(projectName, "rw").
 		Name(containerName).
+		Init().
 		Tag(string(lang.Tag)).
 		Shell("/bin/sh").
 		Exec(fmt.Sprintf("gcc -o %s %s &> output.txt && ./%s &> output.txt", execName, fileName, execName)).
@@ -61,6 +63,7 @@ func (cf *RunCommandFactory) CreateCPlusCommand(containerName string, projectNam
 		RemoveAfterFinished().
 		NewVolume(projectName, "rw").
 		Name(containerName).
+		Init().
 		Tag(string(lang.Tag)).
 		Shell("/bin/sh").
 		Exec(fmt.Sprintf("g++ -o %s %s &> output.txt && ./%s &> output.txt", execName, fileName, execName)).
@@ -82,6 +85,7 @@ func (cf *RunCommandFactory) CreateHaskellCommand(containerName string, projectN
 		User("dockeruser", "dockerusergroup").
 		NewVolume(projectName, "rw").
 		Name(containerName).
+		Init().
 		Tag(string(lang.Tag)).
 		Shell("/bin/sh").
 		Exec(fmt.Sprintf("ghc %s && ./%s", fileName, fileName[:len(fileName)-3])).
@@ -93,18 +97,19 @@ func (cf *RunCommandFactory) CreateHaskellCommand(containerName string, projectN
 	return args
 }
 
-func (cf *RunCommandFactory) CreateGoCommand(containerName string, projectName string, lang Language) []string {
+func (cf *RunCommandFactory) CreateGoCommand(containerName string, projectName string, lang Language, directoryName string) []string {
 	cb := CommandBuilder{Commands: &[]string{}}
 
 	cb.
 		NewNetwork("none").
 		AllocatePseudoTty().
 		RemoveAfterFinished().
-		NewVolumeFull(projectName, fmt.Sprintf("app/src/%s", projectName), "rw").
+		NewVolumeFull(projectName, fmt.Sprintf("app/src/%s", directoryName), "rw").
 		Name(containerName).
+		Init().
 		Tag(string(lang.Tag)).
 		Shell("/bin/sh").
-		Exec(fmt.Sprintf("go run %s | tee output.txt", projectName)).
+		Exec(fmt.Sprintf("go run %s | tee output.txt", directoryName)).
 		SendToStd("/dev/stderr").
 		Run()
 
@@ -123,6 +128,7 @@ func (cf *RunCommandFactory) CreatePython2Command(containerName string, projectN
 		RemoveAfterFinished().
 		NewVolume(projectName, "rw").
 		Name(containerName).
+		Init().
 		Tag(string(lang.Tag)).
 		Shell("/bin/sh").
 		Exec(fmt.Sprintf("python %s &> output.txt", fileName)).
@@ -145,6 +151,7 @@ func (cf *RunCommandFactory) CreatePython3Command(containerName string, projectN
 		RemoveAfterFinished().
 		NewVolume(projectName, "rw").
 		Name(containerName).
+		Init().
 		Tag(string(lang.Tag)).
 		Shell("/bin/sh").
 		Exec(fmt.Sprintf("python3 %s &> output.txt", fileName)).
@@ -166,6 +173,7 @@ func (cf *RunCommandFactory) CreateRubyCommand(containerName string, projectName
 		RemoveAfterFinished().
 		NewVolume(projectName, "rw").
 		Name(containerName).
+		Init().
 		Tag(string(lang.Tag)).
 		Shell("/bin/sh").
 		Exec(fmt.Sprintf("ruby %s &> output.txt", fileName)).
@@ -187,6 +195,7 @@ func (cf *RunCommandFactory) CreatePHP74Command(containerName string, projectNam
 		RemoveAfterFinished().
 		NewVolume(projectName, "rw").
 		Name(containerName).
+		Init().
 		Tag(string(lang.Tag)).
 		Shell("/bin/sh").
 		Exec(fmt.Sprintf("php %s &> output.txt", fileName)).
@@ -207,6 +216,7 @@ func (cf *RunCommandFactory) CreateRustCommand(containerName string, projectName
 		RemoveAfterFinished().
 		NewVolumeFull(projectName, "app", "rw").
 		Name(containerName).
+		Init().
 		Tag(string(lang.Tag)).
 		Shell("/bin/sh").
 		Exec("cargo run --quiet | tee output.txt").
@@ -219,26 +229,26 @@ func (cf *RunCommandFactory) CreateRustCommand(containerName string, projectName
 }
 
 
-func (cf *RunCommandFactory) CreateCommand(containerName, projectName string, fileName string, lang Language, state string) []string {
-	if lang.Name == node12.Name || lang.Name == nodeLts.Name {
+func (cf *RunCommandFactory) CreateCommand(containerName, projectName string, fileName string, lang Language, directoryName string) []string {
+	if lang.Name == Node14.Name || lang.Name == NodeLts.Name {
 		return cf.CreateProjectNodeCommand(containerName, projectName, fileName, lang)
-	} else if lang.Name == goLang.Name {
-		return cf.CreateGoCommand(containerName, projectName, lang)
-	} else if lang.Name == python2.Name {
+	} else if lang.Name == GoLang.Name {
+		return cf.CreateGoCommand(containerName, projectName, lang, directoryName)
+	} else if lang.Name == Python2.Name {
 		return cf.CreatePython2Command(containerName, projectName, fileName, lang)
-	} else if lang.Name == python3.Name {
+	} else if lang.Name == Python3.Name {
 		return cf.CreatePython3Command(containerName, projectName, fileName, lang)
-	} else if lang.Name == ruby.Name {
+	} else if lang.Name == Ruby.Name {
 		return cf.CreateRubyCommand(containerName, projectName, fileName, lang)
-	} else if lang.Name == php74.Name {
+	} else if lang.Name == Php74.Name {
 		return cf.CreatePHP74Command(containerName, projectName, fileName, lang)
-	} else if lang.Name == rust.Name {
+	} else if lang.Name == Rust.Name {
 		return cf.CreateRustCommand(containerName, projectName, fileName, lang)
-	} else if lang.Name == haskell.Name {
+	} else if lang.Name == Haskell.Name {
 		return cf.CreateHaskellCommand(containerName, projectName, fileName, lang)
-	} else if lang.Name == c.Name {
+	} else if lang.Name == CLang.Name {
 		return cf.CreateCCommand(containerName, projectName, fileName, lang)
-	} else if lang.Name == cPlus.Name {
+	} else if lang.Name == CPlus.Name {
 		return cf.CreateCPlusCommand(containerName, projectName, fileName, lang)
 	}
 
