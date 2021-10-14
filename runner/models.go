@@ -1,7 +1,5 @@
 package runner
 
-import "time"
-
 type Name string
 type Text string
 type Tag string
@@ -17,8 +15,6 @@ type Language struct {
 	Language       string        `json:"language"`
 	Extension      string        `json:"extension"`
 	Output         string        `json:"output"`
-	DefaultTimeout time.Duration `json:"defaultTimeout"`
-	PackageTimeout time.Duration `json:"packageTimeout"`
 }
 
 var Node14 = Language{
@@ -30,8 +26,6 @@ var Node14 = Language{
 	Language:       "javascript",
 	Extension:      "js",
 	Output:         "",
-	DefaultTimeout: 10 * time.Second,
-	PackageTimeout: 60 * time.Second,
 }
 
 var NodeLts = Language{
@@ -43,8 +37,6 @@ var NodeLts = Language{
 	Language:       "javascript",
 	Extension:      "js",
 	Output:         "",
-	DefaultTimeout: 10 * time.Second,
-	PackageTimeout: 60 * time.Second,
 }
 
 var GoLang = Language{
@@ -56,8 +48,6 @@ var GoLang = Language{
 	Language:       "go",
 	Extension:      "go",
 	Output:         "",
-	DefaultTimeout: 15 * time.Second,
-	PackageTimeout: 60 * time.Second,
 }
 
 var Python2 = Language{
@@ -69,8 +59,6 @@ var Python2 = Language{
 	Language:       "python",
 	Extension:      "py",
 	Output:         "",
-	DefaultTimeout: 10 * time.Second,
-	PackageTimeout: 60 * time.Second,
 }
 
 var Python3 = Language{
@@ -82,8 +70,6 @@ var Python3 = Language{
 	Language:       "python",
 	Extension:      "py",
 	Output:         "",
-	DefaultTimeout: 10 * time.Second,
-	PackageTimeout: 60 * time.Second,
 }
 
 var Ruby = Language{
@@ -95,8 +81,6 @@ var Ruby = Language{
 	Language:       "ruby",
 	Extension:      "rb",
 	Output:         "",
-	DefaultTimeout: 10 * time.Second,
-	PackageTimeout: 60 * time.Second,
 }
 
 var Php74 = Language{
@@ -108,8 +92,6 @@ var Php74 = Language{
 	Language:       "php",
 	Extension:      "php",
 	Output:         "",
-	DefaultTimeout: 10 * time.Second,
-	PackageTimeout: 30 * time.Second,
 }
 
 var Rust = Language{
@@ -121,8 +103,6 @@ var Rust = Language{
 	Language:       "rust",
 	Extension:      "rs",
 	Output:         "",
-	DefaultTimeout: 15 * time.Second,
-	PackageTimeout: 30 * time.Second,
 }
 
 var Haskell = Language{
@@ -134,8 +114,6 @@ var Haskell = Language{
 	Language:       "haskell",
 	Extension:      "hs",
 	Output:         "",
-	DefaultTimeout: 15 * time.Second,
-	PackageTimeout: 30 * time.Second,
 }
 
 var CLang = Language{
@@ -147,8 +125,6 @@ var CLang = Language{
 	Language:       "c",
 	Extension:      "c",
 	Output:         "",
-	DefaultTimeout: 15 * time.Second,
-	PackageTimeout: 30 * time.Second,
 }
 
 var CPlus = Language{
@@ -160,8 +136,6 @@ var CPlus = Language{
 	Language:       "c",
 	Extension:      "cpp",
 	Output:         "",
-	DefaultTimeout: 15 * time.Second,
-	PackageTimeout: 30 * time.Second,
 }
 
 type SingleFileBuildResult struct {

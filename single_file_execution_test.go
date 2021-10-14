@@ -72,6 +72,7 @@ var _ = GinkgoDescribe("Single file execution tests", func() {
 		gomega.Expect(json.Unmarshal(b, &result)).To(gomega.BeNil())
 
 		gomega.Expect(result.Success).Should(gomega.BeFalse())
+		gomega.Expect(result.Timeout).Should(gomega.Equal(5))
 	})
 
 	GinkgoIt("Should gracefully fail multiple concurrent requests and stop containers", func() {
@@ -79,7 +80,7 @@ var _ = GinkgoDescribe("Single file execution tests", func() {
 		defer testCleanup()
 
 		wg := &sync.WaitGroup{}
-		for i := 0; i < 10; i++ {
+		for i := 0; i < 20; i++ {
 			wg.Add(1)
 			go func(wg *sync.WaitGroup) {
 				pg := testCreateEmptyPage()
@@ -201,7 +202,7 @@ var _ = GinkgoDescribe("Single file execution tests", func() {
 		var result runner.SingleFileRunResult
 		gomega.Expect(json.Unmarshal(b, &result)).To(gomega.BeNil())
 
-		gomega.Expect(result.Timeout).Should(gomega.Equal(int64(0)))
+		gomega.Expect(result.Timeout).Should(gomega.Equal(5))
 		gomega.Expect(result.Success).Should(gomega.BeTrue())
 		gomega.Expect(result.Result).Should(gomega.Equal("mile\n"))
 	})
@@ -263,7 +264,7 @@ var _ = GinkgoDescribe("Single file execution tests", func() {
 		var result runner.SingleFileRunResult
 		gomega.Expect(json.Unmarshal(b, &result)).To(gomega.BeNil())
 
-		gomega.Expect(result.Timeout).Should(gomega.Equal(int64(0)))
+		gomega.Expect(result.Timeout).Should(gomega.Equal(5))
 		gomega.Expect(result.Success).Should(gomega.BeTrue())
 		gomega.Expect(result.Result).Should(gomega.Equal("mile\n"))
 	})
@@ -330,7 +331,7 @@ echo "mile";
 		var result runner.SingleFileRunResult
 		gomega.Expect(json.Unmarshal(b, &result)).To(gomega.BeNil())
 
-		gomega.Expect(result.Timeout).Should(gomega.Equal(int64(0)))
+		gomega.Expect(result.Timeout).Should(gomega.Equal(5))
 		gomega.Expect(result.Success).Should(gomega.BeTrue())
 		gomega.Expect(result.Result).Should(gomega.Equal("\nmile"))
 	})
@@ -392,7 +393,7 @@ echo "mile";
 		var result runner.SingleFileRunResult
 		gomega.Expect(json.Unmarshal(b, &result)).To(gomega.BeNil())
 
-		gomega.Expect(result.Timeout).Should(gomega.Equal(int64(0)))
+		gomega.Expect(result.Timeout).Should(gomega.Equal(5))
 		gomega.Expect(result.Success).Should(gomega.BeTrue())
 		gomega.Expect(result.Result).Should(gomega.Equal("mile\n"))
 	})
@@ -463,7 +464,7 @@ func main() {
 		var result runner.SingleFileRunResult
 		gomega.Expect(json.Unmarshal(b, &result)).To(gomega.BeNil())
 
-		gomega.Expect(result.Timeout).Should(gomega.Equal(int64(0)))
+		gomega.Expect(result.Timeout).Should(gomega.Equal(5))
 		gomega.Expect(result.Success).Should(gomega.BeTrue())
 		gomega.Expect(result.Result).Should(gomega.Equal("mile\r\n"))
 	})
@@ -525,7 +526,7 @@ func main() {
 		var result runner.SingleFileRunResult
 		gomega.Expect(json.Unmarshal(b, &result)).To(gomega.BeNil())
 
-		gomega.Expect(result.Timeout).Should(gomega.Equal(int64(0)))
+		gomega.Expect(result.Timeout).Should(gomega.Equal(5))
 		gomega.Expect(result.Success).Should(gomega.BeTrue())
 		gomega.Expect(result.Result).Should(gomega.Equal("mile\n"))
 	})
@@ -587,7 +588,7 @@ func main() {
 		var result runner.SingleFileRunResult
 		gomega.Expect(json.Unmarshal(b, &result)).To(gomega.BeNil())
 
-		gomega.Expect(result.Timeout).Should(gomega.Equal(int64(0)))
+		gomega.Expect(result.Timeout).Should(gomega.Equal(5))
 		gomega.Expect(result.Success).Should(gomega.BeTrue())
 		gomega.Expect(result.Result).Should(gomega.Equal("mile\n"))
 	})
@@ -649,7 +650,7 @@ func main() {
 		var result runner.SingleFileRunResult
 		gomega.Expect(json.Unmarshal(b, &result)).To(gomega.BeNil())
 
-		gomega.Expect(result.Timeout).Should(gomega.Equal(int64(0)))
+		gomega.Expect(result.Timeout).Should(gomega.Equal(5))
 		gomega.Expect(result.Success).Should(gomega.BeTrue())
 		gomega.Expect(result.Result).Should(gomega.Equal("\r\nmile\r\n"))
 	})
@@ -717,7 +718,7 @@ int main() {
 		var result runner.SingleFileRunResult
 		gomega.Expect(json.Unmarshal(b, &result)).To(gomega.BeNil())
 
-		gomega.Expect(result.Timeout).Should(gomega.Equal(int64(0)))
+		gomega.Expect(result.Timeout).Should(gomega.Equal(5))
 		gomega.Expect(result.Success).Should(gomega.BeTrue())
 		gomega.Expect(result.Result).Should(gomega.Equal("mile"))
 	})
@@ -787,7 +788,7 @@ int main() {
 		var result runner.SingleFileRunResult
 		gomega.Expect(json.Unmarshal(b, &result)).To(gomega.BeNil())
 
-		gomega.Expect(result.Timeout).Should(gomega.Equal(int64(0)))
+		gomega.Expect(result.Timeout).Should(gomega.Equal(5))
 		gomega.Expect(result.Success).Should(gomega.BeTrue())
 		gomega.Expect(result.Result).Should(gomega.Equal("mile"))
 	})

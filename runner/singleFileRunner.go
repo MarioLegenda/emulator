@@ -16,7 +16,7 @@ type SingleFileRunFn func(br SingleFileBuildResult) (SingleFileRunResult, *appEr
 type SingleFileRunResult struct {
 	Success bool `json:"success"`
 	Result string `json:"result"`
-	Timeout int64 `json:"timeout"`
+	Timeout int `json:"timeout"`
 }
 
 func createSingleFileRunner() SingleFileRunFn {
@@ -28,6 +28,8 @@ func createSingleFileRunner() SingleFileRunFn {
 		dockerRunCommand := commandFactory.CreateCommand(containerName, br.ExecutionDirectory, br.FileName, br.Environment, br.DirectoryName)
 
 		context := context.TODO()
+		
+		timeout := getTimeout("blog", "single_file", "anonymous")
 
 		var outb, errb bytes.Buffer
 		var out string
@@ -104,7 +106,7 @@ func createSingleFileRunner() SingleFileRunFn {
 			}
 
 			break
-		case <-time.After(10 * time.Second):
+		case <-time.After(timeout):
 			runnerBalancer.addJob(job{
 				containerName: containerName,
 				pid:           <- pidC,
@@ -112,7 +114,7 @@ func createSingleFileRunner() SingleFileRunFn {
 
 			runResult.Success = false
 			runResult.Result = "timeout"
-			runResult.Timeout = int64(br.Environment.DefaultTimeout / time.Second)
+			runResult.Timeout = int(timeout) / (int(time.Millisecond) * 1000)
 
 			return runResult, nil
 		case <-context.Done():
@@ -123,17 +125,16 @@ func createSingleFileRunner() SingleFileRunFn {
 
 			runResult.Success = false
 			runResult.Result = "timeout"
-			runResult.Timeout = int64(br.Environment.DefaultTimeout / time.Second)
+			runResult.Timeout = int(timeout) / (int(time.Millisecond) * 1000)
 
 			return runResult, nil
 		}
 
 		runResult.Result = out
 		runResult.Success = success
+		runResult.Timeout = int(timeout) / (int(time.Millisecond) * 1000)
 
 		return runResult, nil
-
-		return SingleFileRunResult{}, nil
 	}
 }
 

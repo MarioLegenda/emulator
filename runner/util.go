@@ -2,24 +2,27 @@ package runner
 
 import (
 	"io/ioutil"
-	"os"
 	"os/exec"
 	"syscall"
 	"therebelsource/emulator/appErrors"
+	"time"
 )
 
-func getStateDirectory(state string) string {
-	if state == "dev" {
-		return os.Getenv("DEV_STATE_DIR")
-	} else if state == "prod" {
-		return os.Getenv("PROD_STATE_DIR")
-	} else if state == "session" {
-		return os.Getenv("SESSION_STATE_DIR")
-	} else if state == "single_file" {
-		return os.Getenv("SINGLE_FILE_STATE_DIR")
+func getTimeout(t string, execState string, userState string) time.Duration {
+	if execState == "documentation_private" {
+		return 30 * time.Second
 	}
 
-	return ""
+	if userState == "anonymous" {
+		return 5 * time.Second
+	}
+
+	if userState == "authenticated" {
+		return 15 * time.Second
+	}
+
+
+	return 5 * time.Second
 }
 
 func readFile(path string) (string, *appErrors.Error) {
@@ -48,7 +51,7 @@ func stopDockerContainer(containerName string, pid int) {
 			killErr := syscall.Kill(pid, 9)
 
 			if killErr != nil {
-				// TODO: notify by slack that the container could not be stopped
+				// TODO: notify by slack that the container could not be stopped and time happened
 			}
 		}
 	}
