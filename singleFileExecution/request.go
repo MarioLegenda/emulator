@@ -24,6 +24,8 @@ func (l *SingleFileRunRequest) Sanitize() {
 
 	l.KsUuid = p.Sanitize(l.KsUuid)
 	l.BlockUuid = p.Sanitize(l.BlockUuid)
+	l.Type = p.Sanitize(l.Type)
+	l.State = p.Sanitize(l.State)
 }
 
 func (l *SingleFileRunRequest) Validate() error {

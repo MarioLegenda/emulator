@@ -23,8 +23,8 @@ func InitServer(r *mux.Router) *http.Server {
 	}
 
 	fmt.Println("")
-	fmt.Println("Starting container watcher...")
-	runner.WatchContainers()
+	fmt.Println("Starting container balancer...")
+	runner.StartContainerBalancer()
 
 	// Run our server in a goroutine so that it doesn't block.
 	go func() {
@@ -54,14 +54,10 @@ func WatchServerShutdown(srv *http.Server) {
 
 	fmt.Println("Server is terminated.")
 	fmt.Println("")
-	fmt.Println("Stopping container watcher...")
+	fmt.Println("Stopping container balancer...")
 
-	remaining, current := runner.StopWatching()
-	fmt.Println("Container watcher stopped!")
-	
-	if current != 0 {
-		fmt.Printf("Remaining workers: %d; Current workers: %d. If there are still workers to be run, there is a bug in the worker mechanism that needs to be fixed!\n", remaining, current)
-	}
+	runner.StopContainerBalancer()
+	fmt.Println("Container balancer stopped!")
 
 	os.Exit(0)
 }

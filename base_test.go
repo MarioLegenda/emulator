@@ -38,7 +38,7 @@ func testPrepare() {
 
 	singleFileExecution.InitService()
 
-	runner.WatchContainers()
+	runner.StartContainerBalancer()
 }
 
 func testCleanup() {
@@ -50,7 +50,7 @@ func testCleanup() {
 		return
 	}
 
-	runner.StopWatching()
+	runner.StopContainerBalancer()
 }
 
 func testCreateEmptyPage() map[string]interface{} {

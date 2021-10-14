@@ -41,7 +41,7 @@ func (r Repository) GetCodeBlock(pageUuid string, blockUuid string, ksType strin
 	}
 
 	if response.Status != 200 {
-		return nil, appErrors.New(appErrors.ApplicationError, appErrors.ApplicationRuntimeError, "Unsplash request did not succeed")
+		return nil, appErrors.New(appErrors.ApplicationError, appErrors.ApplicationRuntimeError, fmt.Sprintf("Request did not succeed with status: %d", response.Status))
 	}
 
 	var apiResponse map[string]interface{}

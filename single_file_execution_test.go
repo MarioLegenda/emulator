@@ -7,6 +7,7 @@ import (
 	"github.com/onsi/gomega"
 	"net/http"
 	"net/http/httptest"
+	"sync"
 	"therebelsource/emulator/httpUtil"
 	"therebelsource/emulator/runner"
 	"therebelsource/emulator/staticTypes"
@@ -71,6 +72,76 @@ var _ = GinkgoDescribe("Single file execution tests", func() {
 		gomega.Expect(json.Unmarshal(b, &result)).To(gomega.BeNil())
 
 		gomega.Expect(result.Success).Should(gomega.BeFalse())
+	})
+
+	GinkgoIt("Should gracefully fail multiple concurrent requests and stop containers", func() {
+		testPrepare()
+		defer testCleanup()
+
+		wg := &sync.WaitGroup{}
+		for i := 0; i < 10; i++ {
+			wg.Add(1)
+			go func(wg *sync.WaitGroup) {
+				pg := testCreateEmptyPage()
+				cb := testCreateCodeBlock(pg["uuid"].(string))
+				testAddEmulatorToCodeBlock(pg["uuid"].(string), cb["uuid"].(string), `while(true) {}`, runner.NodeLts)
+
+				bm := map[string]interface{}{
+					"ksUuid":        pg["uuid"].(string),
+					"blockUuid":       cb["uuid"].(string),
+					"state": "single_file",
+					"type": "blog",
+				}
+
+				body, err := json.Marshal(bm)
+
+				gomega.Expect(err).To(gomega.BeNil())
+
+				req, err := http.NewRequest("POST", "/api/environment-emulator/execute/single-file", bytes.NewReader(body))
+
+				if err != nil {
+					ginkgo.Fail(err.Error())
+
+					return
+				}
+
+				rr := httptest.NewRecorder()
+				handler := http.HandlerFunc(executeSingleCodeBlockHandler)
+
+				handler.ServeHTTP(rr, req)
+
+				b := rr.Body.Bytes()
+
+				var apiResponse httpUtil.ApiResponse
+				err = json.Unmarshal(b, &apiResponse)
+
+				gomega.Expect(err).To(gomega.BeNil())
+
+				gomega.Expect(rr.Code).To(gomega.Equal(http.StatusOK))
+				gomega.Expect(rr.Body).To(gomega.Not(gomega.BeNil()))
+
+				gomega.Expect(apiResponse.Method).To(gomega.Equal("POST"))
+				gomega.Expect(apiResponse.Type).To(gomega.Equal(staticTypes.RESPONSE_RESOURCE))
+				gomega.Expect(apiResponse.Message).To(gomega.Equal("Emulator run result"))
+				gomega.Expect(apiResponse.MasterCode).To(gomega.Equal(0))
+				gomega.Expect(apiResponse.Code).To(gomega.Equal(0))
+				gomega.Expect(apiResponse.Status).To(gomega.Equal(http.StatusOK))
+				gomega.Expect(apiResponse.Pagination).To(gomega.BeNil())
+
+				b, err = json.Marshal(apiResponse.Data)
+
+				gomega.Expect(err).To(gomega.BeNil())
+
+				var result runner.SingleFileRunResult
+				gomega.Expect(json.Unmarshal(b, &result)).To(gomega.BeNil())
+
+				gomega.Expect(result.Success).Should(gomega.BeFalse())
+
+				wg.Done()
+			}(wg)
+		}
+
+		wg.Wait()
 	})
 
 	GinkgoIt("Should execute a single file in a node LTS environment", func() {

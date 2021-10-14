@@ -56,7 +56,7 @@ func createSingleFileRunner() SingleFileRunFn {
 				waitErr := cmd.Wait()
 
 				if waitErr != nil {
-					fmt.Printf("Wait error: %s\n", waitErr.Error())
+					//fmt.Printf("Wait error: %s\n", waitErr.Error())
 				}
 			}
 
@@ -105,10 +105,10 @@ func createSingleFileRunner() SingleFileRunFn {
 
 			break
 		case <-time.After(10 * time.Second):
-			containerWorkers<- struct {
-				containerName string
-				pid           int
-			}{containerName: containerName, pid: <- pidC}
+			runnerBalancer.addJob(job{
+				containerName: containerName,
+				pid:           <- pidC,
+			})
 
 			runResult.Success = false
 			runResult.Result = "timeout"
@@ -116,10 +116,10 @@ func createSingleFileRunner() SingleFileRunFn {
 
 			return runResult, nil
 		case <-context.Done():
-			containerWorkers<- struct {
-				containerName string
-				pid           int
-			}{containerName: containerName, pid: <- pidC}
+			runnerBalancer.addJob(job{
+				containerName: containerName,
+				pid:           <- pidC,
+			})
 
 			runResult.Success = false
 			runResult.Result = "timeout"
