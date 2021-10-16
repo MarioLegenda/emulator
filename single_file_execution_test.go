@@ -23,7 +23,7 @@ var _ = GinkgoDescribe("Single file execution tests", func() {
 		testAddEmulatorToCodeBlock(pg["uuid"].(string), cb["uuid"].(string), `while(true) {}`, runner.NodeLts)
 
 		bm := map[string]interface{}{
-			"ksUuid":        pg["uuid"].(string),
+			"pageUuid":        pg["uuid"].(string),
 			"blockUuid":       cb["uuid"].(string),
 			"state": "single_file",
 			"type": "blog",
@@ -88,7 +88,7 @@ var _ = GinkgoDescribe("Single file execution tests", func() {
 				testAddEmulatorToCodeBlock(pg["uuid"].(string), cb["uuid"].(string), `while(true) {}`, runner.NodeLts)
 
 				bm := map[string]interface{}{
-					"ksUuid":        pg["uuid"].(string),
+					"pageUuid":        pg["uuid"].(string),
 					"blockUuid":       cb["uuid"].(string),
 					"state": "single_file",
 					"type": "blog",
@@ -154,7 +154,7 @@ var _ = GinkgoDescribe("Single file execution tests", func() {
 		testAddEmulatorToCodeBlock(pg["uuid"].(string), cb["uuid"].(string), `console.log("mile")`, runner.NodeLts)
 
 		bm := map[string]interface{}{
-			"ksUuid":        pg["uuid"].(string),
+			"pageUuid":        pg["uuid"].(string),
 			"blockUuid":       cb["uuid"].(string),
 			"state": "single_file",
 			"type": "blog",
@@ -216,7 +216,7 @@ var _ = GinkgoDescribe("Single file execution tests", func() {
 		testAddEmulatorToCodeBlock(pg["uuid"].(string), cb["uuid"].(string), `console.log("mile")`, runner.Node14)
 
 		bm := map[string]interface{}{
-			"ksUuid":        pg["uuid"].(string),
+			"pageUuid":        pg["uuid"].(string),
 			"blockUuid":       cb["uuid"].(string),
 			"state": "single_file",
 			"type": "blog",
@@ -283,7 +283,7 @@ echo "mile";
 `, runner.Php74)
 
 		bm := map[string]interface{}{
-			"ksUuid":        pg["uuid"].(string),
+			"pageUuid":        pg["uuid"].(string),
 			"blockUuid":       cb["uuid"].(string),
 			"state": "single_file",
 			"type": "blog",
@@ -345,7 +345,7 @@ echo "mile";
 		testAddEmulatorToCodeBlock(pg["uuid"].(string), cb["uuid"].(string), `puts "mile"`, runner.Ruby)
 
 		bm := map[string]interface{}{
-			"ksUuid":        pg["uuid"].(string),
+			"pageUuid":        pg["uuid"].(string),
 			"blockUuid":       cb["uuid"].(string),
 			"state": "single_file",
 			"type": "blog",
@@ -416,7 +416,7 @@ func main() {
 `, runner.GoLang)
 
 		bm := map[string]interface{}{
-			"ksUuid":        pg["uuid"].(string),
+			"pageUuid":        pg["uuid"].(string),
 			"blockUuid":       cb["uuid"].(string),
 			"state": "single_file",
 			"type": "blog",
@@ -478,7 +478,7 @@ func main() {
 		testAddEmulatorToCodeBlock(pg["uuid"].(string), cb["uuid"].(string), `print("mile")`, runner.Python2)
 
 		bm := map[string]interface{}{
-			"ksUuid":        pg["uuid"].(string),
+			"pageUuid":        pg["uuid"].(string),
 			"blockUuid":       cb["uuid"].(string),
 			"state": "single_file",
 			"type": "blog",
@@ -540,7 +540,7 @@ func main() {
 		testAddEmulatorToCodeBlock(pg["uuid"].(string), cb["uuid"].(string), `print("mile")`, runner.Python2)
 
 		bm := map[string]interface{}{
-			"ksUuid":        pg["uuid"].(string),
+			"pageUuid":        pg["uuid"].(string),
 			"blockUuid":       cb["uuid"].(string),
 			"state": "single_file",
 			"type": "blog",
@@ -602,7 +602,7 @@ func main() {
 		testAddEmulatorToCodeBlock(pg["uuid"].(string), cb["uuid"].(string), `main = putStrLn "mile"`, runner.Haskell)
 
 		bm := map[string]interface{}{
-			"ksUuid":        pg["uuid"].(string),
+			"pageUuid":        pg["uuid"].(string),
 			"blockUuid":       cb["uuid"].(string),
 			"state": "single_file",
 			"type": "blog",
@@ -670,7 +670,7 @@ int main() {
 `, runner.CLang)
 
 		bm := map[string]interface{}{
-			"ksUuid":        pg["uuid"].(string),
+			"pageUuid":        pg["uuid"].(string),
 			"blockUuid":       cb["uuid"].(string),
 			"state": "single_file",
 			"type": "blog",
@@ -740,7 +740,7 @@ int main() {
 `, runner.CPlus)
 
 		bm := map[string]interface{}{
-			"ksUuid":        pg["uuid"].(string),
+			"pageUuid":        pg["uuid"].(string),
 			"blockUuid":       cb["uuid"].(string),
 			"state": "single_file",
 			"type": "blog",

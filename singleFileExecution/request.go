@@ -11,7 +11,7 @@ import (
 )
 
 type SingleFileRunRequest struct {
-	KsUuid           string          `json:"ksUuid"`
+	PageUuid           string          `json:"pageUuid"`
 	BlockUuid        string          `json:"blockUuid"`
 	Type             string          `json:"type"`
 	State            string			 `json:"state"`
@@ -22,7 +22,7 @@ type SingleFileRunRequest struct {
 func (l *SingleFileRunRequest) Sanitize() {
 	p := bluemonday.StrictPolicy()
 
-	l.KsUuid = p.Sanitize(l.KsUuid)
+	l.PageUuid = p.Sanitize(l.PageUuid)
 	l.BlockUuid = p.Sanitize(l.BlockUuid)
 	l.Type = p.Sanitize(l.Type)
 	l.State = p.Sanitize(l.State)
@@ -30,7 +30,7 @@ func (l *SingleFileRunRequest) Sanitize() {
 
 func (l *SingleFileRunRequest) Validate() error {
 	if err := validation.ValidateStruct(l,
-		validation.Field(&l.KsUuid, validation.Required, is.UUID),
+		validation.Field(&l.PageUuid, validation.Required, is.UUID),
 		validation.Field(&l.BlockUuid, validation.Required, is.UUID),
 	); err != nil {
 		return err
@@ -38,13 +38,13 @@ func (l *SingleFileRunRequest) Validate() error {
 
 	blockExists := func(request interface{}) error {
 		data := request.(struct{
-			ksUuid string
+			pageUuid string
 			blockUuid string
 			ksType string
 		})
 		repo := repository.InitRepository()
 
-		codeBlock, err := repo.GetCodeBlock(data.ksUuid, data.blockUuid, data.ksType)
+		codeBlock, err := repo.GetCodeBlock(data.pageUuid, data.blockUuid, data.ksType)
 
 		if err != nil {
 			return errors.New(fmt.Sprintf("Code block %s to be executed does not exist", data.blockUuid))
@@ -85,11 +85,11 @@ func (l *SingleFileRunRequest) Validate() error {
 
 	if err := validation.Validate(map[string]interface{}{
 		"blockExists": struct {
-			ksUuid string
+			pageUuid string
 			blockUuid string
 			ksType string
 		}{
-			ksUuid: l.KsUuid,
+			pageUuid: l.PageUuid,
 			blockUuid: l.BlockUuid,
 			ksType: l.Type,
 		},
