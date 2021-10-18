@@ -9,6 +9,7 @@ import (
 )
 
 type SingleFileRunFn func(cb *repository.CodeBlock, state string) (SingleFileBuildResult, *appErrors.Error)
+type SingleFileDestroyFn func(br SingleFileBuildResult) *appErrors.Error
 
 type SingleFileBuildResult struct {
 	DirectoryName string
@@ -44,5 +45,15 @@ func createSingleFileBuilder() SingleFileRunFn {
 			StateDirectory: getStateDirectory(state),
 			FileName:  fileName,
 		}, nil
+	}
+}
+
+func createSingleFileDestroyer() SingleFileDestroyFn {
+	return func(br SingleFileBuildResult) *appErrors.Error {
+		if err := os.RemoveAll(br.ExecutionDirectory); err != nil {
+			return appErrors.New(appErrors.ApplicationError, appErrors.FilesystemError, fmt.Sprintf("Cannot remove single_file directory: %s", br.ExecutionDirectory))
+		}
+
+		return nil
 	}
 }

@@ -15,7 +15,7 @@ func InitService() {
 }
 
 func (s Service) RunSingleFile(model *SingleFileRunRequest) (runner.SingleFileRunResult, *appErrors.Error) {
-	builder := builders.CreateBuilder(model.Type).(builders.SingleFileRunFn)
+	builder := builders.CreateBuilder("single_file").(builders.SingleFileRunFn)
 
 	buildResult, err := builder(model.codeBlock, model.State)
 
@@ -35,6 +35,12 @@ func (s Service) RunSingleFile(model *SingleFileRunRequest) (runner.SingleFileRu
 
 	if err != nil {
 		return runner.SingleFileRunResult{}, err
+	}
+
+	destroyRunner := builders.CreateDestroyer().(builders.SingleFileDestroyFn)
+
+	if err := destroyRunner(buildResult); err != nil {
+		return runner.SingleFileRunResult{}, nil
 	}
 
 	return runResult, nil

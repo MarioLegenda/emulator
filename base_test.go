@@ -5,6 +5,7 @@ import (
 	"crypto/tls"
 	"encoding/json"
 	"fmt"
+	"github.com/google/uuid"
 	"github.com/onsi/ginkgo"
 	"github.com/onsi/gomega"
 	"os/exec"
@@ -221,3 +222,117 @@ func testAddEmulatorToCodeBlock(pageUuid string, blockUuid string, code string, 
 
 	return data
 }
+
+func testCreateCodeProject() map[string]interface{} {
+	url := fmt.Sprintf("%s/code-project", repository.CreateApiUrl())
+
+	client, err := httpClient.NewHttpClient(&tls.Config{
+		InsecureSkipVerify: true,
+	})
+
+	if err != nil {
+		appErrors.TerminateWithMessage(fmt.Sprintf("Cannot create code project: %s", err.Error()))
+	}
+
+	bm := map[string]interface{}{
+		"name": uuid.New().String(),
+		"description": "description",
+		"environment": runner.Node14,
+	}
+
+	body, err := json.Marshal(bm)
+
+	gomega.Expect(err).To(gomega.BeNil())
+
+	response, clientError := client.MakeJsonRequest(&httpClient.JsonRequest{
+		Url:    url,
+		Method: "PUT",
+		Body:   body,
+	})
+
+	if clientError != nil {
+		appErrors.TerminateWithMessage(fmt.Sprintf("Cannot create code project: %s", err.Error()))
+	}
+
+	if response.Status != 201 {
+		appErrors.TerminateWithMessage(fmt.Sprintf("Cannot create code project: Response status is %d", response.Status))
+	}
+
+	var apiResponse map[string]interface{}
+	err = json.Unmarshal(response.Body, &apiResponse)
+
+	if err != nil {
+		appErrors.TerminateWithMessage(fmt.Sprintf("Cannot create code project: %s", err.Error()))
+	}
+
+	d := apiResponse["data"]
+
+	b, err := json.Marshal(d)
+
+	if err != nil {
+		appErrors.TerminateWithMessage(fmt.Sprintf("Cannot create code project: %s", err.Error()))
+	}
+
+	var data map[string]interface{}
+	gomega.Expect(json.Unmarshal(b, &data)).Should(gomega.BeNil())
+
+	return data
+}
+
+func testCreateFile(isFile bool, parent string, cpUuid string, name string) map[string]interface{} {
+	url := fmt.Sprintf("%s/code-project/file", repository.CreateApiUrl())
+
+	client, err := httpClient.NewHttpClient(&tls.Config{
+		InsecureSkipVerify: true,
+	})
+
+	if err != nil {
+		appErrors.TerminateWithMessage(fmt.Sprintf("Cannot create file: %s", err.Error()))
+	}
+
+	bm := map[string]interface{}{
+		"isFile": isFile,
+		"parent": parent,
+		"codeProjectUuid": cpUuid,
+		"name": name,
+	}
+
+	body, err := json.Marshal(bm)
+
+	gomega.Expect(err).To(gomega.BeNil())
+
+	response, clientError := client.MakeJsonRequest(&httpClient.JsonRequest{
+		Url:    url,
+		Method: "PUT",
+		Body:   body,
+	})
+
+	if clientError != nil {
+		appErrors.TerminateWithMessage(fmt.Sprintf("Cannot create file: %s", err.Error()))
+	}
+
+	if response.Status != 201 {
+		appErrors.TerminateWithMessage(fmt.Sprintf("Cannot create file: Response status is %d", response.Status))
+	}
+
+	var apiResponse map[string]interface{}
+	err = json.Unmarshal(response.Body, &apiResponse)
+
+	if err != nil {
+		appErrors.TerminateWithMessage(fmt.Sprintf("Cannot create file: %s", err.Error()))
+	}
+
+	d := apiResponse["data"]
+
+	b, err := json.Marshal(d)
+
+	if err != nil {
+		appErrors.TerminateWithMessage(fmt.Sprintf("Cannot create file: %s", err.Error()))
+	}
+
+	var data map[string]interface{}
+	gomega.Expect(json.Unmarshal(b, &data)).Should(gomega.BeNil())
+
+	return data
+}
+

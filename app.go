@@ -6,6 +6,7 @@ import (
 	"log"
 	"os"
 	errorHandler "therebelsource/api/appErrors"
+	"therebelsource/emulator/projectExecution"
 	"therebelsource/emulator/singleFileExecution"
 	"therebelsource/emulator/staticTypes"
 )
@@ -78,6 +79,7 @@ func App() {
 	InitRequiredDirectories(true)
 
 	singleFileExecution.InitService()
+	projectExecution.InitService()
 
 	WatchServerShutdown(InitServer(RegisterRoutes()))
 }
