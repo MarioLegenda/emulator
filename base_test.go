@@ -223,7 +223,7 @@ func testAddEmulatorToCodeBlock(pageUuid string, blockUuid string, code string, 
 	return data
 }
 
-func testCreateCodeProject() map[string]interface{} {
+func testCreateCodeProject(lang runner.Language) map[string]interface{} {
 	url := fmt.Sprintf("%s/code-project", repository.CreateApiUrl())
 
 	client, err := httpClient.NewHttpClient(&tls.Config{
@@ -237,7 +237,7 @@ func testCreateCodeProject() map[string]interface{} {
 	bm := map[string]interface{}{
 		"name": uuid.New().String(),
 		"description": "description",
-		"environment": runner.Node14,
+		"environment": lang,
 	}
 
 	body, err := json.Marshal(bm)
@@ -328,6 +328,62 @@ func testCreateFile(isFile bool, parent string, cpUuid string, name string) map[
 
 	if err != nil {
 		appErrors.TerminateWithMessage(fmt.Sprintf("Cannot create file: %s", err.Error()))
+	}
+
+	var data map[string]interface{}
+	gomega.Expect(json.Unmarshal(b, &data)).Should(gomega.BeNil())
+
+	return data
+}
+
+func testUpdateFileContent(cpUuid string, fileUuid string, content string) map[string]interface{} {
+	url := fmt.Sprintf("%s/code-project/file/update-content", repository.CreateApiUrl())
+
+	client, err := httpClient.NewHttpClient(&tls.Config{
+		InsecureSkipVerify: true,
+	})
+
+	if err != nil {
+		appErrors.TerminateWithMessage(fmt.Sprintf("Cannot update file content: %s", err.Error()))
+	}
+
+	bm := map[string]interface{}{
+		"codeProjectUuid": cpUuid,
+		"uuid": fileUuid,
+		"content": content,
+	}
+
+	body, err := json.Marshal(bm)
+
+	gomega.Expect(err).To(gomega.BeNil())
+
+	response, clientError := client.MakeJsonRequest(&httpClient.JsonRequest{
+		Url:    url,
+		Method: "POST",
+		Body:   body,
+	})
+
+	if clientError != nil {
+		appErrors.TerminateWithMessage(fmt.Sprintf("Cannot update file content: %s", err.Error()))
+	}
+
+	if response.Status != 200 {
+		appErrors.TerminateWithMessage(fmt.Sprintf("Cannot create file content: Response status is %d", response.Status))
+	}
+
+	var apiResponse map[string]interface{}
+	err = json.Unmarshal(response.Body, &apiResponse)
+
+	if err != nil {
+		appErrors.TerminateWithMessage(fmt.Sprintf("Cannot create file content: %s", err.Error()))
+	}
+
+	d := apiResponse["data"]
+
+	b, err := json.Marshal(d)
+
+	if err != nil {
+		appErrors.TerminateWithMessage(fmt.Sprintf("Cannot create file content: %s", err.Error()))
 	}
 
 	var data map[string]interface{}

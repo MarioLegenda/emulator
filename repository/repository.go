@@ -163,4 +163,52 @@ func (r Repository) GetAllFileContent(codeProjectUuid string) ([]*FileContent, *
 	return contents, nil
 }
 
+func (r Repository) GetFile(codeProjectUuid string) ([]*FileContent, *appErrors.Error) {
+	url := fmt.Sprintf("%s/code-project/file/content/%s", CreateApiUrl(), codeProjectUuid)
+
+	client, err := httpClient.NewHttpClient(&tls.Config{
+		InsecureSkipVerify: true,
+	})
+
+	if err != nil {
+		return nil, appErrors.New(appErrors.ApplicationError, appErrors.ApplicationRuntimeError, "Cannot create client to get environment data")
+	}
+
+	response, clientError := client.MakeJsonRequest(&httpClient.JsonRequest{
+		Url:    url,
+		Method: "GET",
+		Body:   nil,
+	})
+
+	if clientError != nil {
+		return nil, appErrors.New(appErrors.ApplicationError, appErrors.ApplicationRuntimeError, clientError.GetMessage())
+	}
+
+	if response.Status != 200 {
+		return nil, appErrors.New(appErrors.ApplicationError, appErrors.ApplicationRuntimeError, fmt.Sprintf("Request did not succeed with status: %d", response.Status))
+	}
+
+	var apiResponse map[string]interface{}
+	err = json.Unmarshal(response.Body, &apiResponse)
+
+	if err != nil {
+		return nil, appErrors.New(appErrors.ApplicationError, appErrors.ApplicationRuntimeError, err.Error())
+	}
+
+	d := apiResponse["data"]
+
+	b, err := json.Marshal(d)
+
+	if err != nil {
+		return nil, appErrors.New(appErrors.ApplicationError, appErrors.ApplicationRuntimeError, fmt.Sprintf("Cannot get code projects file system contents: %s", err.Error()))
+	}
+
+	var contents []*FileContent
+	if err := json.Unmarshal(b, &contents); err != nil {
+		return nil, appErrors.New(appErrors.ApplicationError, appErrors.ApplicationRuntimeError, fmt.Sprintf("Cannot get code projects file system contents: %s", err.Error()))
+	}
+
+	return contents, nil
+}
+
 

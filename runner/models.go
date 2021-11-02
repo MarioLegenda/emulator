@@ -14,7 +14,6 @@ type Language struct {
 	InMaintenance  InMaintenance `json:"inMaintenance"`
 	Language       string        `json:"language"`
 	Extension      string        `json:"extension"`
-	Output         string        `json:"output"`
 }
 
 var Node14 = Language{
@@ -25,7 +24,6 @@ var Node14 = Language{
 	InMaintenance:  false,
 	Language:       "javascript",
 	Extension:      "js",
-	Output:         "",
 }
 
 var NodeLts = Language{
@@ -36,7 +34,6 @@ var NodeLts = Language{
 	InMaintenance:  false,
 	Language:       "javascript",
 	Extension:      "js",
-	Output:         "",
 }
 
 var GoLang = Language{
@@ -47,7 +44,6 @@ var GoLang = Language{
 	InMaintenance:  false,
 	Language:       "go",
 	Extension:      "go",
-	Output:         "",
 }
 
 var Python2 = Language{
@@ -58,7 +54,6 @@ var Python2 = Language{
 	InMaintenance:  false,
 	Language:       "python",
 	Extension:      "py",
-	Output:         "",
 }
 
 var Python3 = Language{
@@ -69,7 +64,6 @@ var Python3 = Language{
 	InMaintenance:  false,
 	Language:       "python",
 	Extension:      "py",
-	Output:         "",
 }
 
 var Ruby = Language{
@@ -80,7 +74,6 @@ var Ruby = Language{
 	InMaintenance:  false,
 	Language:       "ruby",
 	Extension:      "rb",
-	Output:         "",
 }
 
 var Php74 = Language{
@@ -91,7 +84,6 @@ var Php74 = Language{
 	InMaintenance:  false,
 	Language:       "php",
 	Extension:      "php",
-	Output:         "",
 }
 
 var Rust = Language{
@@ -102,7 +94,6 @@ var Rust = Language{
 	InMaintenance:  false,
 	Language:       "rust",
 	Extension:      "rs",
-	Output:         "",
 }
 
 var Haskell = Language{
@@ -113,7 +104,6 @@ var Haskell = Language{
 	InMaintenance:  false,
 	Language:       "haskell",
 	Extension:      "hs",
-	Output:         "",
 }
 
 var CLang = Language{
@@ -124,7 +114,6 @@ var CLang = Language{
 	InMaintenance:  false,
 	Language:       "c",
 	Extension:      "c",
-	Output:         "",
 }
 
 var CPlus = Language{
@@ -135,13 +124,21 @@ var CPlus = Language{
 	InMaintenance:  false,
 	Language:       "c",
 	Extension:      "cpp",
-	Output:         "",
 }
 
 type SingleFileBuildResult struct {
+	ContainerName string
 	DirectoryName string
 	ExecutionDirectory string
 	FileName  string
-	Environment Language
+	Environment *Language
 	StateDirectory string
+	Args []string
 }
+
+type ProjectRunResult struct {
+	Success bool `json:"success"`
+	Result string `json:"result"`
+	Timeout int `json:"timeout"`
+}
+

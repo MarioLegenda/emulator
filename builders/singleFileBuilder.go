@@ -16,6 +16,7 @@ type SingleFileBuildResult struct {
 	StateDirectory string
 	ExecutionDirectory string
 	FileName  string
+	Args []string
 }
 
 func createSingleFileBuilder() SingleFileRunFn {

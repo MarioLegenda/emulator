@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"context"
 	"fmt"
-	"github.com/google/uuid"
 	"os/exec"
 	"strings"
 	"therebelsource/emulator/appErrors"
@@ -21,12 +20,6 @@ type SingleFileRunResult struct {
 
 func createSingleFileRunner() SingleFileRunFn {
 	return func(br SingleFileBuildResult) (SingleFileRunResult, *appErrors.Error) {
-		containerName := uuid.New().String()
-
-		commandFactory := RunCommandFactory{}
-
-		dockerRunCommand := commandFactory.CreateCommand(containerName, br.ExecutionDirectory, br.FileName, br.Environment, br.DirectoryName)
-
 		context := context.TODO()
 		
 		timeout := getTimeout("blog", "single_file", "anonymous")
@@ -40,12 +33,7 @@ func createSingleFileRunner() SingleFileRunFn {
 		pidC := make(chan int, 1)
 
 		go func() {
-			chown := exec.Command("chown", "-R", "dockeruser:dockerusergroup", br.StateDirectory)
-			chmod := exec.Command("chmod", "-R", "777", br.ExecutionDirectory)
-			chown.Start()
-			chmod.Start()
-
-			cmd := exec.Command("docker", dockerRunCommand...)
+			cmd := exec.Command("docker", br.Args...)
 			
 			cmd.Stderr = &errb
 			cmd.Stdout = &outb
@@ -108,7 +96,7 @@ func createSingleFileRunner() SingleFileRunFn {
 			break
 		case <-time.After(timeout):
 			runnerBalancer.addJob(job{
-				containerName: containerName,
+				containerName: br.ContainerName,
 				pid:           <- pidC,
 			})
 
@@ -119,7 +107,7 @@ func createSingleFileRunner() SingleFileRunFn {
 			return runResult, nil
 		case <-context.Done():
 			runnerBalancer.addJob(job{
-				containerName: containerName,
+				containerName: br.ContainerName,
 				pid:           <- pidC,
 			})
 

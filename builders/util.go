@@ -31,6 +31,17 @@ func writeContent(name string, dir string, content string) *appErrors.Error {
 	return nil
 }
 
+func createDir(path string) *appErrors.Error {
+	if _, err := os.Stat(path); os.IsNotExist(err) {
+		cErr := os.MkdirAll(path, os.ModePerm)
+		if cErr != nil {
+			return appErrors.New(appErrors.ApplicationError, appErrors.FilesystemError, fmt.Sprintf("Cannot create directory: %s", cErr.Error()))
+		}
+	}
+
+	return nil
+}
+
 func removeDirectories(dir string) error {
 	d, err := os.Open(dir)
 	if err != nil {

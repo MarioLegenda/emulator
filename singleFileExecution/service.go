@@ -1,12 +1,21 @@
 package singleFileExecution
 
 import (
+	"github.com/google/uuid"
 	"therebelsource/emulator/appErrors"
 	"therebelsource/emulator/builders"
 	"therebelsource/emulator/runner"
 )
 
 var SingleFileExecutionService Service
+
+func createCommand(params interface{}, lang *runner.Language, containerName string) []string {
+	commandFactory := runner.RunCommandFactory{}
+
+	br := params.(builders.SingleFileBuildResult)
+
+	return commandFactory.CreateCommand(containerName, br.ExecutionDirectory, br.FileName, lang, br.DirectoryName)
+}
 
 type Service struct {}
 
@@ -25,12 +34,16 @@ func (s Service) RunSingleFile(model *SingleFileRunRequest) (runner.SingleFileRu
 
 	builtRunner := runner.CreateRunner("singleFile").(runner.SingleFileRunFn)
 
+	containerName := uuid.New().String()
+
 	runResult, err := builtRunner(runner.SingleFileBuildResult{
+		ContainerName: containerName,
 		DirectoryName:     buildResult.DirectoryName,
 		ExecutionDirectory: buildResult.ExecutionDirectory,
 		FileName:           buildResult.FileName,
 		Environment: model.codeBlock.Emulator,
 		StateDirectory: buildResult.StateDirectory,
+		Args: createCommand(buildResult, model.codeBlock.Emulator, containerName),
 	})
 
 	if err != nil {

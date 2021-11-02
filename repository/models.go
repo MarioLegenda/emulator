@@ -17,7 +17,7 @@ type CodeBlock struct {
 	Readonly bool `json:"readonly"`
 
 	GistData *GistData `json:"gistData"`
-	Emulator runner.Language `json:"emulator"`
+	Emulator *runner.Language `json:"emulator"`
 
 	CodeProjectUuid *string `json:"codeProjectUuid"`
 	CodeResult      *string `json:"codeResult"`

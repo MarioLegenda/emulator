@@ -7,7 +7,7 @@ import (
 
 type RunCommandFactory struct {}
 
-func (cf *RunCommandFactory) CreateProjectNodeCommand(containerName string, projectName string, fileName string, lang Language) []string {
+func (cf *RunCommandFactory) CreateProjectNodeCommand(containerName string, projectName string, fileName string, lang *Language) []string {
 	cb := CommandBuilder{Commands: &[]string{}}
 
 	cb.
@@ -29,7 +29,7 @@ func (cf *RunCommandFactory) CreateProjectNodeCommand(containerName string, proj
 	return args
 }
 
-func (cf *RunCommandFactory) CreateCCommand(containerName string, projectName string, fileName string, lang Language) []string {
+func (cf *RunCommandFactory) CreateCCommand(containerName string, projectName string, fileName string, lang *Language) []string {
 	cb := CommandBuilder{Commands: &[]string{}}
 
 	execName := strings.Split(fileName, ".")[0]
@@ -52,7 +52,28 @@ func (cf *RunCommandFactory) CreateCCommand(containerName string, projectName st
 	return args
 }
 
-func (cf *RunCommandFactory) CreateCPlusCommand(containerName string, projectName string, fileName string, lang Language) []string {
+func (cf *RunCommandFactory) CreateCProjectCommand(containerName string, projectName string, volumePath string, paths string, lang *Language) []string {
+	cb := CommandBuilder{Commands: &[]string{}}
+
+	cb.
+		NewNetwork("none").
+		AllocatePseudoTty().
+		RemoveAfterFinished().
+		NewVolume(volumePath, "rw").
+		Name(containerName).
+		Init().
+		Tag(string(lang.Tag)).
+		Shell("/bin/sh").
+		Exec(fmt.Sprintf("gcc -o %s %s &> output.txt && ./%s &> output.txt", projectName, paths, projectName)).
+		SendToStd("/dev/stderr").
+		Run()
+
+	args := *cb.Commands
+
+	return args
+}
+
+func (cf *RunCommandFactory) CreateCPlusCommand(containerName string, projectName string, fileName string, lang *Language) []string {
 	cb := CommandBuilder{Commands: &[]string{}}
 
 	execName := strings.Split(fileName, ".")[0]
@@ -75,7 +96,7 @@ func (cf *RunCommandFactory) CreateCPlusCommand(containerName string, projectNam
 	return args
 }
 
-func (cf *RunCommandFactory) CreateHaskellCommand(containerName string, projectName string, fileName string, lang Language) []string {
+func (cf *RunCommandFactory) CreateHaskellCommand(containerName string, projectName string, fileName string, lang *Language) []string {
 	cb := CommandBuilder{Commands: &[]string{}}
 
 	cb.
@@ -97,7 +118,7 @@ func (cf *RunCommandFactory) CreateHaskellCommand(containerName string, projectN
 	return args
 }
 
-func (cf *RunCommandFactory) CreateGoCommand(containerName string, projectName string, lang Language, directoryName string) []string {
+func (cf *RunCommandFactory) CreateGoCommand(containerName string, projectName string, lang *Language, directoryName string) []string {
 	cb := CommandBuilder{Commands: &[]string{}}
 
 	cb.
@@ -118,7 +139,7 @@ func (cf *RunCommandFactory) CreateGoCommand(containerName string, projectName s
 	return args
 }
 
-func (cf *RunCommandFactory) CreatePython2Command(containerName string, projectName string, fileName string, lang Language) []string {
+func (cf *RunCommandFactory) CreatePython2Command(containerName string, projectName string, fileName string, lang *Language) []string {
 	cb := CommandBuilder{Commands: &[]string{}}
 
 	cb.
@@ -140,7 +161,7 @@ func (cf *RunCommandFactory) CreatePython2Command(containerName string, projectN
 	return args
 }
 
-func (cf *RunCommandFactory) CreatePython3Command(containerName string, projectName string, fileName string, lang Language) []string {
+func (cf *RunCommandFactory) CreatePython3Command(containerName string, projectName string, fileName string, lang *Language) []string {
 
 	cb := CommandBuilder{Commands: &[]string{}}
 
@@ -163,7 +184,7 @@ func (cf *RunCommandFactory) CreatePython3Command(containerName string, projectN
 	return args
 }
 
-func (cf *RunCommandFactory) CreateRubyCommand(containerName string, projectName string, fileName string, lang Language) []string {
+func (cf *RunCommandFactory) CreateRubyCommand(containerName string, projectName string, fileName string, lang *Language) []string {
 	cb := CommandBuilder{Commands: &[]string{}}
 
 	cb.
@@ -185,7 +206,7 @@ func (cf *RunCommandFactory) CreateRubyCommand(containerName string, projectName
 	return args
 }
 
-func (cf *RunCommandFactory) CreatePHP74Command(containerName string, projectName string, fileName string, lang Language) []string {
+func (cf *RunCommandFactory) CreatePHP74Command(containerName string, projectName string, fileName string, lang *Language) []string {
 	cb := CommandBuilder{Commands: &[]string{}}
 
 	cb.
@@ -207,7 +228,7 @@ func (cf *RunCommandFactory) CreatePHP74Command(containerName string, projectNam
 	return args
 }
 
-func (cf *RunCommandFactory) CreateRustCommand(containerName string, projectName string, fileName string, lang Language) []string {
+func (cf *RunCommandFactory) CreateRustCommand(containerName string, projectName string, fileName string, lang *Language) []string {
 	cb := CommandBuilder{Commands: &[]string{}}
 
 	cb.
@@ -229,7 +250,7 @@ func (cf *RunCommandFactory) CreateRustCommand(containerName string, projectName
 }
 
 
-func (cf *RunCommandFactory) CreateCommand(containerName, projectName string, fileName string, lang Language, directoryName string) []string {
+func (cf *RunCommandFactory) CreateCommand(containerName, projectName string, fileName string, lang *Language, directoryName string) []string {
 	if lang.Name == Node14.Name || lang.Name == NodeLts.Name {
 		return cf.CreateProjectNodeCommand(containerName, projectName, fileName, lang)
 	} else if lang.Name == GoLang.Name {

@@ -9,6 +9,10 @@ func CreateBuilder(t string) interface{} {
 		return createProjectBuilder()
 	}
 
+	if t == "c_project" {
+		return createCLangBuilder()
+	}
+
 	return nil
 }
 
