@@ -96,6 +96,49 @@ func (cf *RunCommandFactory) CreateCPlusCommand(containerName string, projectNam
 	return args
 }
 
+func (cf *RunCommandFactory) CreateCPlusProjectCommand(containerName string, projectName string, volumePath string, paths string, lang *Language) []string {
+	cb := CommandBuilder{Commands: &[]string{}}
+
+	cb.
+		NewNetwork("none").
+		AllocatePseudoTty().
+		RemoveAfterFinished().
+		NewVolume(volumePath, "rw").
+		Name(containerName).
+		Init().
+		Tag(string(lang.Tag)).
+		Shell("/bin/sh").
+		Exec(fmt.Sprintf("g++ -o %s %s &> output.txt && ./%s &> output.txt", projectName, paths, projectName)).
+		SendToStd("/dev/stderr").
+		Run()
+
+	args := *cb.Commands
+
+	return args
+}
+
+func (cf *RunCommandFactory) CreateHaskellProjectCommand(containerName string, volumePath string, lang *Language) []string {
+	cb := CommandBuilder{Commands: &[]string{}}
+
+	cb.
+		NewNetwork("none").
+		AllocatePseudoTty().
+		RemoveAfterFinished().
+		User("dockeruser", "dockerusergroup").
+		NewVolume(volumePath, "rw").
+		Name(containerName).
+		Init().
+		Tag(string(lang.Tag)).
+		Shell("/bin/sh").
+		Exec(fmt.Sprintf("ghc main.hs && ./main")).
+		SendToStd("/dev/stderr").
+		Run()
+
+	args := *cb.Commands
+
+	return args
+}
+
 func (cf *RunCommandFactory) CreateHaskellCommand(containerName string, projectName string, fileName string, lang *Language) []string {
 	cb := CommandBuilder{Commands: &[]string{}}
 
