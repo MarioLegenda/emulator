@@ -2,8 +2,6 @@ package main
 
 import (
 	"github.com/gorilla/mux"
-	"net/http"
-	"therebelsource/api/staticTypes"
 )
 
 func RegisterRoutes() *mux.Router {
@@ -18,6 +16,4 @@ func registerBlogRoutes(r *mux.Router) {
 	r.HandleFunc("/api/environment-emulator/get-environments", getEnvironmentsHandler).Methods("GET")
 	r.HandleFunc("/api/environment-emulator/execute/single-file", executeSingleCodeBlockHandler).Methods("POST")
 	r.HandleFunc("/api/environment-emulator/execute/project", executeProjectHandler).Methods("POST")
-
-	r.PathPrefix("/api/v2/static/").Handler(http.StripPrefix("/api/v2/static/", http.FileServer(http.Dir(staticTypes.ImgDir()))))
 }

@@ -2,103 +2,63 @@ package singleFileExecution
 
 import (
 	"errors"
-	"fmt"
 	validation "github.com/go-ozzo/ozzo-validation/v4"
 	"github.com/go-ozzo/ozzo-validation/v4/is"
 	"github.com/microcosm-cc/bluemonday"
-	"strings"
 	"therebelsource/emulator/repository"
 )
 
 type SingleFileRunRequest struct {
-	PageUuid           string          `json:"pageUuid"`
-	BlockUuid        string          `json:"blockUuid"`
-	Type             string          `json:"type"`
-	State            string			 `json:"state"`
+	Uuid           string          `json:"uuid"`
 
 	codeBlock *repository.CodeBlock
+	validatedTemporarySession repository.ValidatedTemporarySession
 }
 
 func (l *SingleFileRunRequest) Sanitize() {
 	p := bluemonday.StrictPolicy()
 
-	l.PageUuid = p.Sanitize(l.PageUuid)
-	l.BlockUuid = p.Sanitize(l.BlockUuid)
-	l.Type = p.Sanitize(l.Type)
-	l.State = p.Sanitize(l.State)
+	l.Uuid = p.Sanitize(l.Uuid)
 }
 
 func (l *SingleFileRunRequest) Validate() error {
 	if err := validation.ValidateStruct(l,
-		validation.Field(&l.PageUuid, validation.Required, is.UUID),
-		validation.Field(&l.BlockUuid, validation.Required, is.UUID),
+		validation.Field(&l.Uuid, validation.Required, is.UUID),
 	); err != nil {
 		return err
 	}
 
 	blockExists := func(request interface{}) error {
-		data := request.(struct{
-			pageUuid string
-			blockUuid string
-			ksType string
-		})
+		sessionUuid := request.(string)
+
 		repo := repository.InitRepository()
 
-		codeBlock, err := repo.GetCodeBlock(data.pageUuid, data.blockUuid, data.ksType)
+		session, err := repo.ValidateTemporarySession(sessionUuid)
 
 		if err != nil {
-			return errors.New(fmt.Sprintf("Code block %s to be executed does not exist", data.blockUuid))
+			return errors.New("Code block does not exist")
+		}
+
+		codeBlock, err := repo.GetCodeBlock(sessionUuid)
+
+		if err != nil {
+			return errors.New("Code block does not exist")
+		}
+
+		if err := repo.InvalidateTemporarySession(sessionUuid); err != nil {
+			return errors.New("Code block does not exist")
 		}
 
 		l.codeBlock = codeBlock
+		l.validatedTemporarySession = session
 
 		return nil
 	}
 
-	typeValid := func(request interface{}) error {
-		t := request.(string)
-
-		validTypes := []string{"blog", "documentation", "book"}
-
-		for _, k := range validTypes {
-			if k == t {
-				return nil
-			}
-		}
-
-		return errors.New(fmt.Sprintf("Invalid type. Valid types are: %s", strings.Join(validTypes, ",")))
-	}
-
-	stateValid := func(request interface{}) error {
-		t := request.(string)
-
-		validStates := []string{"dev", "prod", "session", "single_file"}
-
-		for _, k := range validStates {
-			if k == t {
-				return nil
-			}
-		}
-
-		return errors.New(fmt.Sprintf("Invalid state. Valid states are: %s", strings.Join(validStates, ",")))
-	}
-
 	if err := validation.Validate(map[string]interface{}{
-		"blockExists": struct {
-			pageUuid string
-			blockUuid string
-			ksType string
-		}{
-			pageUuid: l.PageUuid,
-			blockUuid: l.BlockUuid,
-			ksType: l.Type,
-		},
-		"typeValid": l.Type,
-		"stateValid": l.State,
+		"blockExists": l.Uuid,
 	}, validation.Map(
 		validation.Key("blockExists", validation.By(blockExists)),
-		validation.Key("typeValid", validation.By(typeValid)),
-		validation.Key("stateValid", validation.By(stateValid)),
 	)); err != nil {
 		return err
 	}

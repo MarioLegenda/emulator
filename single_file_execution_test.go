@@ -20,15 +20,15 @@ var _ = GinkgoDescribe("Single file execution tests", func() {
 		testPrepare()
 		defer testCleanup()
 
-		pg := testCreateEmptyPage()
-		cb := testCreateCodeBlock(pg["uuid"].(string))
-		testAddEmulatorToCodeBlock(pg["uuid"].(string), cb["uuid"].(string), `console.log("mile")`, runner.NodeLts)
+		activeSession := testCreateAccount()
 
-		bm := map[string]interface{}{
-			"pageUuid":        pg["uuid"].(string),
-			"blockUuid":       cb["uuid"].(string),
-			"state": "single_file",
-			"type": "blog",
+		pg := testCreateEmptyPage(activeSession)
+		cb := testCreateCodeBlock(pg["uuid"].(string), activeSession)
+		testAddEmulatorToCodeBlock(pg["uuid"].(string), cb["uuid"].(string), `console.log("mile")`, runner.NodeLts, activeSession)
+		data := testCreateTemporarySession(activeSession, pg["uuid"].(string), cb["uuid"].(string), "single_file")
+
+		bm := map[string]interface{} {
+			"uuid": data.Uuid,
 		}
 
 		body, err := json.Marshal(bm)
@@ -82,15 +82,15 @@ var _ = GinkgoDescribe("Single file execution tests", func() {
 		testPrepare()
 		defer testCleanup()
 
-		pg := testCreateEmptyPage()
-		cb := testCreateCodeBlock(pg["uuid"].(string))
-		testAddEmulatorToCodeBlock(pg["uuid"].(string), cb["uuid"].(string), `console.log("mile")`, runner.Node14)
+		activeSession := testCreateAccount()
 
-		bm := map[string]interface{}{
-			"pageUuid":        pg["uuid"].(string),
-			"blockUuid":       cb["uuid"].(string),
-			"state": "single_file",
-			"type": "blog",
+		pg := testCreateEmptyPage(activeSession)
+		cb := testCreateCodeBlock(pg["uuid"].(string), activeSession)
+		testAddEmulatorToCodeBlock(pg["uuid"].(string), cb["uuid"].(string), `console.log("mile")`, runner.NodeLts, activeSession)
+		data := testCreateTemporarySession(activeSession, pg["uuid"].(string), cb["uuid"].(string), "single_file")
+
+		bm := map[string]interface{} {
+			"uuid": data.Uuid,
 		}
 
 		body, err := json.Marshal(bm)
@@ -145,19 +145,19 @@ var _ = GinkgoDescribe("Single file execution tests", func() {
 		testPrepare()
 		defer testCleanup()
 
-		pg := testCreateEmptyPage()
-		cb := testCreateCodeBlock(pg["uuid"].(string))
+		activeSession := testCreateAccount()
+
+		pg := testCreateEmptyPage(activeSession)
+		cb := testCreateCodeBlock(pg["uuid"].(string), activeSession)
 		testAddEmulatorToCodeBlock(pg["uuid"].(string), cb["uuid"].(string), `
 <?php
 
 echo "mile";
-`, runner.Php74)
+`, runner.Php74, activeSession)
+		data := testCreateTemporarySession(activeSession, pg["uuid"].(string), cb["uuid"].(string), "single_file")
 
-		bm := map[string]interface{}{
-			"pageUuid":        pg["uuid"].(string),
-			"blockUuid":       cb["uuid"].(string),
-			"state": "single_file",
-			"type": "blog",
+		bm := map[string]interface{} {
+			"uuid": data.Uuid,
 		}
 
 		body, err := json.Marshal(bm)
@@ -211,15 +211,15 @@ echo "mile";
 		testPrepare()
 		defer testCleanup()
 
-		pg := testCreateEmptyPage()
-		cb := testCreateCodeBlock(pg["uuid"].(string))
-		testAddEmulatorToCodeBlock(pg["uuid"].(string), cb["uuid"].(string), `puts "mile"`, runner.Ruby)
+		activeSession := testCreateAccount()
 
-		bm := map[string]interface{}{
-			"pageUuid":        pg["uuid"].(string),
-			"blockUuid":       cb["uuid"].(string),
-			"state": "single_file",
-			"type": "blog",
+		pg := testCreateEmptyPage(activeSession)
+		cb := testCreateCodeBlock(pg["uuid"].(string), activeSession)
+		testAddEmulatorToCodeBlock(pg["uuid"].(string), cb["uuid"].(string), `puts "mile"`, runner.Ruby, activeSession)
+		data := testCreateTemporarySession(activeSession, pg["uuid"].(string), cb["uuid"].(string), "single_file")
+
+		bm := map[string]interface{} {
+			"uuid": data.Uuid,
 		}
 
 		body, err := json.Marshal(bm)
@@ -271,11 +271,12 @@ echo "mile";
 
 	GinkgoIt("Should execute a single file in a Go environment", func() {
 		testPrepare()
-
 		defer testCleanup()
 
-		pg := testCreateEmptyPage()
-		cb := testCreateCodeBlock(pg["uuid"].(string))
+		activeSession := testCreateAccount()
+
+		pg := testCreateEmptyPage(activeSession)
+		cb := testCreateCodeBlock(pg["uuid"].(string), activeSession)
 		testAddEmulatorToCodeBlock(pg["uuid"].(string), cb["uuid"].(string), `
 package main
 
@@ -284,13 +285,11 @@ import "fmt"
 func main() {
 	fmt.Println("mile")
 }
-`, runner.GoLang)
+`, runner.GoLang, activeSession)
+		data := testCreateTemporarySession(activeSession, pg["uuid"].(string), cb["uuid"].(string), "single_file")
 
-		bm := map[string]interface{}{
-			"pageUuid":        pg["uuid"].(string),
-			"blockUuid":       cb["uuid"].(string),
-			"state": "single_file",
-			"type": "blog",
+		bm := map[string]interface{} {
+			"uuid": data.Uuid,
 		}
 
 		body, err := json.Marshal(bm)
@@ -344,15 +343,15 @@ func main() {
 		testPrepare()
 		defer testCleanup()
 
-		pg := testCreateEmptyPage()
-		cb := testCreateCodeBlock(pg["uuid"].(string))
-		testAddEmulatorToCodeBlock(pg["uuid"].(string), cb["uuid"].(string), `print("mile")`, runner.Python2)
+		activeSession := testCreateAccount()
 
-		bm := map[string]interface{}{
-			"pageUuid":        pg["uuid"].(string),
-			"blockUuid":       cb["uuid"].(string),
-			"state": "single_file",
-			"type": "blog",
+		pg := testCreateEmptyPage(activeSession)
+		cb := testCreateCodeBlock(pg["uuid"].(string), activeSession)
+		testAddEmulatorToCodeBlock(pg["uuid"].(string), cb["uuid"].(string), `print("mile")`, runner.Python2, activeSession)
+		data := testCreateTemporarySession(activeSession, pg["uuid"].(string), cb["uuid"].(string), "single_file")
+
+		bm := map[string]interface{} {
+			"uuid": data.Uuid,
 		}
 
 		body, err := json.Marshal(bm)
@@ -406,15 +405,15 @@ func main() {
 		testPrepare()
 		defer testCleanup()
 
-		pg := testCreateEmptyPage()
-		cb := testCreateCodeBlock(pg["uuid"].(string))
-		testAddEmulatorToCodeBlock(pg["uuid"].(string), cb["uuid"].(string), `print("mile")`, runner.Python2)
+		activeSession := testCreateAccount()
 
-		bm := map[string]interface{}{
-			"pageUuid":        pg["uuid"].(string),
-			"blockUuid":       cb["uuid"].(string),
-			"state": "single_file",
-			"type": "blog",
+		pg := testCreateEmptyPage(activeSession)
+		cb := testCreateCodeBlock(pg["uuid"].(string), activeSession)
+		testAddEmulatorToCodeBlock(pg["uuid"].(string), cb["uuid"].(string), `print("mile")`, runner.Python2, activeSession)
+		data := testCreateTemporarySession(activeSession, pg["uuid"].(string), cb["uuid"].(string), "single_file")
+
+		bm := map[string]interface{} {
+			"uuid": data.Uuid,
 		}
 
 		body, err := json.Marshal(bm)
@@ -468,15 +467,15 @@ func main() {
 		testPrepare()
 		defer testCleanup()
 
-		pg := testCreateEmptyPage()
-		cb := testCreateCodeBlock(pg["uuid"].(string))
-		testAddEmulatorToCodeBlock(pg["uuid"].(string), cb["uuid"].(string), `main = putStrLn "mile"`, runner.Haskell)
+		activeSession := testCreateAccount()
 
-		bm := map[string]interface{}{
-			"pageUuid":        pg["uuid"].(string),
-			"blockUuid":       cb["uuid"].(string),
-			"state": "single_file",
-			"type": "blog",
+		pg := testCreateEmptyPage(activeSession)
+		cb := testCreateCodeBlock(pg["uuid"].(string), activeSession)
+		testAddEmulatorToCodeBlock(pg["uuid"].(string), cb["uuid"].(string), `main = putStrLn "mile"`, runner.Haskell, activeSession)
+		data := testCreateTemporarySession(activeSession, pg["uuid"].(string), cb["uuid"].(string), "single_file")
+
+		bm := map[string]interface{} {
+			"uuid": data.Uuid,
 		}
 
 		body, err := json.Marshal(bm)
@@ -530,21 +529,21 @@ func main() {
 		testPrepare()
 		defer testCleanup()
 
-		pg := testCreateEmptyPage()
-		cb := testCreateCodeBlock(pg["uuid"].(string))
+		activeSession := testCreateAccount()
+
+		pg := testCreateEmptyPage(activeSession)
+		cb := testCreateCodeBlock(pg["uuid"].(string), activeSession)
 		testAddEmulatorToCodeBlock(pg["uuid"].(string), cb["uuid"].(string), `
 #include <stdio.h>
 int main() {
    printf("mile");
    return 0;
 }
-`, runner.CLang)
+`, runner.CLang, activeSession)
+		data := testCreateTemporarySession(activeSession, pg["uuid"].(string), cb["uuid"].(string), "single_file")
 
-		bm := map[string]interface{}{
-			"pageUuid":        pg["uuid"].(string),
-			"blockUuid":       cb["uuid"].(string),
-			"state": "single_file",
-			"type": "blog",
+		bm := map[string]interface{} {
+			"uuid": data.Uuid,
 		}
 
 		body, err := json.Marshal(bm)
@@ -594,13 +593,14 @@ int main() {
 		gomega.Expect(result.Result).Should(gomega.Equal("mile"))
 	})
 
-
 	GinkgoIt("Should execute a single file in a C++ environment", func() {
 		testPrepare()
 		defer testCleanup()
 
-		pg := testCreateEmptyPage()
-		cb := testCreateCodeBlock(pg["uuid"].(string))
+		activeSession := testCreateAccount()
+
+		pg := testCreateEmptyPage(activeSession)
+		cb := testCreateCodeBlock(pg["uuid"].(string), activeSession)
 		testAddEmulatorToCodeBlock(pg["uuid"].(string), cb["uuid"].(string), `
 #include <iostream>
 
@@ -608,13 +608,11 @@ int main() {
     std::cout << "mile";
     return 0;
 }
-`, runner.CPlus)
+`, runner.CPlus, activeSession)
+		data := testCreateTemporarySession(activeSession, pg["uuid"].(string), cb["uuid"].(string), "single_file")
 
-		bm := map[string]interface{}{
-			"pageUuid":        pg["uuid"].(string),
-			"blockUuid":       cb["uuid"].(string),
-			"state": "single_file",
-			"type": "blog",
+		bm := map[string]interface{} {
+			"uuid": data.Uuid,
 		}
 
 		body, err := json.Marshal(bm)
@@ -677,15 +675,15 @@ int main() {
 		testPrepare()
 		defer testCleanup()
 
-		pg := testCreateEmptyPage()
-		cb := testCreateCodeBlock(pg["uuid"].(string))
-		testAddEmulatorToCodeBlock(pg["uuid"].(string), cb["uuid"].(string), `while(true) {}`, runner.NodeLts)
+		activeSession := testCreateAccount()
 
-		bm := map[string]interface{}{
-			"pageUuid":        pg["uuid"].(string),
-			"blockUuid":       cb["uuid"].(string),
-			"state": "single_file",
-			"type": "blog",
+		pg := testCreateEmptyPage(activeSession)
+		cb := testCreateCodeBlock(pg["uuid"].(string), activeSession)
+		testAddEmulatorToCodeBlock(pg["uuid"].(string), cb["uuid"].(string), `while(true) {}`, runner.NodeLts, activeSession)
+		data := testCreateTemporarySession(activeSession, pg["uuid"].(string), cb["uuid"].(string), "single_file")
+
+		bm := map[string]interface{} {
+			"uuid": data.Uuid,
 		}
 
 		body, err := json.Marshal(bm)
@@ -738,19 +736,19 @@ int main() {
 		testPrepare()
 		defer testCleanup()
 
+		activeSession := testCreateAccount()
+
 		wg := &sync.WaitGroup{}
 		for i := 0; i < 20; i++ {
 			wg.Add(1)
 			go func(wg *sync.WaitGroup) {
-				pg := testCreateEmptyPage()
-				cb := testCreateCodeBlock(pg["uuid"].(string))
-				testAddEmulatorToCodeBlock(pg["uuid"].(string), cb["uuid"].(string), `while(true) {}`, runner.NodeLts)
+				pg := testCreateEmptyPage(activeSession)
+				cb := testCreateCodeBlock(pg["uuid"].(string), activeSession)
+				testAddEmulatorToCodeBlock(pg["uuid"].(string), cb["uuid"].(string), `while(true) {}`, runner.NodeLts, activeSession)
+				data := testCreateTemporarySession(activeSession, pg["uuid"].(string), cb["uuid"].(string), "single_file")
 
-				bm := map[string]interface{}{
-					"pageUuid":        pg["uuid"].(string),
-					"blockUuid":       cb["uuid"].(string),
-					"state": "single_file",
-					"type": "blog",
+				bm := map[string]interface{} {
+					"uuid": data.Uuid,
 				}
 
 				body, err := json.Marshal(bm)

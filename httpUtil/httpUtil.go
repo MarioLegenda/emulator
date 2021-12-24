@@ -91,14 +91,14 @@ func (cr CurrentHttpRequest) ReadSingleFileRunRequest() *singleFileExecution.Sin
 	return t
 }
 
-func (cr CurrentHttpRequest) ReadProjectExecutionRequest() *projectExecution.CodeProjectRunRequest {
+func (cr CurrentHttpRequest) ReadProjectExecutionRequest() *projectExecution.ProjectRunRequest {
 	body := cr.ReadBodyOrSendError()
 
 	if body == nil {
 		return nil
 	}
 
-	var m projectExecution.CodeProjectRunRequest
+	var m projectExecution.ProjectRunRequest
 	t := &m
 
 	err := json.Unmarshal(body, t)

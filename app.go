@@ -5,7 +5,7 @@ import (
 	"github.com/joho/godotenv"
 	"log"
 	"os"
-	errorHandler "therebelsource/api/appErrors"
+	errorHandler "therebelsource/emulator/appErrors"
 	"therebelsource/emulator/projectExecution"
 	"therebelsource/emulator/singleFileExecution"
 	"therebelsource/emulator/staticTypes"

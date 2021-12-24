@@ -4,7 +4,6 @@ import (
 	"github.com/google/uuid"
 	"therebelsource/emulator/appErrors"
 	"therebelsource/emulator/builders"
-	"therebelsource/emulator/repository"
 	"therebelsource/emulator/runner"
 )
 
@@ -14,6 +13,17 @@ type Service struct {}
 
 func InitService() {
 	ProjectExecutionService = Service{}
+}
+
+func destroy(dir string) *appErrors.Error {
+	destroyRunner := builders.CreateDestroyer("project").(builders.ProjectDestroyFn)
+
+	if err := destroyRunner(dir); err != nil {
+		// log here if it fails, do not tell the user
+		return nil
+	}
+
+	return nil
 }
 
 func createCommand(params interface{}, lang *runner.Language, containerName string) []string {
@@ -42,23 +52,16 @@ func createCommand(params interface{}, lang *runner.Language, containerName stri
 	return commandFactory.CreateCommand(containerName, br.ExecutionDirectory, br.FileName, lang, br.DirectoryName)
 }
 
-func (s Service) RunProject(model *CodeProjectRunRequest) (runner.ProjectRunResult, *appErrors.Error) {
-	repository := repository.InitRepository()
-
-	contents, err := repository.GetAllFileContent(model.CodeProjectUuid)
-
-	if err != nil {
-		return runner.ProjectRunResult{}, err
-	}
-
-	if model.codeProject.Environment.Name == "c" {
+func (s Service) RunProject(model *ProjectRunRequest) (runner.ProjectRunResult, *appErrors.Error) {
+	if model.sessionData.CodeProject.Environment.Name == "c" {
 		projectBuilder := builders.CreateBuilder("c_project").(builders.CProjectBuildFn)
 
 		containerName := uuid.New().String()
 
-		buildResult, err := projectBuilder(model.codeProject, contents, "session", model.executingFile)
+		buildResult, err := projectBuilder(model.sessionData.CodeProject, model.sessionData.Content, "session", model.executingFile)
+		defer destroy(buildResult.ExecutionDirectory)
 
-		args := createCommand(buildResult, model.codeProject.Environment, containerName)
+		args := createCommand(buildResult, model.sessionData.CodeProject.Environment, containerName)
 
 		buildResult.Args = args
 
@@ -71,7 +74,7 @@ func (s Service) RunProject(model *CodeProjectRunRequest) (runner.ProjectRunResu
 		runResult, err := builtRunner(runner.SingleFileBuildResult{
 			ContainerName: containerName,
 			ExecutionDirectory: buildResult.ExecutionDirectory,
-			Environment:     model.codeProject.Environment,
+			Environment:     model.sessionData.CodeProject.Environment,
 			Args: args,
 		})
 
@@ -86,14 +89,15 @@ func (s Service) RunProject(model *CodeProjectRunRequest) (runner.ProjectRunResu
 		}, nil
 	}
 
-	if model.codeProject.Environment.Name == "c++" {
+	if model.sessionData.CodeProject.Environment.Name == "c++" {
 		projectBuilder := builders.CreateBuilder("c_project").(builders.CProjectBuildFn)
 
 		containerName := uuid.New().String()
 
-		buildResult, err := projectBuilder(model.codeProject, contents, "session", model.executingFile)
+		buildResult, err := projectBuilder(model.sessionData.CodeProject, model.sessionData.Content, "session", model.executingFile)
+		defer destroy(buildResult.ExecutionDirectory)
 
-		args := createCommand(buildResult, model.codeProject.Environment, containerName)
+		args := createCommand(buildResult, model.sessionData.CodeProject.Environment, containerName)
 
 		buildResult.Args = args
 
@@ -106,7 +110,7 @@ func (s Service) RunProject(model *CodeProjectRunRequest) (runner.ProjectRunResu
 		runResult, err := builtRunner(runner.SingleFileBuildResult{
 			ContainerName: containerName,
 			ExecutionDirectory: buildResult.ExecutionDirectory,
-			Environment:     model.codeProject.Environment,
+			Environment:     model.sessionData.CodeProject.Environment,
 			Args: args,
 		})
 
@@ -121,14 +125,15 @@ func (s Service) RunProject(model *CodeProjectRunRequest) (runner.ProjectRunResu
 		}, nil
 	}
 
-	if model.codeProject.Environment.Name == "haskell" {
+	if model.sessionData.CodeProject.Environment.Name == "haskell" {
 		projectBuilder := builders.CreateBuilder("c_project").(builders.CProjectBuildFn)
 
 		containerName := uuid.New().String()
 
-		buildResult, err := projectBuilder(model.codeProject, contents, "session", model.executingFile)
+		buildResult, err := projectBuilder(model.sessionData.CodeProject, model.sessionData.Content, "session", model.executingFile)
+		defer destroy(buildResult.ExecutionDirectory)
 
-		args := createCommand(buildResult, model.codeProject.Environment, containerName)
+		args := createCommand(buildResult, model.sessionData.CodeProject.Environment, containerName)
 
 		buildResult.Args = args
 
@@ -141,7 +146,7 @@ func (s Service) RunProject(model *CodeProjectRunRequest) (runner.ProjectRunResu
 		runResult, err := builtRunner(runner.SingleFileBuildResult{
 			ContainerName: containerName,
 			ExecutionDirectory: buildResult.ExecutionDirectory,
-			Environment:     model.codeProject.Environment,
+			Environment:     model.sessionData.CodeProject.Environment,
 			Args: args,
 		})
 
@@ -158,7 +163,8 @@ func (s Service) RunProject(model *CodeProjectRunRequest) (runner.ProjectRunResu
 
 	projectBuilder := builders.CreateBuilder("project").(builders.ProjectBuildFn)
 
-	buildResult, err := projectBuilder(model.codeProject, contents, "session", model.executingFile)
+	buildResult, err := projectBuilder(model.sessionData.CodeProject, model.sessionData.Content, "session", model.executingFile)
+	defer destroy(buildResult.ExecutionDirectory)
 
 	if err != nil {
 		return runner.ProjectRunResult{}, err
@@ -173,9 +179,9 @@ func (s Service) RunProject(model *CodeProjectRunRequest) (runner.ProjectRunResu
 		DirectoryName:     buildResult.DirectoryName,
 		ExecutionDirectory: buildResult.ExecutionDirectory,
 		FileName:           buildResult.FileName,
-		Environment:     model.codeProject.Environment,
+		Environment:     model.sessionData.CodeProject.Environment,
 		StateDirectory: buildResult.StateDirectory,
-		Args: createCommand(buildResult, model.codeProject.Environment, containerName),
+		Args: createCommand(buildResult, model.sessionData.CodeProject.Environment, containerName),
 	})
 
 	if err != nil {

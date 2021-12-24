@@ -10,6 +10,7 @@ Master codes
 */
 
 const ApplicationError = 1
+const ServerError = 2
 
 /**
 Application codes

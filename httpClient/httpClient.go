@@ -25,11 +25,13 @@ type JsonRequest struct {
 	Url     string
 	Method  string
 	Body    []byte
+	Session string
 }
 
 type RawResponse struct {
 	Status int
 	Body   []byte
+	Cookies []*http.Cookie
 }
 
 type HttpClient struct {
@@ -111,6 +113,10 @@ func NewHttpClient(config *tls.Config) (*HttpClient, error) {
 func (ac *HttpClient) MakeJsonRequest(r *JsonRequest) (RawResponse, IClientError) {
 	request, err := http.NewRequest(r.Method, r.Url, bytes.NewBuffer(r.Body))
 
+	if r.Session != "" {
+		request.AddCookie(&http.Cookie{Name: "session", Value: r.Session, Path: "/", HttpOnly: true, Secure: true})
+	}
+
 	if err != nil {
 		return RawResponse{}, &NetworkError{
 			Code:    BootError,
@@ -156,5 +162,6 @@ func (ac *HttpClient) MakeJsonRequest(r *JsonRequest) (RawResponse, IClientError
 	return RawResponse{
 		Status: response.StatusCode,
 		Body:   body,
+		Cookies: response.Cookies(),
 	}, nil
 }

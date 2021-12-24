@@ -16,6 +16,14 @@ func CreateBuilder(t string) interface{} {
 	return nil
 }
 
-func CreateDestroyer() interface{} {
-	return createSingleFileDestroyer()
+func CreateDestroyer(t string) interface{} {
+	if t == "single_file" {
+		return createSingleFileDestroyer()
+	}
+
+	if t == "project" {
+		return createProjectDestroyer()
+	}
+
+	return nil
 }

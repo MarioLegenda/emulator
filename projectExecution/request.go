@@ -6,58 +6,65 @@ import (
 	validation "github.com/go-ozzo/ozzo-validation/v4"
 	"github.com/go-ozzo/ozzo-validation/v4/is"
 	"github.com/microcosm-cc/bluemonday"
-	"strings"
 	"therebelsource/emulator/repository"
 )
 
-type CodeProjectRunRequest struct {
-	CodeProjectUuid           string          `json:"codeProjectUuid"`
-	FileUuid                  string          `json:"fileUuid"`
-	Type             string          `json:"type"`
+type ProjectRunRequest struct {
+	Uuid           string          `json:"uuid"`
+	FileUuid string `json:"fileUuid"`
 
-	codeProject *repository.CodeProject
+	sessionData *repository.SessionCodeProjectData
 	executingFile *repository.File
+	validatedTemporarySession repository.ValidatedTemporarySession
 }
 
-func (l *CodeProjectRunRequest) Sanitize() {
+func (l *ProjectRunRequest) Sanitize() {
 	p := bluemonday.StrictPolicy()
 
-	l.CodeProjectUuid = p.Sanitize(l.CodeProjectUuid)
-	l.Type = p.Sanitize(l.Type)
+	l.Uuid = p.Sanitize(l.Uuid)
 }
 
-func (l *CodeProjectRunRequest) Validate() error {
+func (l *ProjectRunRequest) Validate() error {
 	if err := validation.ValidateStruct(l,
-		validation.Field(&l.CodeProjectUuid, validation.Required, is.UUID),
+		validation.Field(&l.Uuid, validation.Required, is.UUID),
 	); err != nil {
 		return err
 	}
 
-	codeProjectExists := func(request interface{}) error {
-		codeProjectUuid := request.(string)
+	sessionValid := func(request interface{}) error {
+		sessionUuid := request.(string)
 
 		repo := repository.InitRepository()
-
-		codeProject, err := repo.GetCodeProject(codeProjectUuid)
+		
+		session, err := repo.ValidateTemporarySession(sessionUuid)
 
 		if err != nil {
-			return errors.New(fmt.Sprintf("Code project %s to be executed does not exist", codeProjectUuid))
+			return errors.New("Project does not exist")
 		}
 
-		l.codeProject = codeProject
+		sessionData, err := repo.GetProjectSessionData(sessionUuid)
+
+		if err != nil {
+			return errors.New("Project does not exists")
+		}
+
+		if err := repo.InvalidateTemporarySession(sessionUuid); err != nil {
+			return errors.New("Project does not exist")
+		}
+
+		l.validatedTemporarySession = session
+		l.sessionData = sessionData
 
 		return nil
 	}
 
 	fileExists := func(request interface{}) error {
-		if l.codeProject != nil {
-			data := request.(struct{
-				fileUuid string
-			})
+		if l.sessionData != nil {
+			fileUuid := request.(string)
 
 			found := false
-			for _, f := range l.codeProject.Structure {
-				if f.Uuid == data.fileUuid {
+			for _, f := range l.sessionData.CodeProject.Structure {
+				if f.Uuid == fileUuid {
 					found = true
 					
 					l.executingFile = f
@@ -67,39 +74,19 @@ func (l *CodeProjectRunRequest) Validate() error {
 			}
 
 			if !found {
-				return errors.New(fmt.Sprintf("File to be executed %s does not exist", data.fileUuid))
+				return errors.New(fmt.Sprintf("File to be executed %s does not exist", fileUuid))
 			}
 		}
 
 		return nil
 	}
 
-	typeValid := func(request interface{}) error {
-		t := request.(string)
-
-		validTypes := []string{"session"}
-
-		for _, k := range validTypes {
-			if k == t {
-				return nil
-			}
-		}
-
-		return errors.New(fmt.Sprintf("Invalid type. Valid types are: %s", strings.Join(validTypes, ",")))
-	}
-
 	if err := validation.Validate(map[string]interface{} {
-		"codeProjectExists": l.CodeProjectUuid,
-		"fileExists": struct {
-			fileUuid string
-		}{
-			fileUuid: l.FileUuid,
-		},
-		"typeValid": l.Type,
+		"sessionValid": l.Uuid,
+		"fileExists": l.FileUuid,
 	}, validation.Map(
-		validation.Key("codeProjectExists", validation.By(codeProjectExists)),
+		validation.Key("sessionValid", validation.By(sessionValid)),
 		validation.Key("fileExists", validation.By(fileExists)),
-		validation.Key("typeValid", validation.By(typeValid)),
 	)); err != nil {
 		return err
 	}

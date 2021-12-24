@@ -4,22 +4,32 @@ import (
 	"context"
 	"fmt"
 	"github.com/gorilla/mux"
+	"github.com/rs/cors"
 	"log"
 	"net/http"
 	"os"
 	"os/signal"
-	errorHandler "therebelsource/api/appErrors"
+	errorHandler "therebelsource/emulator/appErrors"
 	"therebelsource/emulator/runner"
 	"time"
 )
 
 func InitServer(r *mux.Router) *http.Server {
+	c := cors.New(cors.Options{
+		AllowedOrigins:   []string{"https://dev.therebelsource.local:8000"},
+		AllowCredentials: true,
+		AllowedMethods:   []string{http.MethodGet, http.MethodPost, http.MethodOptions, http.MethodPut, http.MethodDelete},
+		ExposedHeaders:   []string{"Content-Length", "Content-Range", "Content-Type", "Cookie", "Set-Cookie"},
+		AllowedHeaders:   []string{"Content-Range", "Set-Cookie", "Cookie", "Range", "Content-Type", "User-Agent", "X-Requested-With", "Cache-Control", "If-Modified-Since", "Keep-Alive", "DNT", "Origin", "Authorization", "x-rebel-source-auth", "Accept"},
+		// Enable Debugging for testing, consider disabling in production
+		Debug: os.Getenv("APP_ENV") != "prod",
+	})
+
+	handler := c.Handler(http.TimeoutHandler(r, 15*time.Second, "A timeout occurred"))
 
 	srv := &http.Server{
-		Handler:      r,
+		Handler:      handler,
 		Addr:         os.Getenv("SERVER_HOST") + ":" + os.Getenv("SERVER_PORT"),
-		WriteTimeout: 15 * time.Second,
-		ReadTimeout:  15 * time.Second,
 	}
 
 	fmt.Println("")
@@ -49,7 +59,7 @@ func WatchServerShutdown(srv *http.Server) {
 	err := srv.Shutdown(ctx)
 
 	if err != nil {
-		fmt.Println(errorHandler.ConstructError(errorHandler.ServerError, errorHandler.ServerShutdownError, err.Error()))
+		fmt.Println(errorHandler.ConstructError(errorHandler.ServerError, 0, err.Error()))
 	}
 
 	fmt.Println("Server is terminated.")

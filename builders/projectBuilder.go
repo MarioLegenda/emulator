@@ -2,6 +2,7 @@ package builders
 
 import (
 	"fmt"
+	"os"
 	"strings"
 	"therebelsource/emulator/appErrors"
 	"therebelsource/emulator/repository"
@@ -9,6 +10,7 @@ import (
 
 type ProjectBuildFn func(*repository.CodeProject, []*repository.FileContent, string, *repository.File) (ProjectBuildResult, *appErrors.Error)
 type CProjectBuildFn func(*repository.CodeProject, []*repository.FileContent, string, *repository.File) (CProjectBuildResult, *appErrors.Error)
+type ProjectDestroyFn func(dir string) *appErrors.Error
 
 type ProjectBuildResult struct {
 	DirectoryName string
@@ -40,6 +42,20 @@ func createProjectBuilder() ProjectBuildFn {
 			return ProjectBuildResult{}, nil
 		}
 
+		fileName := executingFile.Name
+
+		if executingFile.Depth != 1 {
+			for path, files := range paths {
+				for _, file := range files {
+					if file.Uuid == executingFile.Uuid {
+						s := strings.Split(path, cb.Uuid)
+
+						fileName = fmt.Sprintf("/app%s/%s", s[1], executingFile.Name)
+					}
+				}
+			}
+		}
+
 		if cb.Environment.Name == "rust" {
 			if err := writeContent("Cargo.toml", executionDir, `
 [package]
@@ -59,7 +75,7 @@ path = "main.rs"
 			DirectoryName: cb.Uuid,
 			StateDirectory: getStateDirectory(state),
 			ExecutionDirectory: executionDir,
-			FileName: executingFile.Name,
+			FileName: fileName,
 		}, nil
 	}
 }
@@ -98,5 +114,15 @@ func createCLangBuilder() CProjectBuildFn {
 			ResolvedFiles: resolvedFiles,
 			ExecutionDirectory: executionDir,
 		}, nil
+	}
+}
+
+func createProjectDestroyer() ProjectDestroyFn {
+	return func(dir string) *appErrors.Error {
+		if err := os.RemoveAll(dir); err != nil {
+			return appErrors.New(appErrors.ApplicationError, appErrors.FilesystemError, fmt.Sprintf("Cannot remove project directory: %s", dir))
+		}
+
+		return nil
 	}
 }

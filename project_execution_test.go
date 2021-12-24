@@ -19,7 +19,10 @@ var _ = GinkgoDescribe("Project execution tests", func() {
 		testPrepare()
 		defer testCleanup()
 
-		cp := testCreateCodeProject(runner.Node14)
+		activeSession := testCreateAccount()
+
+		cp := testCreateCodeProject(activeSession, runner.Node14)
+
 		cpUuid := cp["uuid"].(string)
 
 		var rootDirectory map[string]interface{}
@@ -27,8 +30,8 @@ var _ = GinkgoDescribe("Project execution tests", func() {
 		gomega.Expect(err).Should(gomega.BeNil())
 		gomega.Expect(json.Unmarshal(s, &rootDirectory)).Should(gomega.BeNil())
 
-		rootDirectoryFile1 := testCreateFile(true, rootDirectory["uuid"].(string), cpUuid, "rootDirectoryFile1.js")
-		testUpdateFileContent(cpUuid, rootDirectoryFile1["uuid"].(string), fmt.Sprintf(`
+		rootDirectoryFile1 := testCreateFile(activeSession, true, rootDirectory["uuid"].(string), cpUuid, "rootDirectoryFile1.js")
+		testUpdateFileContent(activeSession, cpUuid, rootDirectoryFile1["uuid"].(string), fmt.Sprintf(`
 const {execute} = require('./rootDirectoryFile2');
 const {subDirDirFileExecute} = require('./subDir/subSubDir/subSubDirFile');
 
@@ -37,8 +40,8 @@ execute();
 console.log('rootDirectoryFile1');
 `))
 
-		rootDirectoryFile2 := testCreateFile(true, rootDirectory["uuid"].(string), cpUuid, "rootDirectoryFile2.js")
-		testUpdateFileContent(cpUuid, rootDirectoryFile2["uuid"].(string), `
+		rootDirectoryFile2 := testCreateFile(activeSession, true, rootDirectory["uuid"].(string), cpUuid, "rootDirectoryFile2.js")
+		testUpdateFileContent(activeSession, cpUuid, rootDirectoryFile2["uuid"].(string), `
 const {subDirFileExecute} = require('./subDir/subDirFile');
 
 function execute() {
@@ -52,9 +55,9 @@ module.exports = {
 }
 `)
 
-		rootDirectorySubDir := testCreateFile(false, rootDirectory["uuid"].(string), cpUuid, "subDir")
-		subDirFile := testCreateFile(true, rootDirectorySubDir["uuid"].(string), cpUuid, "subDirFile.js")
-		testUpdateFileContent(cpUuid, subDirFile["uuid"].(string), `
+		rootDirectorySubDir := testCreateFile(activeSession, false, rootDirectory["uuid"].(string), cpUuid, "subDir")
+		subDirFile := testCreateFile(activeSession, true, rootDirectorySubDir["uuid"].(string), cpUuid, "subDirFile.js")
+		testUpdateFileContent(activeSession, cpUuid, subDirFile["uuid"].(string), `
 function subDirFileExecute() {
     console.log('subDirFile');
 }
@@ -64,9 +67,9 @@ module.exports = {
 }
 `)
 
-		subDir := testCreateFile(false, rootDirectorySubDir["uuid"].(string), cpUuid, "subSubDir")
-		subDirSubFile := testCreateFile(true, subDir["uuid"].(string), cpUuid, "subSubDirFile.js")
-		testUpdateFileContent(cpUuid, subDirSubFile["uuid"].(string), `
+		subDir := testCreateFile(activeSession, false, rootDirectorySubDir["uuid"].(string), cpUuid, "subSubDir")
+		subDirSubFile := testCreateFile(activeSession, true, subDir["uuid"].(string), cpUuid, "subSubDirFile.js")
+		testUpdateFileContent(activeSession, cpUuid, subDirSubFile["uuid"].(string), `
 function subDirDirFileExecute() {
     console.log('subSubDirFile');
 }
@@ -76,10 +79,11 @@ module.exports = {
 }
 `)
 
+		session := testCreateProjectTemporarySession(repository.ActiveSession{}, cp["uuid"].(string))
+
 		bm := map[string]interface{}{
-			"codeProjectUuid": cpUuid,
+			"uuid": session.Uuid,
 			"fileUuid": rootDirectoryFile1["uuid"].(string),
-			"type": "session",
 		}
 
 		body, err := json.Marshal(bm)
@@ -105,7 +109,7 @@ module.exports = {
 		err = json.Unmarshal(b, &apiResponse)
 
 		gomega.Expect(err).To(gomega.BeNil())
-		
+
 		gomega.Expect(rr.Code).To(gomega.Equal(http.StatusOK))
 		gomega.Expect(rr.Body).To(gomega.Not(gomega.BeNil()))
 
@@ -129,11 +133,12 @@ module.exports = {
 		gomega.Expect(result.Result).Should(gomega.Equal("rootDirectoryFile2\nsubDirFile\nrootDirectoryFile1\n"))
 	})
 
-	GinkgoIt("Should run a project execution as a session in a Go environment", func() {
+	GinkgoIt("Should run a project execution as a session in a node14 environment with a file in a deeper directory structure", func() {
 		testPrepare()
 		defer testCleanup()
 
-		cp := testCreateCodeProject(runner.GoLang)
+		activeSession := testCreateAccount()
+		cp := testCreateCodeProject(activeSession, runner.Node14)
 		cpUuid := cp["uuid"].(string)
 
 		var rootDirectory map[string]interface{}
@@ -141,16 +146,125 @@ module.exports = {
 		gomega.Expect(err).Should(gomega.BeNil())
 		gomega.Expect(json.Unmarshal(s, &rootDirectory)).Should(gomega.BeNil())
 
-		rootDirectoryFile1 := testCreateFile(true, rootDirectory["uuid"].(string), cpUuid, "rootDirectoryFile1.go")
-		testUpdateFileContent(cpUuid, rootDirectoryFile1["uuid"].(string), fmt.Sprintf(`
+		rootDirectoryFile1 := testCreateFile(activeSession, true, rootDirectory["uuid"].(string), cpUuid, "rootDirectoryFile1.js")
+		testUpdateFileContent(activeSession, cpUuid, rootDirectoryFile1["uuid"].(string), fmt.Sprintf(`
+const {execute} = require('./rootDirectoryFile2');
+const {subDirDirFileExecute} = require('./subDir/subSubDir/subSubDirFile');
+
+execute();
+
+console.log('rootDirectoryFile1');
+`))
+
+		rootDirectoryFile2 := testCreateFile(activeSession, true, rootDirectory["uuid"].(string), cpUuid, "rootDirectoryFile2.js")
+		testUpdateFileContent(activeSession, cpUuid, rootDirectoryFile2["uuid"].(string), `
+const {subDirFileExecute} = require('./subDir/subDirFile');
+
+function execute() {
+    console.log('rootDirectoryFile2');
+
+    subDirFileExecute();
+}
+
+module.exports = {
+	execute,
+}
+`)
+
+		rootDirectorySubDir := testCreateFile(activeSession, false, rootDirectory["uuid"].(string), cpUuid, "subDir")
+		subDirFile := testCreateFile(activeSession, true, rootDirectorySubDir["uuid"].(string), cpUuid, "subDirFile.js")
+		testUpdateFileContent(activeSession, cpUuid, subDirFile["uuid"].(string), `
+function subDirFileExecute() {
+    console.log('subDirFile');
+}
+
+module.exports = {
+	subDirFileExecute,
+}
+`)
+
+		subDir := testCreateFile(activeSession, false, rootDirectorySubDir["uuid"].(string), cpUuid, "subSubDir")
+		subDirSubFile := testCreateFile(activeSession, true, subDir["uuid"].(string), cpUuid, "subSubDirFile.js")
+		testUpdateFileContent(activeSession, cpUuid, subDirSubFile["uuid"].(string), `
+console.log('subSubDirFile.js is executed');
+`)
+
+		session := testCreateProjectTemporarySession(repository.ActiveSession{}, cp["uuid"].(string))
+		bm := map[string]interface{}{
+			"uuid": session.Uuid,
+			"fileUuid": subDirSubFile["uuid"].(string),
+		}
+
+		body, err := json.Marshal(bm)
+
+		gomega.Expect(err).To(gomega.BeNil())
+
+		req, err := http.NewRequest("POST", "/api/environment-emulator/execute/project", bytes.NewReader(body))
+
+		if err != nil {
+			ginkgo.Fail(err.Error())
+
+			return
+		}
+
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(executeProjectHandler)
+
+		handler.ServeHTTP(rr, req)
+
+		b := rr.Body.Bytes()
+
+		var apiResponse httpUtil.ApiResponse
+		err = json.Unmarshal(b, &apiResponse)
+
+		gomega.Expect(err).To(gomega.BeNil())
+
+		gomega.Expect(rr.Code).To(gomega.Equal(http.StatusOK))
+		gomega.Expect(rr.Body).To(gomega.Not(gomega.BeNil()))
+
+		gomega.Expect(apiResponse.Method).To(gomega.Equal("POST"))
+		gomega.Expect(apiResponse.Type).To(gomega.Equal(staticTypes.RESPONSE_RESOURCE))
+		gomega.Expect(apiResponse.Message).To(gomega.Equal("Emulator run result"))
+		gomega.Expect(apiResponse.MasterCode).To(gomega.Equal(0))
+		gomega.Expect(apiResponse.Code).To(gomega.Equal(0))
+		gomega.Expect(apiResponse.Status).To(gomega.Equal(http.StatusOK))
+		gomega.Expect(apiResponse.Pagination).To(gomega.BeNil())
+
+		b, err = json.Marshal(apiResponse.Data)
+
+		gomega.Expect(err).To(gomega.BeNil())
+
+		var result runner.ProjectRunResult
+		gomega.Expect(json.Unmarshal(b, &result)).To(gomega.BeNil())
+
+		gomega.Expect(result.Timeout).Should(gomega.Equal(5))
+		gomega.Expect(result.Success).Should(gomega.BeTrue())
+		gomega.Expect(result.Result).Should(gomega.Equal("subSubDirFile.js is executed\n"))
+	})
+
+	GinkgoIt("Should run a project execution as a session in a Go environment", func() {
+		testPrepare()
+		defer testCleanup()
+
+		activeSession := testCreateAccount()
+		cp := testCreateCodeProject(activeSession, runner.GoLang)
+		cpUuid := cp["uuid"].(string)
+
+		var rootDirectory map[string]interface{}
+		s, err := json.Marshal(cp["rootDirectory"])
+		gomega.Expect(err).Should(gomega.BeNil())
+		gomega.Expect(json.Unmarshal(s, &rootDirectory)).Should(gomega.BeNil())
+
+		rootDirectoryFile1 := testCreateFile(activeSession, true, rootDirectory["uuid"].(string), cpUuid, "rootDirectoryFile1.go")
+		testUpdateFileContent(activeSession, cpUuid, rootDirectoryFile1["uuid"].(string), fmt.Sprintf(`
 	package main
 
 `))
 
+		session := testCreateProjectTemporarySession(repository.ActiveSession{}, cp["uuid"].(string))
 		bm := map[string]interface{}{
-			"codeProjectUuid": cpUuid,
+			"uuid": session.Uuid,
 			"fileUuid": rootDirectoryFile1["uuid"].(string),
-			"type": "session",
 		}
 
 		body, err := json.Marshal(bm)
@@ -204,7 +318,8 @@ module.exports = {
 		testPrepare()
 		defer testCleanup()
 
-		cp := testCreateCodeProject(runner.Rust)
+		activeSession := testCreateAccount()
+		cp := testCreateCodeProject(activeSession, runner.Rust)
 		cpUuid := cp["uuid"].(string)
 
 		var rootDirectory map[string]interface{}
@@ -212,16 +327,16 @@ module.exports = {
 		gomega.Expect(err).Should(gomega.BeNil())
 		gomega.Expect(json.Unmarshal(s, &rootDirectory)).Should(gomega.BeNil())
 
-		rootDirectoryFile1 := testCreateFile(true, rootDirectory["uuid"].(string), cpUuid, "rootDirectoryFile1.rs")
-		testUpdateFileContent(cpUuid, rootDirectoryFile1["uuid"].(string), fmt.Sprintf(`
+		rootDirectoryFile1 := testCreateFile(activeSession, true, rootDirectory["uuid"].(string), cpUuid, "rootDirectoryFile1.rs")
+		testUpdateFileContent(activeSession, cpUuid, rootDirectoryFile1["uuid"].(string), fmt.Sprintf(`
 `))
 
-		testCreateFile(true, rootDirectory["uuid"].(string), cpUuid, "rootDirectoryFile2.rs")
+		testCreateFile(activeSession, true, rootDirectory["uuid"].(string), cpUuid, "rootDirectoryFile2.rs")
 
+		session := testCreateProjectTemporarySession(repository.ActiveSession{}, cp["uuid"].(string))
 		bm := map[string]interface{}{
-			"codeProjectUuid": cpUuid,
+			"uuid": session.Uuid,
 			"fileUuid": rootDirectoryFile1["uuid"].(string),
-			"type": "session",
 		}
 
 		body, err := json.Marshal(bm)
@@ -272,10 +387,11 @@ module.exports = {
 	})
 
    GinkgoIt("Should run a project execution as a session in a C environment", func() {
-		testPrepare()
+	   testPrepare()
 		defer testCleanup()
 
-		cp := testCreateCodeProject(runner.CLang)
+	   activeSession := testCreateAccount()
+		cp := testCreateCodeProject(activeSession, runner.CLang)
 		cpUuid := cp["uuid"].(string)
 
 		var rootDirectory map[string]interface{}
@@ -283,18 +399,18 @@ module.exports = {
 		gomega.Expect(err).Should(gomega.BeNil())
 		gomega.Expect(json.Unmarshal(s, &rootDirectory)).Should(gomega.BeNil())
 
-		rootDirectoryFile1 := testCreateFile(true, rootDirectory["uuid"].(string), cpUuid, "rootDirectoryFile1.c")
-		testUpdateFileContent(cpUuid, rootDirectoryFile1["uuid"].(string), fmt.Sprintf(`
+		rootDirectoryFile1 := testCreateFile(activeSession, true, rootDirectory["uuid"].(string), cpUuid, "rootDirectoryFile1.c")
+		testUpdateFileContent(activeSession, cpUuid, rootDirectoryFile1["uuid"].(string), fmt.Sprintf(`
 
 `))
 
-		testCreateFile(true, rootDirectory["uuid"].(string), cpUuid, "rootDirectoryFile2.c")
+		testCreateFile(activeSession, true, rootDirectory["uuid"].(string), cpUuid, "rootDirectoryFile2.c")
 
-		bm := map[string]interface{}{
-			"codeProjectUuid": cpUuid,
-			"fileUuid": rootDirectoryFile1["uuid"].(string),
-			"type": "session",
-		}
+	   session := testCreateProjectTemporarySession(repository.ActiveSession{}, cp["uuid"].(string))
+	   bm := map[string]interface{}{
+		   "uuid": session.Uuid,
+		   "fileUuid": rootDirectoryFile1["uuid"].(string),
+	   }
 
 		body, err := json.Marshal(bm)
 
@@ -347,7 +463,8 @@ module.exports = {
 		testPrepare()
 		defer testCleanup()
 
-		cp := testCreateCodeProject(runner.CPlus)
+		activeSession := testCreateAccount()
+		cp := testCreateCodeProject(activeSession, runner.CPlus)
 		cpUuid := cp["uuid"].(string)
 
 		var rootDirectory map[string]interface{}
@@ -355,17 +472,17 @@ module.exports = {
 		gomega.Expect(err).Should(gomega.BeNil())
 		gomega.Expect(json.Unmarshal(s, &rootDirectory)).Should(gomega.BeNil())
 
-		rootDirectoryFile1 := testCreateFile(true, rootDirectory["uuid"].(string), cpUuid, "rootDirectoryFile1.cpp")
-		testUpdateFileContent(cpUuid, rootDirectoryFile1["uuid"].(string), fmt.Sprintf(`
+		rootDirectoryFile1 := testCreateFile(activeSession, true, rootDirectory["uuid"].(string), cpUuid, "rootDirectoryFile1.cpp")
+		testUpdateFileContent(activeSession, cpUuid, rootDirectoryFile1["uuid"].(string), fmt.Sprintf(`
 
 `))
 
-		testCreateFile(true, rootDirectory["uuid"].(string), cpUuid, "rootDirectoryFile2.cpp")
+		testCreateFile(activeSession, true, rootDirectory["uuid"].(string), cpUuid, "rootDirectoryFile2.cpp")
 
+		session := testCreateProjectTemporarySession(repository.ActiveSession{}, cp["uuid"].(string))
 		bm := map[string]interface{}{
-			"codeProjectUuid": cpUuid,
+			"uuid": session.Uuid,
 			"fileUuid": rootDirectoryFile1["uuid"].(string),
-			"type": "session",
 		}
 
 		body, err := json.Marshal(bm)
@@ -419,7 +536,8 @@ module.exports = {
 		testPrepare()
 		defer testCleanup()
 
-		cp := testCreateCodeProject(runner.Haskell)
+		activeSession := testCreateAccount()
+		cp := testCreateCodeProject(activeSession, runner.Haskell)
 		cpUuid := cp["uuid"].(string)
 
 		var rootDirectory *repository.File
@@ -427,29 +545,29 @@ module.exports = {
 		gomega.Expect(err).Should(gomega.BeNil())
 		gomega.Expect(json.Unmarshal(s, &rootDirectory)).Should(gomega.BeNil())
 
-		testUpdateFileContent(cpUuid, rootDirectory.Children[0], fmt.Sprintf(`
+		testUpdateFileContent(activeSession, cpUuid, rootDirectory.Children[0], fmt.Sprintf(`
 import Foo
 import Bar.FooBar
 
 main = putStrLn "Hello, World!"
 `))
 
-		rootDirectoryFile1 := testCreateFile(true, rootDirectory.Uuid, cpUuid, "Foo.hs")
-		testUpdateFileContent(cpUuid, rootDirectoryFile1["uuid"].(string), fmt.Sprintf(`
+		rootDirectoryFile1 := testCreateFile(activeSession, true, rootDirectory.Uuid, cpUuid, "Foo.hs")
+		testUpdateFileContent(activeSession, cpUuid, rootDirectoryFile1["uuid"].(string), fmt.Sprintf(`
 module Foo where
 `))
 
-		barDir := testCreateFile(false, rootDirectory.Uuid, cpUuid, "Bar")
+		barDir := testCreateFile(activeSession, false, rootDirectory.Uuid, cpUuid, "Bar")
 
-		fooBar := testCreateFile(true, barDir["uuid"].(string), cpUuid, "FooBar.hs")
-		testUpdateFileContent(cpUuid, fooBar["uuid"].(string), fmt.Sprintf(`
+		fooBar := testCreateFile(activeSession, true, barDir["uuid"].(string), cpUuid, "FooBar.hs")
+		testUpdateFileContent(activeSession, cpUuid, fooBar["uuid"].(string), fmt.Sprintf(`
 module Bar.FooBar where
 `))
 
+		session := testCreateProjectTemporarySession(repository.ActiveSession{}, cp["uuid"].(string))
 		bm := map[string]interface{}{
-			"codeProjectUuid": cpUuid,
+			"uuid": session.Uuid,
 			"fileUuid": rootDirectoryFile1["uuid"].(string),
-			"type": "session",
 		}
 
 		body, err := json.Marshal(bm)
@@ -503,7 +621,8 @@ module Bar.FooBar where
 		testPrepare()
 		defer testCleanup()
 
-		cp := testCreateCodeProject(runner.Ruby)
+		activeSession := testCreateAccount()
+		cp := testCreateCodeProject(activeSession, runner.Ruby)
 		cpUuid := cp["uuid"].(string)
 
 		var rootDirectory *repository.File
@@ -511,8 +630,8 @@ module Bar.FooBar where
 		gomega.Expect(err).Should(gomega.BeNil())
 		gomega.Expect(json.Unmarshal(s, &rootDirectory)).Should(gomega.BeNil())
 
-		foo := testCreateFile(true, rootDirectory.Uuid, cpUuid, "foo.rb")
-		testUpdateFileContent(cpUuid, foo["uuid"].(string), fmt.Sprintf(`
+		foo := testCreateFile(activeSession, true, rootDirectory.Uuid, cpUuid, "foo.rb")
+		testUpdateFileContent(activeSession, cpUuid, foo["uuid"].(string), fmt.Sprintf(`
 class TestClass
     def initialize
         puts "TestClass object created"
@@ -520,17 +639,17 @@ class TestClass
 end 
 `))
 
-		bar := testCreateFile(true, rootDirectory.Uuid, cpUuid, "bar.rb")
-		testUpdateFileContent(cpUuid, bar["uuid"].(string), fmt.Sprintf(`
+		bar := testCreateFile(activeSession, true, rootDirectory.Uuid, cpUuid, "bar.rb")
+		testUpdateFileContent(activeSession, cpUuid, bar["uuid"].(string), fmt.Sprintf(`
 require "./foo.rb"
 
 puts "Hello world!"
 `))
 
+		session := testCreateProjectTemporarySession(repository.ActiveSession{}, cp["uuid"].(string))
 		bm := map[string]interface{}{
-			"codeProjectUuid": cpUuid,
+			"uuid": session.Uuid,
 			"fileUuid": bar["uuid"].(string),
-			"type": "session",
 		}
 
 		body, err := json.Marshal(bm)
@@ -584,7 +703,8 @@ puts "Hello world!"
 		testPrepare()
 		defer testCleanup()
 
-		cp := testCreateCodeProject(runner.Php74)
+		activeSession := testCreateAccount()
+		cp := testCreateCodeProject(activeSession, runner.Php74)
 		cpUuid := cp["uuid"].(string)
 
 		var rootDirectory *repository.File
@@ -592,12 +712,12 @@ puts "Hello world!"
 		gomega.Expect(err).Should(gomega.BeNil())
 		gomega.Expect(json.Unmarshal(s, &rootDirectory)).Should(gomega.BeNil())
 
-		foo := testCreateFile(true, rootDirectory.Uuid, cpUuid, "foo.php")
-		testUpdateFileContent(cpUuid, foo["uuid"].(string), fmt.Sprintf(`
+		foo := testCreateFile(activeSession, true, rootDirectory.Uuid, cpUuid, "foo.php")
+		testUpdateFileContent(activeSession, cpUuid, foo["uuid"].(string), fmt.Sprintf(`
 `))
 
-		bar := testCreateFile(true, rootDirectory.Uuid, cpUuid, "bar.php")
-		testUpdateFileContent(cpUuid, bar["uuid"].(string), fmt.Sprintf(`
+		bar := testCreateFile(activeSession, true, rootDirectory.Uuid, cpUuid, "bar.php")
+		testUpdateFileContent(activeSession, cpUuid, bar["uuid"].(string), fmt.Sprintf(`
 <?php
 
 require(__DIR__."/foo.php");
@@ -605,10 +725,10 @@ require(__DIR__."/foo.php");
 echo "Hello world!";
 `))
 
+		session := testCreateProjectTemporarySession(repository.ActiveSession{}, cp["uuid"].(string))
 		bm := map[string]interface{}{
-			"codeProjectUuid": cpUuid,
+			"uuid": session.Uuid,
 			"fileUuid": bar["uuid"].(string),
-			"type": "session",
 		}
 
 		body, err := json.Marshal(bm)
@@ -662,7 +782,8 @@ echo "Hello world!";
 		testPrepare()
 		defer testCleanup()
 
-		cp := testCreateCodeProject(runner.Python2)
+		activeSession := testCreateAccount()
+		cp := testCreateCodeProject(activeSession, runner.Python2)
 		cpUuid := cp["uuid"].(string)
 
 		var rootDirectory *repository.File
@@ -670,26 +791,26 @@ echo "Hello world!";
 		gomega.Expect(err).Should(gomega.BeNil())
 		gomega.Expect(json.Unmarshal(s, &rootDirectory)).Should(gomega.BeNil())
 
-		foo := testCreateFile(true, rootDirectory.Uuid, cpUuid, "foo.py")
-		testUpdateFileContent(cpUuid, foo["uuid"].(string), fmt.Sprintf(`
+		foo := testCreateFile(activeSession, true, rootDirectory.Uuid, cpUuid, "foo.py")
+		testUpdateFileContent(activeSession, cpUuid, foo["uuid"].(string), fmt.Sprintf(`
 import foo.bar as bt
 
 bt.greeting("Jonathan")
 `))
 
-		foobar := testCreateFile(false, rootDirectory.Uuid, cpUuid, "foo")
-		testCreateFile(true, foobar["uuid"].(string), cpUuid, "__init__.py")
+		foobar := testCreateFile(activeSession, false, rootDirectory.Uuid, cpUuid, "foo")
+		testCreateFile(activeSession, true, foobar["uuid"].(string), cpUuid, "__init__.py")
 
-		bar := testCreateFile(true, foobar["uuid"].(string), cpUuid, "bar.py")
-		testUpdateFileContent(cpUuid, bar["uuid"].(string), fmt.Sprintf(`
+		bar := testCreateFile(activeSession, true, foobar["uuid"].(string), cpUuid, "bar.py")
+		testUpdateFileContent(activeSession, cpUuid, bar["uuid"].(string), fmt.Sprintf(`
 def greeting(name):
   print("Hello, " + name) 
 `))
 
+		session := testCreateProjectTemporarySession(repository.ActiveSession{}, cp["uuid"].(string))
 		bm := map[string]interface{}{
-			"codeProjectUuid": cpUuid,
+			"uuid": session.Uuid,
 			"fileUuid": foo["uuid"].(string),
-			"type": "session",
 		}
 
 		body, err := json.Marshal(bm)
@@ -743,7 +864,8 @@ def greeting(name):
 		testPrepare()
 		defer testCleanup()
 
-		cp := testCreateCodeProject(runner.Python3)
+		activeSession := testCreateAccount()
+		cp := testCreateCodeProject(activeSession, runner.Python3)
 		cpUuid := cp["uuid"].(string)
 
 		var rootDirectory *repository.File
@@ -751,26 +873,26 @@ def greeting(name):
 		gomega.Expect(err).Should(gomega.BeNil())
 		gomega.Expect(json.Unmarshal(s, &rootDirectory)).Should(gomega.BeNil())
 
-		foo := testCreateFile(true, rootDirectory.Uuid, cpUuid, "foo.py")
-		testUpdateFileContent(cpUuid, foo["uuid"].(string), fmt.Sprintf(`
+		foo := testCreateFile(activeSession, true, rootDirectory.Uuid, cpUuid, "foo.py")
+		testUpdateFileContent(activeSession, cpUuid, foo["uuid"].(string), fmt.Sprintf(`
 import foo.bar as bt
 
 bt.greeting("Jonathan")
 `))
 
-		foobar := testCreateFile(false, rootDirectory.Uuid, cpUuid, "foo")
-		testCreateFile(true, foobar["uuid"].(string), cpUuid, "__init__.py")
+		foobar := testCreateFile(activeSession, false, rootDirectory.Uuid, cpUuid, "foo")
+		testCreateFile(activeSession, true, foobar["uuid"].(string), cpUuid, "__init__.py")
 
-		bar := testCreateFile(true, foobar["uuid"].(string), cpUuid, "bar.py")
-		testUpdateFileContent(cpUuid, bar["uuid"].(string), fmt.Sprintf(`
+		bar := testCreateFile(activeSession, true, foobar["uuid"].(string), cpUuid, "bar.py")
+		testUpdateFileContent(activeSession, cpUuid, bar["uuid"].(string), fmt.Sprintf(`
 def greeting(name):
   print("Hello, " + name) 
 `))
 
+		session := testCreateProjectTemporarySession(repository.ActiveSession{}, cp["uuid"].(string))
 		bm := map[string]interface{}{
-			"codeProjectUuid": cpUuid,
+			"uuid": session.Uuid,
 			"fileUuid": foo["uuid"].(string),
-			"type": "session",
 		}
 
 		body, err := json.Marshal(bm)
