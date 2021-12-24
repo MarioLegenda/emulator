@@ -1,6 +1,6 @@
 .idea
 .vscode
 /public
-.env.dev
+.env
 .env.test
 api.test

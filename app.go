@@ -8,15 +8,10 @@ import (
 	errorHandler "therebelsource/emulator/appErrors"
 	"therebelsource/emulator/projectExecution"
 	"therebelsource/emulator/singleFileExecution"
-	"therebelsource/emulator/staticTypes"
 )
 
-func LoadEnv(env string) {
-	if env == "" {
-		env = staticTypes.APP_DEV_ENV
-	}
-
-	err := godotenv.Load(fmt.Sprintf(".env.%s", env))
+func LoadEnv() {
+	err := godotenv.Load(".env")
 
 	if err != nil {
 		log.Fatal(err)
@@ -39,7 +34,7 @@ func InitRequiredDirectories(output bool) {
 			errorHandler.TerminateWithMessage(fmt.Sprintf("Cannot create %s directory", projectsDir))
 		}
 	}
-	
+
 	if !directoriesExist {
 		rest := []string{
 			os.Getenv("DEV_STATE_DIR"),
@@ -75,7 +70,7 @@ func InitRequiredDirectories(output bool) {
 }
 
 func App() {
-	LoadEnv(staticTypes.APP_DEV_ENV)
+	LoadEnv()
 	InitRequiredDirectories(true)
 
 	singleFileExecution.InitService()
