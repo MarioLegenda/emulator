@@ -19,7 +19,6 @@ import (
 	"therebelsource/emulator/repository"
 	"therebelsource/emulator/runner"
 	"therebelsource/emulator/singleFileExecution"
-	"therebelsource/emulator/staticTypes"
 )
 
 var GomegaRegisterFailHandler = gomega.RegisterFailHandler
@@ -38,7 +37,7 @@ func TestApi(t *testing.T) {
 }
 
 func testPrepare() {
-	LoadEnv(staticTypes.APP_DEV_ENV)
+	LoadEnv()
 	InitRequiredDirectories(false)
 
 	singleFileExecution.InitService()
@@ -53,12 +52,12 @@ func testCreateSecureRequest(rr *httptest.ResponseRecorder, sessionUuid string, 
 		ginkgo.Fail(err.Error())
 	}
 	req.AddCookie(&http.Cookie{
-		Name:       "session",
-		Value:      sessionUuid,
-		Path:       "/",
-		MaxAge:     3600,
-		Secure:     true,
-		HttpOnly:   true,
+		Name:     "session",
+		Value:    sessionUuid,
+		Path:     "/",
+		MaxAge:   3600,
+		Secure:   true,
+		HttpOnly: true,
 	})
 
 	return req
@@ -88,9 +87,9 @@ func testCreateEmptyPage(activeSession repository.ActiveSession) map[string]inte
 	}
 
 	response, clientError := client.MakeJsonRequest(&httpClient.JsonRequest{
-		Url:    url,
-		Method: "PUT",
-		Body:   nil,
+		Url:     url,
+		Method:  "PUT",
+		Body:    nil,
 		Session: activeSession.Session.Uuid,
 	})
 
@@ -135,9 +134,9 @@ func testCreateTemporarySession(activeSession repository.ActiveSession, pageUuid
 	}
 
 	bm := map[string]interface{}{
-		"pageUuid": pageUuid,
-		"blockUuid": blockUuid,
-		"type": t,
+		"pageUuid":    pageUuid,
+		"blockUuid":   blockUuid,
+		"type":        t,
 		"accountUuid": activeSession.Account.Uuid,
 	}
 
@@ -193,7 +192,7 @@ func testCreateProjectTemporarySession(activeSession repository.ActiveSession, c
 
 	bm := map[string]interface{}{
 		"codeProjectUuid": codeProjectUuid,
-		"type": "project",
+		"type":            "project",
 	}
 
 	body, err := json.Marshal(bm)
@@ -251,9 +250,9 @@ func testCreateAccount() repository.ActiveSession {
 	}
 
 	bm := map[string]interface{}{
-		"name": "name",
+		"name":     "name",
 		"lastName": "Last name",
-		"email": testGetEmail(),
+		"email":    testGetEmail(),
 		"password": "mypassword",
 	}
 
@@ -316,9 +315,9 @@ func testCreateCodeBlock(pageUuid string, activeSession repository.ActiveSession
 	gomega.Expect(err).To(gomega.BeNil())
 
 	response, clientError := client.MakeJsonRequest(&httpClient.JsonRequest{
-		Url:    url,
-		Method: "PUT",
-		Body:   body,
+		Url:     url,
+		Method:  "PUT",
+		Body:    body,
 		Session: activeSession.Session.Uuid,
 	})
 
@@ -367,14 +366,14 @@ func testAddEmulatorToCodeBlock(pageUuid string, blockUuid string, code string, 
 		"blockUuid": blockUuid,
 		"text":      code,
 		"emulator": map[string]interface{}{
-			"name": lang.Name,
-			"text": lang.Text,
-			"tag": lang.Tag,
-			"inDevelopment": false,
-			"inMaintenance": false,
-			"language": lang.Language,
-			"extension": lang.Extension,
-			"output": "",
+			"name":           lang.Name,
+			"text":           lang.Text,
+			"tag":            lang.Tag,
+			"inDevelopment":  false,
+			"inMaintenance":  false,
+			"language":       lang.Language,
+			"extension":      lang.Extension,
+			"output":         "",
 			"defaultTimeout": 0,
 			"packageTimeout": 0,
 		},
@@ -386,9 +385,9 @@ func testAddEmulatorToCodeBlock(pageUuid string, blockUuid string, code string, 
 	gomega.Expect(err).To(gomega.BeNil())
 
 	response, clientError := client.MakeJsonRequest(&httpClient.JsonRequest{
-		Url:    url,
-		Method: "POST",
-		Body:   body,
+		Url:     url,
+		Method:  "POST",
+		Body:    body,
 		Session: activeSession.Session.Uuid,
 	})
 
@@ -433,7 +432,7 @@ func testCreateCodeProject(activeSession repository.ActiveSession, lang runner.L
 	}
 
 	bm := map[string]interface{}{
-		"name": uuid.New().String(),
+		"name":        uuid.New().String(),
 		"description": "description",
 		"environment": lang,
 	}
@@ -443,9 +442,9 @@ func testCreateCodeProject(activeSession repository.ActiveSession, lang runner.L
 	gomega.Expect(err).To(gomega.BeNil())
 
 	response, clientError := client.MakeJsonRequest(&httpClient.JsonRequest{
-		Url:    url,
-		Method: "PUT",
-		Body:   body,
+		Url:     url,
+		Method:  "PUT",
+		Body:    body,
 		Session: activeSession.Session.Uuid,
 	})
 
@@ -490,10 +489,10 @@ func testCreateFile(activeSession repository.ActiveSession, isFile bool, parent 
 	}
 
 	bm := map[string]interface{}{
-		"isFile": isFile,
-		"parent": parent,
+		"isFile":          isFile,
+		"parent":          parent,
 		"codeProjectUuid": cpUuid,
-		"name": name,
+		"name":            name,
 	}
 
 	body, err := json.Marshal(bm)
@@ -501,9 +500,9 @@ func testCreateFile(activeSession repository.ActiveSession, isFile bool, parent 
 	gomega.Expect(err).To(gomega.BeNil())
 
 	response, clientError := client.MakeJsonRequest(&httpClient.JsonRequest{
-		Url:    url,
-		Method: "PUT",
-		Body:   body,
+		Url:     url,
+		Method:  "PUT",
+		Body:    body,
 		Session: activeSession.Session.Uuid,
 	})
 
@@ -549,8 +548,8 @@ func testUpdateFileContent(activeSession repository.ActiveSession, cpUuid string
 
 	bm := map[string]interface{}{
 		"codeProjectUuid": cpUuid,
-		"uuid": fileUuid,
-		"content": content,
+		"uuid":            fileUuid,
+		"content":         content,
 	}
 
 	body, err := json.Marshal(bm)
@@ -558,9 +557,9 @@ func testUpdateFileContent(activeSession repository.ActiveSession, cpUuid string
 	gomega.Expect(err).To(gomega.BeNil())
 
 	response, clientError := client.MakeJsonRequest(&httpClient.JsonRequest{
-		Url:    url,
-		Method: "POST",
-		Body:   body,
+		Url:     url,
+		Method:  "POST",
+		Body:    body,
 		Session: activeSession.Session.Uuid,
 	})
 
@@ -592,4 +591,3 @@ func testUpdateFileContent(activeSession repository.ActiveSession, cpUuid string
 
 	return data
 }
-

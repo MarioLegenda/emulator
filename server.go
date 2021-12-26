@@ -15,8 +15,14 @@ import (
 )
 
 func InitServer(r *mux.Router) *http.Server {
+	origins := []string{"https://rebelsource.dev"}
+
+	if os.Getenv("APP_ENV") != "prod" {
+		origins = []string{"https://dev.therebelsource.local:8000"}
+	}
+	
 	c := cors.New(cors.Options{
-		AllowedOrigins:   []string{"https://dev.therebelsource.local:8000"},
+		AllowedOrigins:   origins,
 		AllowCredentials: true,
 		AllowedMethods:   []string{http.MethodGet, http.MethodPost, http.MethodOptions, http.MethodPut, http.MethodDelete},
 		ExposedHeaders:   []string{"Content-Length", "Content-Range", "Content-Type", "Cookie", "Set-Cookie"},
@@ -28,8 +34,8 @@ func InitServer(r *mux.Router) *http.Server {
 	handler := c.Handler(http.TimeoutHandler(r, 15*time.Second, "A timeout occurred"))
 
 	srv := &http.Server{
-		Handler:      handler,
-		Addr:         os.Getenv("SERVER_HOST") + ":" + os.Getenv("SERVER_PORT"),
+		Handler: handler,
+		Addr:    os.Getenv("SERVER_HOST") + ":" + os.Getenv("SERVER_PORT"),
 	}
 
 	fmt.Println("")
