@@ -10,11 +10,11 @@ import (
 )
 
 type ProjectRunRequest struct {
-	Uuid           string          `json:"uuid"`
+	Uuid     string `json:"uuid"`
 	FileUuid string `json:"fileUuid"`
 
-	sessionData *repository.SessionCodeProjectData
-	executingFile *repository.File
+	sessionData               *repository.SessionCodeProjectData
+	executingFile             *repository.File
 	validatedTemporarySession repository.ValidatedTemporarySession
 }
 
@@ -35,7 +35,7 @@ func (l *ProjectRunRequest) Validate() error {
 		sessionUuid := request.(string)
 
 		repo := repository.InitRepository()
-		
+
 		session, err := repo.ValidateTemporarySession(sessionUuid)
 
 		if err != nil {
@@ -66,7 +66,7 @@ func (l *ProjectRunRequest) Validate() error {
 			for _, f := range l.sessionData.CodeProject.Structure {
 				if f.Uuid == fileUuid {
 					found = true
-					
+
 					l.executingFile = f
 
 					break
@@ -81,9 +81,9 @@ func (l *ProjectRunRequest) Validate() error {
 		return nil
 	}
 
-	if err := validation.Validate(map[string]interface{} {
+	if err := validation.Validate(map[string]interface{}{
 		"sessionValid": l.Uuid,
-		"fileExists": l.FileUuid,
+		"fileExists":   l.FileUuid,
 	}, validation.Map(
 		validation.Key("sessionValid", validation.By(sessionValid)),
 		validation.Key("fileExists", validation.By(fileExists)),

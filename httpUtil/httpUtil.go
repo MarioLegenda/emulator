@@ -6,6 +6,7 @@ import (
 	"log"
 	"net/http"
 	"therebelsource/emulator/appErrors"
+	"therebelsource/emulator/linkedProjectExecution"
 	"therebelsource/emulator/projectExecution"
 	"therebelsource/emulator/singleFileExecution"
 )
@@ -59,7 +60,7 @@ func (cr CurrentHttpRequest) ReadBodyOrSendError() []byte {
 	return body
 }
 
-func (cr CurrentHttpRequest) ReadSingleFileRunRequest() *singleFileExecution.SingleFileRunRequest{
+func (cr CurrentHttpRequest) ReadSingleFileRunRequest() *singleFileExecution.SingleFileRunRequest {
 	body := cr.ReadBodyOrSendError()
 
 	if body == nil {
@@ -123,6 +124,38 @@ func (cr CurrentHttpRequest) ReadProjectExecutionRequest() *projectExecution.Pro
 	return t
 }
 
+func (cr CurrentHttpRequest) ReadLinkedProjectExecutionRequest() *linkedProjectExecution.LinkedProjectRunRequest {
+	body := cr.ReadBodyOrSendError()
+
+	if body == nil {
+		return nil
+	}
+
+	var m linkedProjectExecution.LinkedProjectRunRequest
+	t := &m
+
+	err := json.Unmarshal(body, t)
+
+	if err != nil {
+		requestErr := appErrors.New(appErrors.ApplicationError, appErrors.ApplicationRuntimeError, "Request data is invalid")
+		apiResponse := CreateErrorResponse(cr, requestErr, nil)
+
+		cr.SendResponse(apiResponse)
+
+		return nil
+	}
+
+	err = t.Validate()
+
+	if err != nil {
+		cr.sendValidationError(err)
+
+		return nil
+	}
+
+	return t
+}
+
 func (cr CurrentHttpRequest) sendValidationError(err error) {
 	b, _ := json.Marshal(err)
 
@@ -135,4 +168,3 @@ func (cr CurrentHttpRequest) sendValidationError(err error) {
 
 	cr.SendResponse(apiResponse)
 }
-

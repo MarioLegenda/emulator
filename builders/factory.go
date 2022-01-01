@@ -13,6 +13,10 @@ func CreateBuilder(t string) interface{} {
 		return createCLangBuilder()
 	}
 
+	if t == "linked_compiled_project" {
+		return createCompiledProject()
+	}
+
 	return nil
 }
 

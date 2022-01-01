@@ -7,12 +7,12 @@ type Token struct {
 }
 
 type Session struct {
-	Uuid string `json:"uuid"`
-	Tokens [3]Token `json:"tokens"`
-	Persistent bool `json:"persistent"`
-	Device string `json:"device"`
-	Type string `json:"type"`
-	AccountUuid string  `json:"AccountUuid"`
+	Uuid        string   `json:"uuid"`
+	Tokens      [3]Token `json:"tokens"`
+	Persistent  bool     `json:"persistent"`
+	Device      string   `json:"device"`
+	Type        string   `json:"type"`
+	AccountUuid string   `json:"AccountUuid"`
 }
 
 type ActiveSession struct {
@@ -21,11 +21,11 @@ type ActiveSession struct {
 }
 
 type Account struct {
-	Uuid string `json:"uuid"`
-	Name string `json:"name"`
+	Uuid     string `json:"uuid"`
+	Name     string `json:"name"`
 	LastName string `json:"lastName"`
-	Email string `json:"email"`
-	Type string `json:"type"`
+	Email    string `json:"email"`
+	Type     string `json:"type"`
 	Provider string `json:"provider"`
 
 	Confirmed bool `json:"confirmed"`
@@ -35,11 +35,11 @@ type Account struct {
 }
 
 type TemporarySession struct {
-	Uuid string `json:"uuid"`
-	Device string `json:"device"`
-	Purpose string `json:"purpose"`
-	Permissions []string `json:"permissions"`
-	Data map[string]interface{} `json:"data"`
+	Uuid        string                 `json:"uuid"`
+	Device      string                 `json:"device"`
+	Purpose     string                 `json:"purpose"`
+	Permissions []string               `json:"permissions"`
+	Data        map[string]interface{} `json:"data"`
 }
 
 type ValidatedTemporarySession struct {
@@ -60,7 +60,7 @@ type CodeBlock struct {
 	IsCode   bool `json:"isCode"`
 	Readonly bool `json:"readonly"`
 
-	GistData *GistData `json:"gistData"`
+	GistData *GistData        `json:"gistData"`
 	Emulator *runner.Language `json:"emulator"`
 
 	CodeProjectUuid *string `json:"codeProjectUuid"`
@@ -73,13 +73,13 @@ type GistData struct {
 }
 
 type CodeProject struct {
-	Uuid        string    `json:"uuid" bson:"uuid"`
-	ShortId     string    `json:"shortId" bson:"shortId"`
-	Name        string    `json:"name" bson:"name"`
-	Description string    `json:"description" bson:"description"`
-	Environment *runner.Language `json:"environment" bson:"environment"`
-	Structure []*File `json:"structure" bson:"structure"`
-	StructureCount int `json:"structureCount" bson:"structureCount"`
+	Uuid           string           `json:"uuid" bson:"uuid"`
+	ShortId        string           `json:"shortId" bson:"shortId"`
+	Name           string           `json:"name" bson:"name"`
+	Description    string           `json:"description" bson:"description"`
+	Environment    *runner.Language `json:"environment" bson:"environment"`
+	Structure      []*File          `json:"structure" bson:"structure"`
+	StructureCount int              `json:"structureCount" bson:"structureCount"`
 
 	RootDirectory *File `json:"rootDirectory" bson:"-"`
 
@@ -88,7 +88,7 @@ type CodeProject struct {
 }
 
 type File struct {
-	Name     string   `json:"name" bson:"name"`
+	Name string `json:"name" bson:"name"`
 
 	IsRoot bool `json:"isRoot" bson:"isRoot"`
 	Depth  int  `json:"depth" bson:"depth"`
@@ -105,12 +105,17 @@ type File struct {
 
 type FileContent struct {
 	CodeProjectUuid string `json:"codeProjectUuid" bson:"codeProjectUuid"`
-	Uuid string `json:"uuid" bson:"uuid"`
-	Content string `json:"content" bson:"content"`
+	Uuid            string `json:"uuid" bson:"uuid"`
+	Content         string `json:"content" bson:"content"`
 }
 
 type SessionCodeProjectData struct {
-	CodeProject *CodeProject `json:"codeProject"`
-	Content []*FileContent `json:"fileContent"`
+	CodeProject *CodeProject   `json:"codeProject"`
+	Content     []*FileContent `json:"fileContent"`
 }
 
+type LinkedSessionData struct {
+	CodeProject *CodeProject   `json:"codeProject"`
+	CodeBlock   *CodeBlock     `json:"codeBlock"`
+	Content     []*FileContent `json:"fileContent"`
+}

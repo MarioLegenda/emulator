@@ -25,10 +25,10 @@ var _ = GinkgoDescribe("Single file execution tests", func() {
 		pg := testCreateEmptyPage(activeSession)
 		cb := testCreateCodeBlock(pg["uuid"].(string), activeSession)
 		testAddEmulatorToCodeBlock(pg["uuid"].(string), cb["uuid"].(string), `console.log("mile")`, runner.NodeLts, activeSession)
-		data := testCreateTemporarySession(activeSession, pg["uuid"].(string), cb["uuid"].(string), "single_file")
+		sessionUuid := testCreateTemporarySession(activeSession, pg["uuid"].(string), cb["uuid"].(string), "single_file")
 
-		bm := map[string]interface{} {
-			"uuid": data.Uuid,
+		bm := map[string]interface{}{
+			"uuid": sessionUuid,
 		}
 
 		body, err := json.Marshal(bm)
@@ -87,10 +87,10 @@ var _ = GinkgoDescribe("Single file execution tests", func() {
 		pg := testCreateEmptyPage(activeSession)
 		cb := testCreateCodeBlock(pg["uuid"].(string), activeSession)
 		testAddEmulatorToCodeBlock(pg["uuid"].(string), cb["uuid"].(string), `console.log("mile")`, runner.NodeLts, activeSession)
-		data := testCreateTemporarySession(activeSession, pg["uuid"].(string), cb["uuid"].(string), "single_file")
+		sessionUuid := testCreateTemporarySession(activeSession, pg["uuid"].(string), cb["uuid"].(string), "single_file")
 
-		bm := map[string]interface{} {
-			"uuid": data.Uuid,
+		bm := map[string]interface{}{
+			"uuid": sessionUuid,
 		}
 
 		body, err := json.Marshal(bm)
@@ -140,7 +140,6 @@ var _ = GinkgoDescribe("Single file execution tests", func() {
 		gomega.Expect(result.Result).Should(gomega.Equal("mile\n"))
 	})
 
-
 	GinkgoIt("Should execute a single file in a PHP environment", func() {
 		testPrepare()
 		defer testCleanup()
@@ -154,10 +153,10 @@ var _ = GinkgoDescribe("Single file execution tests", func() {
 
 echo "mile";
 `, runner.Php74, activeSession)
-		data := testCreateTemporarySession(activeSession, pg["uuid"].(string), cb["uuid"].(string), "single_file")
+		sessionUuid := testCreateTemporarySession(activeSession, pg["uuid"].(string), cb["uuid"].(string), "single_file")
 
-		bm := map[string]interface{} {
-			"uuid": data.Uuid,
+		bm := map[string]interface{}{
+			"uuid": sessionUuid,
 		}
 
 		body, err := json.Marshal(bm)
@@ -216,10 +215,10 @@ echo "mile";
 		pg := testCreateEmptyPage(activeSession)
 		cb := testCreateCodeBlock(pg["uuid"].(string), activeSession)
 		testAddEmulatorToCodeBlock(pg["uuid"].(string), cb["uuid"].(string), `puts "mile"`, runner.Ruby, activeSession)
-		data := testCreateTemporarySession(activeSession, pg["uuid"].(string), cb["uuid"].(string), "single_file")
+		sessionUuid := testCreateTemporarySession(activeSession, pg["uuid"].(string), cb["uuid"].(string), "single_file")
 
-		bm := map[string]interface{} {
-			"uuid": data.Uuid,
+		bm := map[string]interface{}{
+			"uuid": sessionUuid,
 		}
 
 		body, err := json.Marshal(bm)
@@ -286,10 +285,10 @@ func main() {
 	fmt.Println("mile")
 }
 `, runner.GoLang, activeSession)
-		data := testCreateTemporarySession(activeSession, pg["uuid"].(string), cb["uuid"].(string), "single_file")
+		sessionUuid := testCreateTemporarySession(activeSession, pg["uuid"].(string), cb["uuid"].(string), "single_file")
 
-		bm := map[string]interface{} {
-			"uuid": data.Uuid,
+		bm := map[string]interface{}{
+			"uuid": sessionUuid,
 		}
 
 		body, err := json.Marshal(bm)
@@ -348,10 +347,10 @@ func main() {
 		pg := testCreateEmptyPage(activeSession)
 		cb := testCreateCodeBlock(pg["uuid"].(string), activeSession)
 		testAddEmulatorToCodeBlock(pg["uuid"].(string), cb["uuid"].(string), `print("mile")`, runner.Python2, activeSession)
-		data := testCreateTemporarySession(activeSession, pg["uuid"].(string), cb["uuid"].(string), "single_file")
+		sessionUuid := testCreateTemporarySession(activeSession, pg["uuid"].(string), cb["uuid"].(string), "single_file")
 
-		bm := map[string]interface{} {
-			"uuid": data.Uuid,
+		bm := map[string]interface{}{
+			"uuid": sessionUuid,
 		}
 
 		body, err := json.Marshal(bm)
@@ -410,10 +409,10 @@ func main() {
 		pg := testCreateEmptyPage(activeSession)
 		cb := testCreateCodeBlock(pg["uuid"].(string), activeSession)
 		testAddEmulatorToCodeBlock(pg["uuid"].(string), cb["uuid"].(string), `print("mile")`, runner.Python2, activeSession)
-		data := testCreateTemporarySession(activeSession, pg["uuid"].(string), cb["uuid"].(string), "single_file")
+		sessionUuid := testCreateTemporarySession(activeSession, pg["uuid"].(string), cb["uuid"].(string), "single_file")
 
-		bm := map[string]interface{} {
-			"uuid": data.Uuid,
+		bm := map[string]interface{}{
+			"uuid": sessionUuid,
 		}
 
 		body, err := json.Marshal(bm)
@@ -472,10 +471,10 @@ func main() {
 		pg := testCreateEmptyPage(activeSession)
 		cb := testCreateCodeBlock(pg["uuid"].(string), activeSession)
 		testAddEmulatorToCodeBlock(pg["uuid"].(string), cb["uuid"].(string), `main = putStrLn "mile"`, runner.Haskell, activeSession)
-		data := testCreateTemporarySession(activeSession, pg["uuid"].(string), cb["uuid"].(string), "single_file")
+		sessionUuid := testCreateTemporarySession(activeSession, pg["uuid"].(string), cb["uuid"].(string), "single_file")
 
-		bm := map[string]interface{} {
-			"uuid": data.Uuid,
+		bm := map[string]interface{}{
+			"uuid": sessionUuid,
 		}
 
 		body, err := json.Marshal(bm)
@@ -540,10 +539,10 @@ int main() {
    return 0;
 }
 `, runner.CLang, activeSession)
-		data := testCreateTemporarySession(activeSession, pg["uuid"].(string), cb["uuid"].(string), "single_file")
+		sessionUuid := testCreateTemporarySession(activeSession, pg["uuid"].(string), cb["uuid"].(string), "single_file")
 
-		bm := map[string]interface{} {
-			"uuid": data.Uuid,
+		bm := map[string]interface{}{
+			"uuid": sessionUuid,
 		}
 
 		body, err := json.Marshal(bm)
@@ -609,10 +608,10 @@ int main() {
     return 0;
 }
 `, runner.CPlus, activeSession)
-		data := testCreateTemporarySession(activeSession, pg["uuid"].(string), cb["uuid"].(string), "single_file")
+		sessionUuid := testCreateTemporarySession(activeSession, pg["uuid"].(string), cb["uuid"].(string), "single_file")
 
-		bm := map[string]interface{} {
-			"uuid": data.Uuid,
+		bm := map[string]interface{}{
+			"uuid": sessionUuid,
 		}
 
 		body, err := json.Marshal(bm)
@@ -661,11 +660,11 @@ int main() {
 		gomega.Expect(result.Success).Should(gomega.BeTrue())
 		gomega.Expect(result.Result).Should(gomega.Equal("mile"))
 
-		if _, err := os.Stat("/var/www/projects/singleFile"); os.IsNotExist(err) {
-			ginkgo.Fail("/var/www/singleFile directory does not exist but should")
+		if _, err := os.Stat("/var/www/execution/singleFile"); os.IsNotExist(err) {
+			ginkgo.Fail("/var/www/execution/singleFile directory does not exist but should")
 		}
 
-		files, err := ioutil.ReadDir("/var/www/projects/singleFile")
+		files, err := ioutil.ReadDir("/var/www/execution/singleFile")
 
 		gomega.Expect(err).Should(gomega.BeNil())
 		gomega.Expect(files).Should(gomega.HaveLen(0))
@@ -680,10 +679,10 @@ int main() {
 		pg := testCreateEmptyPage(activeSession)
 		cb := testCreateCodeBlock(pg["uuid"].(string), activeSession)
 		testAddEmulatorToCodeBlock(pg["uuid"].(string), cb["uuid"].(string), `while(true) {}`, runner.NodeLts, activeSession)
-		data := testCreateTemporarySession(activeSession, pg["uuid"].(string), cb["uuid"].(string), "single_file")
+		sessionUuid := testCreateTemporarySession(activeSession, pg["uuid"].(string), cb["uuid"].(string), "single_file")
 
-		bm := map[string]interface{} {
-			"uuid": data.Uuid,
+		bm := map[string]interface{}{
+			"uuid": sessionUuid,
 		}
 
 		body, err := json.Marshal(bm)
@@ -745,10 +744,10 @@ int main() {
 				pg := testCreateEmptyPage(activeSession)
 				cb := testCreateCodeBlock(pg["uuid"].(string), activeSession)
 				testAddEmulatorToCodeBlock(pg["uuid"].(string), cb["uuid"].(string), `while(true) {}`, runner.NodeLts, activeSession)
-				data := testCreateTemporarySession(activeSession, pg["uuid"].(string), cb["uuid"].(string), "single_file")
+				sessionUuid := testCreateTemporarySession(activeSession, pg["uuid"].(string), cb["uuid"].(string), "single_file")
 
-				bm := map[string]interface{} {
-					"uuid": data.Uuid,
+				bm := map[string]interface{}{
+					"uuid": sessionUuid,
 				}
 
 				body, err := json.Marshal(bm)

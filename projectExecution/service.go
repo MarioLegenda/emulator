@@ -9,7 +9,7 @@ import (
 
 var ProjectExecutionService Service
 
-type Service struct {}
+type Service struct{}
 
 func InitService() {
 	ProjectExecutionService = Service{}
@@ -58,7 +58,7 @@ func (s Service) RunProject(model *ProjectRunRequest) (runner.ProjectRunResult, 
 
 		containerName := uuid.New().String()
 
-		buildResult, err := projectBuilder(model.sessionData.CodeProject, model.sessionData.Content, "session", model.executingFile)
+		buildResult, err := projectBuilder(model.sessionData.CodeProject, model.sessionData.Content, builders.PROJECT_EXECUTION_STATE, model.executingFile)
 		defer destroy(buildResult.ExecutionDirectory)
 
 		args := createCommand(buildResult, model.sessionData.CodeProject.Environment, containerName)
@@ -72,10 +72,10 @@ func (s Service) RunProject(model *ProjectRunRequest) (runner.ProjectRunResult, 
 		builtRunner := runner.CreateRunner("singleFile").(runner.SingleFileRunFn)
 
 		runResult, err := builtRunner(runner.SingleFileBuildResult{
-			ContainerName: containerName,
+			ContainerName:      containerName,
 			ExecutionDirectory: buildResult.ExecutionDirectory,
-			Environment:     model.sessionData.CodeProject.Environment,
-			Args: args,
+			Environment:        model.sessionData.CodeProject.Environment,
+			Args:               args,
 		})
 
 		if err != nil {
@@ -94,7 +94,7 @@ func (s Service) RunProject(model *ProjectRunRequest) (runner.ProjectRunResult, 
 
 		containerName := uuid.New().String()
 
-		buildResult, err := projectBuilder(model.sessionData.CodeProject, model.sessionData.Content, "session", model.executingFile)
+		buildResult, err := projectBuilder(model.sessionData.CodeProject, model.sessionData.Content, builders.PROJECT_EXECUTION_STATE, model.executingFile)
 		defer destroy(buildResult.ExecutionDirectory)
 
 		args := createCommand(buildResult, model.sessionData.CodeProject.Environment, containerName)
@@ -108,10 +108,10 @@ func (s Service) RunProject(model *ProjectRunRequest) (runner.ProjectRunResult, 
 		builtRunner := runner.CreateRunner("singleFile").(runner.SingleFileRunFn)
 
 		runResult, err := builtRunner(runner.SingleFileBuildResult{
-			ContainerName: containerName,
+			ContainerName:      containerName,
 			ExecutionDirectory: buildResult.ExecutionDirectory,
-			Environment:     model.sessionData.CodeProject.Environment,
-			Args: args,
+			Environment:        model.sessionData.CodeProject.Environment,
+			Args:               args,
 		})
 
 		if err != nil {
@@ -130,7 +130,7 @@ func (s Service) RunProject(model *ProjectRunRequest) (runner.ProjectRunResult, 
 
 		containerName := uuid.New().String()
 
-		buildResult, err := projectBuilder(model.sessionData.CodeProject, model.sessionData.Content, "session", model.executingFile)
+		buildResult, err := projectBuilder(model.sessionData.CodeProject, model.sessionData.Content, builders.PROJECT_EXECUTION_STATE, model.executingFile)
 		defer destroy(buildResult.ExecutionDirectory)
 
 		args := createCommand(buildResult, model.sessionData.CodeProject.Environment, containerName)
@@ -144,10 +144,10 @@ func (s Service) RunProject(model *ProjectRunRequest) (runner.ProjectRunResult, 
 		builtRunner := runner.CreateRunner("singleFile").(runner.SingleFileRunFn)
 
 		runResult, err := builtRunner(runner.SingleFileBuildResult{
-			ContainerName: containerName,
+			ContainerName:      containerName,
 			ExecutionDirectory: buildResult.ExecutionDirectory,
-			Environment:     model.sessionData.CodeProject.Environment,
-			Args: args,
+			Environment:        model.sessionData.CodeProject.Environment,
+			Args:               args,
 		})
 
 		if err != nil {
@@ -163,7 +163,7 @@ func (s Service) RunProject(model *ProjectRunRequest) (runner.ProjectRunResult, 
 
 	projectBuilder := builders.CreateBuilder("project").(builders.ProjectBuildFn)
 
-	buildResult, err := projectBuilder(model.sessionData.CodeProject, model.sessionData.Content, "session", model.executingFile)
+	buildResult, err := projectBuilder(model.sessionData.CodeProject, model.sessionData.Content, builders.PROJECT_EXECUTION_STATE, model.executingFile)
 	defer destroy(buildResult.ExecutionDirectory)
 
 	if err != nil {
@@ -175,13 +175,13 @@ func (s Service) RunProject(model *ProjectRunRequest) (runner.ProjectRunResult, 
 	containerName := uuid.New().String()
 
 	runResult, err := builtRunner(runner.SingleFileBuildResult{
-		ContainerName: containerName,
-		DirectoryName:     buildResult.DirectoryName,
+		ContainerName:      containerName,
+		DirectoryName:      buildResult.DirectoryName,
 		ExecutionDirectory: buildResult.ExecutionDirectory,
 		FileName:           buildResult.FileName,
-		Environment:     model.sessionData.CodeProject.Environment,
-		StateDirectory: buildResult.StateDirectory,
-		Args: createCommand(buildResult, model.sessionData.CodeProject.Environment, containerName),
+		Environment:        model.sessionData.CodeProject.Environment,
+		StateDirectory:     buildResult.StateDirectory,
+		Args:               createCommand(buildResult, model.sessionData.CodeProject.Environment, containerName),
 	})
 
 	if err != nil {

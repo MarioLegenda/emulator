@@ -9,7 +9,7 @@ import (
 	"therebelsource/emulator/httpClient"
 )
 
-type Repository struct {}
+type Repository struct{}
 
 func InitRepository() Repository {
 	return Repository{}
@@ -78,7 +78,7 @@ func (r Repository) GetCodeBlock(sessionUuid string) (*CodeBlock, *appErrors.Err
 }
 
 func (r Repository) GetProjectSessionData(sessionUuid string) (*SessionCodeProjectData, *appErrors.Error) {
-	url := fmt.Sprintf("%s/code-project/session-secure", CreateApiUrl())
+	url := fmt.Sprintf("%s/code-project/temp-session/project", CreateApiUrl())
 
 	client, err := httpClient.NewHttpClient(&tls.Config{
 		InsecureSkipVerify: true,
@@ -128,6 +128,64 @@ func (r Repository) GetProjectSessionData(sessionUuid string) (*SessionCodeProje
 	}
 
 	var sessionData *SessionCodeProjectData
+	if err := json.Unmarshal(b, &sessionData); err != nil {
+		return nil, appErrors.New(appErrors.ApplicationError, appErrors.ApplicationRuntimeError, fmt.Sprintf("Cannot get session data: %s", err.Error()))
+	}
+
+	return sessionData, nil
+}
+
+func (r Repository) GetLinkedSessionData(sessionUuid string) (*LinkedSessionData, *appErrors.Error) {
+	url := fmt.Sprintf("%s/code-project/linked-session-secure", CreateApiUrl())
+
+	client, err := httpClient.NewHttpClient(&tls.Config{
+		InsecureSkipVerify: true,
+	})
+
+	if err != nil {
+		return nil, appErrors.New(appErrors.ApplicationError, appErrors.ApplicationRuntimeError, "Cannot create client to get environment data")
+	}
+
+	bm := map[string]interface{}{
+		"uuid": sessionUuid,
+	}
+
+	body, err := json.Marshal(bm)
+
+	if err != nil {
+		return nil, appErrors.New(appErrors.ApplicationError, appErrors.ApplicationRuntimeError, "Cannot create client to get environment data")
+	}
+
+	response, clientError := client.MakeJsonRequest(&httpClient.JsonRequest{
+		Url:    url,
+		Method: "POST",
+		Body:   body,
+	})
+
+	if clientError != nil {
+		return nil, appErrors.New(appErrors.ApplicationError, appErrors.ApplicationRuntimeError, clientError.GetMessage())
+	}
+
+	if response.Status != 200 {
+		return nil, appErrors.New(appErrors.ApplicationError, appErrors.ApplicationRuntimeError, fmt.Sprintf("Request did not succeed with status: %d", response.Status))
+	}
+
+	var apiResponse map[string]interface{}
+	err = json.Unmarshal(response.Body, &apiResponse)
+
+	if err != nil {
+		return nil, appErrors.New(appErrors.ApplicationError, appErrors.ApplicationRuntimeError, err.Error())
+	}
+
+	d := apiResponse["data"]
+
+	b, err := json.Marshal(d)
+
+	if err != nil {
+		return nil, appErrors.New(appErrors.ApplicationError, appErrors.ApplicationRuntimeError, fmt.Sprintf("Cannot get session data: %s", err.Error()))
+	}
+
+	var sessionData *LinkedSessionData
 	if err := json.Unmarshal(b, &sessionData); err != nil {
 		return nil, appErrors.New(appErrors.ApplicationError, appErrors.ApplicationRuntimeError, fmt.Sprintf("Cannot get session data: %s", err.Error()))
 	}
@@ -346,4 +404,3 @@ func (r Repository) GetAllFileContent(codeProjectUuid string) ([]*FileContent, *
 
 	return contents, nil
 }
-

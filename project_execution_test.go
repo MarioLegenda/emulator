@@ -79,10 +79,10 @@ module.exports = {
 }
 `)
 
-		session := testCreateProjectTemporarySession(repository.ActiveSession{}, cp["uuid"].(string))
+		sessionUuid := testCreateProjectTemporarySession(repository.ActiveSession{}, cp["uuid"].(string))
 
 		bm := map[string]interface{}{
-			"uuid": session.Uuid,
+			"uuid":     sessionUuid,
 			"fileUuid": rootDirectoryFile1["uuid"].(string),
 		}
 
@@ -189,9 +189,9 @@ module.exports = {
 console.log('subSubDirFile.js is executed');
 `)
 
-		session := testCreateProjectTemporarySession(repository.ActiveSession{}, cp["uuid"].(string))
+		sessionUuid := testCreateProjectTemporarySession(repository.ActiveSession{}, cp["uuid"].(string))
 		bm := map[string]interface{}{
-			"uuid": session.Uuid,
+			"uuid":     sessionUuid,
 			"fileUuid": subDirSubFile["uuid"].(string),
 		}
 
@@ -261,9 +261,9 @@ console.log('subSubDirFile.js is executed');
 
 `))
 
-		session := testCreateProjectTemporarySession(repository.ActiveSession{}, cp["uuid"].(string))
+		sessionUuid := testCreateProjectTemporarySession(repository.ActiveSession{}, cp["uuid"].(string))
 		bm := map[string]interface{}{
-			"uuid": session.Uuid,
+			"uuid":     sessionUuid,
 			"fileUuid": rootDirectoryFile1["uuid"].(string),
 		}
 
@@ -333,9 +333,9 @@ console.log('subSubDirFile.js is executed');
 
 		testCreateFile(activeSession, true, rootDirectory["uuid"].(string), cpUuid, "rootDirectoryFile2.rs")
 
-		session := testCreateProjectTemporarySession(repository.ActiveSession{}, cp["uuid"].(string))
+		sessionUuid := testCreateProjectTemporarySession(repository.ActiveSession{}, cp["uuid"].(string))
 		bm := map[string]interface{}{
-			"uuid": session.Uuid,
+			"uuid":     sessionUuid,
 			"fileUuid": rootDirectoryFile1["uuid"].(string),
 		}
 
@@ -386,11 +386,11 @@ console.log('subSubDirFile.js is executed');
 		gomega.Expect(result.Result).Should(gomega.Equal("Hello World!\r\n"))
 	})
 
-   GinkgoIt("Should run a project execution as a session in a C environment", func() {
-	   testPrepare()
+	GinkgoIt("Should run a project execution as a session in a C environment", func() {
+		testPrepare()
 		defer testCleanup()
 
-	   activeSession := testCreateAccount()
+		activeSession := testCreateAccount()
 		cp := testCreateCodeProject(activeSession, runner.CLang)
 		cpUuid := cp["uuid"].(string)
 
@@ -406,11 +406,11 @@ console.log('subSubDirFile.js is executed');
 
 		testCreateFile(activeSession, true, rootDirectory["uuid"].(string), cpUuid, "rootDirectoryFile2.c")
 
-	   session := testCreateProjectTemporarySession(repository.ActiveSession{}, cp["uuid"].(string))
-	   bm := map[string]interface{}{
-		   "uuid": session.Uuid,
-		   "fileUuid": rootDirectoryFile1["uuid"].(string),
-	   }
+		sessionUuid := testCreateProjectTemporarySession(repository.ActiveSession{}, cp["uuid"].(string))
+		bm := map[string]interface{}{
+			"uuid":     sessionUuid,
+			"fileUuid": rootDirectoryFile1["uuid"].(string),
+		}
 
 		body, err := json.Marshal(bm)
 
@@ -479,9 +479,9 @@ console.log('subSubDirFile.js is executed');
 
 		testCreateFile(activeSession, true, rootDirectory["uuid"].(string), cpUuid, "rootDirectoryFile2.cpp")
 
-		session := testCreateProjectTemporarySession(repository.ActiveSession{}, cp["uuid"].(string))
+		sessionUuid := testCreateProjectTemporarySession(repository.ActiveSession{}, cp["uuid"].(string))
 		bm := map[string]interface{}{
-			"uuid": session.Uuid,
+			"uuid":     sessionUuid,
 			"fileUuid": rootDirectoryFile1["uuid"].(string),
 		}
 
@@ -564,9 +564,9 @@ module Foo where
 module Bar.FooBar where
 `))
 
-		session := testCreateProjectTemporarySession(repository.ActiveSession{}, cp["uuid"].(string))
+		sessionUuid := testCreateProjectTemporarySession(repository.ActiveSession{}, cp["uuid"].(string))
 		bm := map[string]interface{}{
-			"uuid": session.Uuid,
+			"uuid":     sessionUuid,
 			"fileUuid": rootDirectoryFile1["uuid"].(string),
 		}
 
@@ -646,9 +646,9 @@ require "./foo.rb"
 puts "Hello world!"
 `))
 
-		session := testCreateProjectTemporarySession(repository.ActiveSession{}, cp["uuid"].(string))
+		sessionUuid := testCreateProjectTemporarySession(repository.ActiveSession{}, cp["uuid"].(string))
 		bm := map[string]interface{}{
-			"uuid": session.Uuid,
+			"uuid":     sessionUuid,
 			"fileUuid": bar["uuid"].(string),
 		}
 
@@ -725,9 +725,9 @@ require(__DIR__."/foo.php");
 echo "Hello world!";
 `))
 
-		session := testCreateProjectTemporarySession(repository.ActiveSession{}, cp["uuid"].(string))
+		sessionUuid := testCreateProjectTemporarySession(repository.ActiveSession{}, cp["uuid"].(string))
 		bm := map[string]interface{}{
-			"uuid": session.Uuid,
+			"uuid":     sessionUuid,
 			"fileUuid": bar["uuid"].(string),
 		}
 
@@ -807,9 +807,9 @@ def greeting(name):
   print("Hello, " + name) 
 `))
 
-		session := testCreateProjectTemporarySession(repository.ActiveSession{}, cp["uuid"].(string))
+		sessionUuid := testCreateProjectTemporarySession(repository.ActiveSession{}, cp["uuid"].(string))
 		bm := map[string]interface{}{
-			"uuid": session.Uuid,
+			"uuid":     sessionUuid,
 			"fileUuid": foo["uuid"].(string),
 		}
 
@@ -889,9 +889,9 @@ def greeting(name):
   print("Hello, " + name) 
 `))
 
-		session := testCreateProjectTemporarySession(repository.ActiveSession{}, cp["uuid"].(string))
+		sessionUuid := testCreateProjectTemporarySession(repository.ActiveSession{}, cp["uuid"].(string))
 		bm := map[string]interface{}{
-			"uuid": session.Uuid,
+			"uuid":     sessionUuid,
 			"fileUuid": foo["uuid"].(string),
 		}
 
@@ -942,4 +942,3 @@ def greeting(name):
 		gomega.Expect(result.Result).Should(gomega.Equal("Hello, Jonathan\n"))
 	})
 })
-

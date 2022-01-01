@@ -12,19 +12,21 @@ type ProjectBuildFn func(*repository.CodeProject, []*repository.FileContent, str
 type CProjectBuildFn func(*repository.CodeProject, []*repository.FileContent, string, *repository.File) (CProjectBuildResult, *appErrors.Error)
 type ProjectDestroyFn func(dir string) *appErrors.Error
 
+type LinkedBuildFn func(*repository.CodeProject, []*repository.FileContent, string, *repository.CodeBlock) (CProjectBuildResult, *appErrors.Error)
+
 type ProjectBuildResult struct {
-	DirectoryName string
-	StateDirectory string
+	DirectoryName      string
+	StateDirectory     string
 	ExecutionDirectory string
-	FileName  string
-	Args []string
+	FileName           string
+	Args               []string
 }
 
 type CProjectBuildResult struct {
-	BinaryFileName string
-	ResolvedFiles string
+	BinaryFileName     string
+	ResolvedFiles      string
 	ExecutionDirectory string
-	Args []string
+	Args               []string
 }
 
 func createProjectBuilder() ProjectBuildFn {
@@ -72,10 +74,10 @@ path = "main.rs"
 		}
 
 		return ProjectBuildResult{
-			DirectoryName: cb.Uuid,
-			StateDirectory: getStateDirectory(state),
+			DirectoryName:      cb.Uuid,
+			StateDirectory:     getStateDirectory(state),
 			ExecutionDirectory: executionDir,
-			FileName: fileName,
+			FileName:           fileName,
 		}, nil
 	}
 }
@@ -110,8 +112,45 @@ func createCLangBuilder() CProjectBuildFn {
 		}
 
 		return CProjectBuildResult{
-			BinaryFileName: cb.Uuid,
-			ResolvedFiles: resolvedFiles,
+			BinaryFileName:     cb.Uuid,
+			ResolvedFiles:      resolvedFiles,
+			ExecutionDirectory: executionDir,
+		}, nil
+	}
+}
+
+func createCompiledProject() LinkedBuildFn {
+	return func(cb *repository.CodeProject, contents []*repository.FileContent, state string, executingFile *repository.CodeBlock) (CProjectBuildResult, *appErrors.Error) {
+		executionDir := fmt.Sprintf("%s/%s", getStateDirectory(state), cb.Uuid)
+		ft := initFileTraverse(cb.Structure, executionDir)
+
+		paths := ft.createPaths()
+
+		if err := createDir(fmt.Sprintf("%s/%s", getStateDirectory(state), cb.Uuid)); err != nil {
+			return CProjectBuildResult{}, err
+		}
+
+		if err := createFsSystem(paths, contents); err != nil {
+			return CProjectBuildResult{}, nil
+		}
+
+		resolvedFiles := ""
+		for dir, files := range paths {
+			s := strings.Split(dir, cb.Uuid)
+			dockerPath := s[1]
+
+			for _, file := range files {
+				if dockerPath == "" {
+					resolvedFiles += fmt.Sprintf("%s ", file.Name)
+				} else {
+					resolvedFiles += fmt.Sprintf("%s/%s ", dockerPath, file.Name)
+				}
+			}
+		}
+
+		return CProjectBuildResult{
+			BinaryFileName:     cb.Uuid,
+			ResolvedFiles:      resolvedFiles,
 			ExecutionDirectory: executionDir,
 		}, nil
 	}

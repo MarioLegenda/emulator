@@ -122,8 +122,55 @@ func testCreateEmptyPage(activeSession repository.ActiveSession) map[string]inte
 	return data
 }
 
-func testCreateTemporarySession(activeSession repository.ActiveSession, pageUuid string, blockUuid string, t string) repository.TemporarySession {
-	url := fmt.Sprintf("%s/auth/single-file-emulator-temporary-session", repository.CreateApiUrl())
+func testCreateBlog(activeSession repository.ActiveSession) map[string]interface{} {
+	url := fmt.Sprintf("%s/knowledge-source/blog", repository.CreateApiUrl())
+
+	client, err := httpClient.NewHttpClient(&tls.Config{
+		InsecureSkipVerify: true,
+	})
+
+	if err != nil {
+		appErrors.TerminateWithMessage(fmt.Sprintf("Cannot create blog: %s", err.Error()))
+	}
+
+	response, clientError := client.MakeJsonRequest(&httpClient.JsonRequest{
+		Url:     url,
+		Method:  "PUT",
+		Body:    nil,
+		Session: activeSession.Session.Uuid,
+	})
+
+	if clientError != nil {
+		appErrors.TerminateWithMessage(fmt.Sprintf("Cannot create blog: %s", err.Error()))
+	}
+
+	if response.Status != 201 {
+		appErrors.TerminateWithMessage(fmt.Sprintf("Cannot create blog: Response status is %d", response.Status))
+	}
+
+	var apiResponse map[string]interface{}
+	err = json.Unmarshal(response.Body, &apiResponse)
+
+	if err != nil {
+		appErrors.TerminateWithMessage(fmt.Sprintf("Cannot create blog: %s", err.Error()))
+	}
+
+	d := apiResponse["data"]
+
+	b, err := json.Marshal(d)
+
+	if err != nil {
+		appErrors.TerminateWithMessage(fmt.Sprintf("Cannot create blog: %s", err.Error()))
+	}
+
+	var data map[string]interface{}
+	gomega.Expect(json.Unmarshal(b, &data)).Should(gomega.BeNil())
+
+	return data
+}
+
+func testCreateTemporarySession(activeSession repository.ActiveSession, pageUuid string, blockUuid string, t string) string {
+	url := fmt.Sprintf("%s/auth/temp-session/single-file", repository.CreateApiUrl())
 
 	client, err := httpClient.NewHttpClient(&tls.Config{
 		InsecureSkipVerify: true,
@@ -165,29 +212,62 @@ func testCreateTemporarySession(activeSession repository.ActiveSession, pageUuid
 		appErrors.TerminateWithMessage(fmt.Sprintf("Cannot create temporary session: %s", err.Error()))
 	}
 
-	d := apiResponse["data"]
-
-	b, err := json.Marshal(d)
-
-	if err != nil {
-		appErrors.TerminateWithMessage(fmt.Sprintf("Cannot create temporary session: %s", err.Error()))
-	}
-
-	var data repository.TemporarySession
-	gomega.Expect(json.Unmarshal(b, &data)).Should(gomega.BeNil())
-
-	return data
+	return apiResponse["data"].(string)
 }
 
-func testCreateProjectTemporarySession(activeSession repository.ActiveSession, codeProjectUuid string) repository.TemporarySession {
-	url := fmt.Sprintf("%s/auth/project-emulator-temporary-session", repository.CreateApiUrl())
+func testCreateLinkedSession(activeSession repository.ActiveSession, pageUuid string, codeBlockUuid string) string {
+	url := fmt.Sprintf("%s/auth/temp-session/linked-code-block", repository.CreateApiUrl())
 
 	client, err := httpClient.NewHttpClient(&tls.Config{
 		InsecureSkipVerify: true,
 	})
 
 	if err != nil {
-		appErrors.TerminateWithMessage(fmt.Sprintf("Cannot create temporary session: %s", err.Error()))
+		appErrors.TerminateWithMessage(fmt.Sprintf("Cannot create linked session: %s", err.Error()))
+	}
+
+	bm := map[string]string{
+		"pageUuid":      pageUuid,
+		"codeBlockUuid": codeBlockUuid,
+	}
+
+	body, err := json.Marshal(bm)
+
+	gomega.Expect(err).To(gomega.BeNil())
+
+	response, clientError := client.MakeJsonRequest(&httpClient.JsonRequest{
+		Url:    url,
+		Method: "POST",
+		Body:   body,
+	})
+
+	if clientError != nil {
+		appErrors.TerminateWithMessage(fmt.Sprintf("Cannot create linked session: %s", err.Error()))
+	}
+
+	if response.Status != 201 {
+		appErrors.TerminateWithMessage(fmt.Sprintf("Cannot create linked session: Response status is %d", response.Status))
+	}
+
+	var apiResponse map[string]interface{}
+	err = json.Unmarshal(response.Body, &apiResponse)
+
+	if err != nil {
+		appErrors.TerminateWithMessage(fmt.Sprintf("Cannot create linked session: %s", err.Error()))
+	}
+
+	return apiResponse["data"].(string)
+}
+
+func testCreateProjectTemporarySession(activeSession repository.ActiveSession, codeProjectUuid string) string {
+	url := fmt.Sprintf("%s/auth/temp-session/project", repository.CreateApiUrl())
+
+	client, err := httpClient.NewHttpClient(&tls.Config{
+		InsecureSkipVerify: true,
+	})
+
+	if err != nil {
+		appErrors.TerminateWithMessage(fmt.Sprintf("Cannot create project temporary session: %s", err.Error()))
 	}
 
 	bm := map[string]interface{}{
@@ -206,32 +286,21 @@ func testCreateProjectTemporarySession(activeSession repository.ActiveSession, c
 	})
 
 	if clientError != nil {
-		appErrors.TerminateWithMessage(fmt.Sprintf("Cannot create temporary session: %s", err.Error()))
+		appErrors.TerminateWithMessage(fmt.Sprintf("Cannot create project temporary session: %s", err.Error()))
 	}
 
 	if response.Status != 201 {
-		appErrors.TerminateWithMessage(fmt.Sprintf("Cannot create temporary session: Response status is %d", response.Status))
+		appErrors.TerminateWithMessage(fmt.Sprintf("Cannot create project temporary session: Response status is %d", response.Status))
 	}
 
 	var apiResponse map[string]interface{}
 	err = json.Unmarshal(response.Body, &apiResponse)
 
 	if err != nil {
-		appErrors.TerminateWithMessage(fmt.Sprintf("Cannot create temporary session: %s", err.Error()))
+		appErrors.TerminateWithMessage(fmt.Sprintf("Cannot create project temporary session: %s", err.Error()))
 	}
 
-	d := apiResponse["data"]
-
-	b, err := json.Marshal(d)
-
-	if err != nil {
-		appErrors.TerminateWithMessage(fmt.Sprintf("Cannot create temporary session: %s", err.Error()))
-	}
-
-	var data repository.TemporarySession
-	gomega.Expect(json.Unmarshal(b, &data)).Should(gomega.BeNil())
-
-	return data
+	return apiResponse["data"].(string)
 }
 
 func testGetEmail() string {
@@ -342,6 +411,121 @@ func testCreateCodeBlock(pageUuid string, activeSession repository.ActiveSession
 
 	if err != nil {
 		appErrors.TerminateWithMessage(fmt.Sprintf("Cannot create code block: %s", err.Error()))
+	}
+
+	var data map[string]interface{}
+	gomega.Expect(json.Unmarshal(b, &data)).Should(gomega.BeNil())
+
+	return data
+}
+
+func testUpdateCodeBlock(activeSession repository.ActiveSession, pageUuid string, codeBlockUuid string, text string) map[string]interface{} {
+	url := fmt.Sprintf("%s/page/code-block", repository.CreateApiUrl())
+
+	client, err := httpClient.NewHttpClient(&tls.Config{
+		InsecureSkipVerify: true,
+	})
+
+	if err != nil {
+		appErrors.TerminateWithMessage(fmt.Sprintf("Cannot update code block: %s", err.Error()))
+	}
+
+	bm := map[string]interface{}{
+		"pageUuid":  pageUuid,
+		"blockUuid": codeBlockUuid,
+		"text":      text,
+		"update":    []string{"text"},
+	}
+
+	body, err := json.Marshal(bm)
+
+	gomega.Expect(err).To(gomega.BeNil())
+
+	response, clientError := client.MakeJsonRequest(&httpClient.JsonRequest{
+		Url:     url,
+		Method:  "POST",
+		Body:    body,
+		Session: activeSession.Session.Uuid,
+	})
+
+	if clientError != nil {
+		appErrors.TerminateWithMessage(fmt.Sprintf("Cannot update code block: %s", err.Error()))
+	}
+
+	if response.Status != 200 {
+		appErrors.TerminateWithMessage(fmt.Sprintf("Cannot update code block: Response status is %d", response.Status))
+	}
+
+	var apiResponse map[string]interface{}
+	err = json.Unmarshal(response.Body, &apiResponse)
+
+	if err != nil {
+		appErrors.TerminateWithMessage(fmt.Sprintf("Cannot update code block: %s", err.Error()))
+	}
+
+	d := apiResponse["data"]
+
+	b, err := json.Marshal(d)
+
+	if err != nil {
+		appErrors.TerminateWithMessage(fmt.Sprintf("Cannot update code block: %s", err.Error()))
+	}
+
+	var data map[string]interface{}
+	gomega.Expect(json.Unmarshal(b, &data)).Should(gomega.BeNil())
+
+	return data
+}
+
+func testLinkCodeProject(activeSession repository.ActiveSession, codeProjectUuid string, pageUuid string, blockUuid string) map[string]interface{} {
+	url := fmt.Sprintf("%s/code-project/link-project", repository.CreateApiUrl())
+
+	client, err := httpClient.NewHttpClient(&tls.Config{
+		InsecureSkipVerify: true,
+	})
+
+	if err != nil {
+		appErrors.TerminateWithMessage(fmt.Sprintf("Cannot create link: %s", err.Error()))
+	}
+
+	bm := map[string]interface{}{
+		"codeProjectUuid": codeProjectUuid,
+		"pageUuid":        pageUuid,
+		"blockUuid":       blockUuid,
+	}
+
+	body, err := json.Marshal(bm)
+
+	gomega.Expect(err).To(gomega.BeNil())
+
+	response, clientError := client.MakeJsonRequest(&httpClient.JsonRequest{
+		Url:     url,
+		Method:  "POST",
+		Body:    body,
+		Session: activeSession.Session.Uuid,
+	})
+
+	if clientError != nil {
+		appErrors.TerminateWithMessage(fmt.Sprintf("Cannot create link: %s", err.Error()))
+	}
+
+	if response.Status != 200 {
+		appErrors.TerminateWithMessage(fmt.Sprintf("Cannot create link: Response status is %d", response.Status))
+	}
+
+	var apiResponse map[string]interface{}
+	err = json.Unmarshal(response.Body, &apiResponse)
+
+	if err != nil {
+		appErrors.TerminateWithMessage(fmt.Sprintf("Cannot create link: %s", err.Error()))
+	}
+
+	d := apiResponse["data"]
+
+	b, err := json.Marshal(d)
+
+	if err != nil {
+		appErrors.TerminateWithMessage(fmt.Sprintf("Cannot create link: %s", err.Error()))
 	}
 
 	var data map[string]interface{}

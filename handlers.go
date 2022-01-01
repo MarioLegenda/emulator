@@ -3,6 +3,7 @@ package main
 import (
 	"net/http"
 	"therebelsource/emulator/httpUtil"
+	"therebelsource/emulator/linkedProjectExecution"
 	"therebelsource/emulator/projectExecution"
 	"therebelsource/emulator/runner"
 	"therebelsource/emulator/singleFileExecution"
@@ -79,4 +80,26 @@ func executeProjectHandler(w http.ResponseWriter, r *http.Request) {
 	cr.SendResponse(apiResponse)
 }
 
+func executeLinkedProjectHandler(w http.ResponseWriter, r *http.Request) {
+	cr := httpUtil.InitCurrentRequest(w, r)
 
+	requestModel := cr.ReadLinkedProjectExecutionRequest()
+
+	if requestModel == nil {
+		return
+	}
+
+	runResult, err := linkedProjectExecution.ProjectExecutionService.RunProject(requestModel)
+
+	if err != nil {
+		apiResponse := httpUtil.CreateErrorResponse(cr, err, err.GetData())
+
+		cr.SendResponse(apiResponse)
+
+		return
+	}
+
+	apiResponse := httpUtil.CreateSuccessResponse(cr, staticTypes.RESPONSE_RESOURCE, runResult, http.StatusOK, "Emulator run result")
+
+	cr.SendResponse(apiResponse)
+}

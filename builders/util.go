@@ -7,6 +7,9 @@ import (
 	"therebelsource/emulator/appErrors"
 )
 
+const PROJECT_EXECUTION_STATE = "project"
+const SINGLE_FILE_EXECUTION_STATE = "single_file"
+
 func writeContent(name string, dir string, content string) *appErrors.Error {
 	handle, cErr := os.Create(fmt.Sprintf("%s/%s", dir, name))
 	if cErr != nil {
@@ -63,17 +66,11 @@ func removeDirectories(dir string) error {
 }
 
 func getStateDirectory(state string) string {
-	if state == "dev" {
-		return os.Getenv("DEV_STATE_DIR")
-	} else if state == "prod" {
-		return os.Getenv("PROD_STATE_DIR")
-	} else if state == "session" {
-		return os.Getenv("SESSION_STATE_DIR")
-	} else if state == "single_file" {
+	if state == PROJECT_EXECUTION_STATE {
+		return os.Getenv("CODE_PROJECT_STATE_DIR")
+	} else if state == SINGLE_FILE_EXECUTION_STATE {
 		return os.Getenv("SINGLE_FILE_STATE_DIR")
 	}
 
 	return ""
 }
-
-
