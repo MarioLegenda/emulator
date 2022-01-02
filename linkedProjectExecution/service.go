@@ -26,6 +26,14 @@ func destroy(dir string) *appErrors.Error {
 	return nil
 }
 
+func goDestroy(dir string) {
+	go func(executionDirectory string) {
+		if err := destroy(executionDirectory); err != nil {
+			// TODO: log and send to slack, big error
+		}
+	}(dir)
+}
+
 func createCommand(params interface{}, lang *runner.Language, containerName string) []string {
 	commandFactory := runner.RunCommandFactory{}
 
@@ -59,7 +67,7 @@ func (s Service) RunProject(model *LinkedProjectRunRequest) (runner.ProjectRunRe
 		containerName := uuid.New().String()
 
 		buildResult, err := projectBuilder(model.sessionData.CodeProject, model.sessionData.Content, builders.PROJECT_EXECUTION_STATE, model.sessionData.CodeBlock)
-		defer destroy(buildResult.ExecutionDirectory)
+		defer goDestroy(buildResult.ExecutionDirectory)
 
 		args := createCommand(buildResult, model.sessionData.CodeProject.Environment, containerName)
 
@@ -95,7 +103,7 @@ func (s Service) RunProject(model *LinkedProjectRunRequest) (runner.ProjectRunRe
 		containerName := uuid.New().String()
 
 		buildResult, err := projectBuilder(model.sessionData.CodeProject, model.sessionData.Content, builders.PROJECT_EXECUTION_STATE, model.sessionData.CodeBlock)
-		defer destroy(buildResult.ExecutionDirectory)
+		defer goDestroy(buildResult.ExecutionDirectory)
 
 		args := createCommand(buildResult, model.sessionData.CodeProject.Environment, containerName)
 
@@ -131,7 +139,7 @@ func (s Service) RunProject(model *LinkedProjectRunRequest) (runner.ProjectRunRe
 		containerName := uuid.New().String()
 
 		buildResult, err := projectBuilder(model.sessionData.CodeProject, model.sessionData.Content, builders.PROJECT_EXECUTION_STATE, model.sessionData.CodeBlock)
-		defer destroy(buildResult.ExecutionDirectory)
+		defer goDestroy(buildResult.ExecutionDirectory)
 
 		args := createCommand(buildResult, model.sessionData.CodeProject.Environment, containerName)
 
@@ -164,7 +172,7 @@ func (s Service) RunProject(model *LinkedProjectRunRequest) (runner.ProjectRunRe
 	projectBuilder := builders.CreateBuilder("linked_interpreted_project").(builders.LinkedInterpretedBuildFn)
 
 	buildResult, err := projectBuilder(model.sessionData.CodeProject, model.sessionData.Content, builders.PROJECT_EXECUTION_STATE, model.sessionData.CodeBlock)
-	defer destroy(buildResult.ExecutionDirectory)
+	defer goDestroy(buildResult.ExecutionDirectory)
 
 	if err != nil {
 		return runner.ProjectRunResult{}, err
