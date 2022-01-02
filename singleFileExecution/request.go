@@ -9,9 +9,9 @@ import (
 )
 
 type SingleFileRunRequest struct {
-	Uuid           string          `json:"uuid"`
+	Uuid string `json:"uuid"`
 
-	codeBlock *repository.CodeBlock
+	codeBlock                 *repository.CodeBlock
 	validatedTemporarySession repository.ValidatedTemporarySession
 }
 
@@ -39,17 +39,15 @@ func (l *SingleFileRunRequest) Validate() error {
 			return errors.New("Code block does not exist")
 		}
 
-		codeBlock, err := repo.GetCodeBlock(sessionUuid)
+		sessionData, err := repo.GetCodeBlock(sessionUuid)
 
 		if err != nil {
 			return errors.New("Code block does not exist")
 		}
 
-		if err := repo.InvalidateTemporarySession(sessionUuid); err != nil {
-			return errors.New("Code block does not exist")
-		}
+		go repo.InvalidateTemporarySession(sessionUuid)
 
-		l.codeBlock = codeBlock
+		l.codeBlock = sessionData
 		l.validatedTemporarySession = session
 
 		return nil

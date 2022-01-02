@@ -48,9 +48,7 @@ func (l *ProjectRunRequest) Validate() error {
 			return errors.New("Project does not exists")
 		}
 
-		if err := repo.InvalidateTemporarySession(sessionUuid); err != nil {
-			return errors.New("Project does not exist")
-		}
+		go repo.InvalidateTemporarySession(sessionUuid)
 
 		l.validatedTemporarySession = session
 		l.sessionData = sessionData
