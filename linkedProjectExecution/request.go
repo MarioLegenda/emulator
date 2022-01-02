@@ -46,7 +46,7 @@ func (l *LinkedProjectRunRequest) Validate() error {
 		}
 
 		go repo.InvalidateTemporarySession(sessionUuid)
-		
+
 		l.validatedTemporarySession = session
 		l.sessionData = sessionData
 

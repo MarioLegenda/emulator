@@ -89,7 +89,7 @@ func executeLinkedProjectHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	runResult, err := linkedProjectExecution.ProjectExecutionService.RunProject(requestModel)
+	runResult, err := linkedProjectExecution.ExecutionService.RunProject(requestModel)
 
 	if err != nil {
 		apiResponse := httpUtil.CreateErrorResponse(cr, err, err.GetData())

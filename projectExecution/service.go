@@ -58,7 +58,7 @@ func (s Service) RunProject(model *ProjectRunRequest) (runner.ProjectRunResult, 
 
 		containerName := uuid.New().String()
 
-		buildResult, err := projectBuilder(model.sessionData.CodeProject, model.sessionData.Content, builders.PROJECT_EXECUTION_STATE, model.executingFile)
+		buildResult, err := projectBuilder(model.sessionData.CodeProject, model.sessionData.Content, builders.PROJECT_EXECUTION_STATE, nil)
 		defer destroy(buildResult.ExecutionDirectory)
 
 		args := createCommand(buildResult, model.sessionData.CodeProject.Environment, containerName)
@@ -94,7 +94,7 @@ func (s Service) RunProject(model *ProjectRunRequest) (runner.ProjectRunResult, 
 
 		containerName := uuid.New().String()
 
-		buildResult, err := projectBuilder(model.sessionData.CodeProject, model.sessionData.Content, builders.PROJECT_EXECUTION_STATE, model.executingFile)
+		buildResult, err := projectBuilder(model.sessionData.CodeProject, model.sessionData.Content, builders.PROJECT_EXECUTION_STATE, nil)
 		defer destroy(buildResult.ExecutionDirectory)
 
 		args := createCommand(buildResult, model.sessionData.CodeProject.Environment, containerName)
@@ -130,7 +130,7 @@ func (s Service) RunProject(model *ProjectRunRequest) (runner.ProjectRunResult, 
 
 		containerName := uuid.New().String()
 
-		buildResult, err := projectBuilder(model.sessionData.CodeProject, model.sessionData.Content, builders.PROJECT_EXECUTION_STATE, model.executingFile)
+		buildResult, err := projectBuilder(model.sessionData.CodeProject, model.sessionData.Content, builders.PROJECT_EXECUTION_STATE, nil)
 		defer destroy(buildResult.ExecutionDirectory)
 
 		args := createCommand(buildResult, model.sessionData.CodeProject.Environment, containerName)
@@ -163,7 +163,7 @@ func (s Service) RunProject(model *ProjectRunRequest) (runner.ProjectRunResult, 
 
 	projectBuilder := builders.CreateBuilder("project").(builders.ProjectBuildFn)
 
-	buildResult, err := projectBuilder(model.sessionData.CodeProject, model.sessionData.Content, builders.PROJECT_EXECUTION_STATE, model.executingFile)
+	buildResult, err := projectBuilder(model.sessionData.CodeProject, model.sessionData.Content, builders.PROJECT_EXECUTION_STATE, model.sessionData.ExecutingFile)
 	defer destroy(buildResult.ExecutionDirectory)
 
 	if err != nil {

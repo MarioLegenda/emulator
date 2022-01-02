@@ -7,12 +7,12 @@ import (
 	"therebelsource/emulator/runner"
 )
 
-var ProjectExecutionService Service
+var ExecutionService Service
 
 type Service struct{}
 
 func InitService() {
-	ProjectExecutionService = Service{}
+	ExecutionService = Service{}
 }
 
 func destroy(dir string) *appErrors.Error {
@@ -30,19 +30,19 @@ func createCommand(params interface{}, lang *runner.Language, containerName stri
 	commandFactory := runner.RunCommandFactory{}
 
 	if lang.Name == "c" {
-		br := params.(builders.CProjectBuildResult)
+		br := params.(builders.LinkedProjectBuildResult)
 
 		return commandFactory.CreateCProjectCommand(uuid.New().String(), br.BinaryFileName, br.ExecutionDirectory, br.ResolvedFiles, lang)
 	}
 
 	if lang.Name == "c++" {
-		br := params.(builders.CProjectBuildResult)
+		br := params.(builders.LinkedProjectBuildResult)
 
 		return commandFactory.CreateCPlusProjectCommand(uuid.New().String(), br.BinaryFileName, br.ExecutionDirectory, br.ResolvedFiles, lang)
 	}
 
 	if lang.Name == "haskell" {
-		br := params.(builders.CProjectBuildResult)
+		br := params.(builders.LinkedProjectBuildResult)
 
 		return commandFactory.CreateHaskellProjectCommand(uuid.New().String(), br.ExecutionDirectory, lang)
 	}
@@ -124,6 +124,73 @@ func (s Service) RunProject(model *LinkedProjectRunRequest) (runner.ProjectRunRe
 			Timeout: runResult.Timeout,
 		}, nil
 	}
-	
-	return runner.ProjectRunResult{}, nil
+
+	if model.sessionData.CodeProject.Environment.Name == "haskell" {
+		projectBuilder := builders.CreateBuilder("linked_compiled_project").(builders.LinkedBuildFn)
+
+		containerName := uuid.New().String()
+
+		buildResult, err := projectBuilder(model.sessionData.CodeProject, model.sessionData.Content, builders.PROJECT_EXECUTION_STATE, model.sessionData.CodeBlock)
+		defer destroy(buildResult.ExecutionDirectory)
+
+		args := createCommand(buildResult, model.sessionData.CodeProject.Environment, containerName)
+
+		buildResult.Args = args
+
+		if err != nil {
+			return runner.ProjectRunResult{}, err
+		}
+
+		builtRunner := runner.CreateRunner("singleFile").(runner.SingleFileRunFn)
+
+		runResult, err := builtRunner(runner.SingleFileBuildResult{
+			ContainerName:      containerName,
+			ExecutionDirectory: buildResult.ExecutionDirectory,
+			Environment:        model.sessionData.CodeProject.Environment,
+			Args:               args,
+		})
+
+		if err != nil {
+			return runner.ProjectRunResult{}, err
+		}
+
+		return runner.ProjectRunResult{
+			Success: runResult.Success,
+			Result:  runResult.Result,
+			Timeout: runResult.Timeout,
+		}, nil
+	}
+
+	projectBuilder := builders.CreateBuilder("linked_interpreted_project").(builders.LinkedInterpretedBuildFn)
+
+	buildResult, err := projectBuilder(model.sessionData.CodeProject, model.sessionData.Content, builders.PROJECT_EXECUTION_STATE, model.sessionData.CodeBlock)
+	defer destroy(buildResult.ExecutionDirectory)
+
+	if err != nil {
+		return runner.ProjectRunResult{}, err
+	}
+
+	builtRunner := runner.CreateRunner("singleFile").(runner.SingleFileRunFn)
+
+	containerName := uuid.New().String()
+
+	runResult, err := builtRunner(runner.SingleFileBuildResult{
+		ContainerName:      containerName,
+		DirectoryName:      buildResult.DirectoryName,
+		ExecutionDirectory: buildResult.ExecutionDirectory,
+		FileName:           buildResult.FileName,
+		Environment:        model.sessionData.CodeProject.Environment,
+		StateDirectory:     buildResult.StateDirectory,
+		Args:               createCommand(buildResult, model.sessionData.CodeProject.Environment, containerName),
+	})
+
+	if err != nil {
+		return runner.ProjectRunResult{}, err
+	}
+
+	return runner.ProjectRunResult{
+		Success: runResult.Success,
+		Result:  runResult.Result,
+		Timeout: runResult.Timeout,
+	}, nil
 }

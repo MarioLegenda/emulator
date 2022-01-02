@@ -194,7 +194,7 @@ func (r Repository) GetSingleFileSessionData(sessionUuid string) (*SingleFileSes
 }
 
 func (r Repository) GetLinkedSessionData(sessionUuid string) (*LinkedSessionData, *appErrors.Error) {
-	url := fmt.Sprintf("%s/code-project/linked-session-secure", CreateApiUrl())
+	url := fmt.Sprintf("%s/code-project/temp-session/linked-code-block", CreateApiUrl())
 
 	client, err := httpClient.NewHttpClient(&tls.Config{
 		InsecureSkipVerify: true,

@@ -16,6 +16,7 @@ import (
 	"testing"
 	"therebelsource/emulator/appErrors"
 	"therebelsource/emulator/httpClient"
+	"therebelsource/emulator/linkedProjectExecution"
 	"therebelsource/emulator/repository"
 	"therebelsource/emulator/runner"
 	"therebelsource/emulator/singleFileExecution"
@@ -41,6 +42,7 @@ func testPrepare() {
 	InitRequiredDirectories(false)
 
 	singleFileExecution.InitService()
+	linkedProjectExecution.InitService()
 
 	runner.StartContainerBalancer()
 }
@@ -64,7 +66,7 @@ func testCreateSecureRequest(rr *httptest.ResponseRecorder, sessionUuid string, 
 }
 
 func testCleanup() {
-	cmd := exec.Command("bash", "-c", "/usr/bin/rm -rf /var/www/projects")
+	cmd := exec.Command("bash", "-c", "/usr/bin/rm -rf /var/www/execution")
 	_, err := cmd.Output()
 
 	if err != nil {
@@ -259,7 +261,7 @@ func testCreateLinkedSession(activeSession repository.ActiveSession, pageUuid st
 	return apiResponse["data"].(string)
 }
 
-func testCreateProjectTemporarySession(activeSession repository.ActiveSession, codeProjectUuid string) string {
+func testCreateProjectTemporarySession(activeSession repository.ActiveSession, codeProjectUuid string, executingFile string) string {
 	url := fmt.Sprintf("%s/auth/temp-session/project", repository.CreateApiUrl())
 
 	client, err := httpClient.NewHttpClient(&tls.Config{
@@ -273,6 +275,7 @@ func testCreateProjectTemporarySession(activeSession repository.ActiveSession, c
 	bm := map[string]interface{}{
 		"codeProjectUuid": codeProjectUuid,
 		"type":            "project",
+		"executingFile":   executingFile,
 	}
 
 	body, err := json.Marshal(bm)

@@ -12,7 +12,8 @@ type ProjectBuildFn func(*repository.CodeProject, []*repository.FileContent, str
 type CProjectBuildFn func(*repository.CodeProject, []*repository.FileContent, string, *repository.File) (CProjectBuildResult, *appErrors.Error)
 type ProjectDestroyFn func(dir string) *appErrors.Error
 
-type LinkedBuildFn func(*repository.CodeProject, []*repository.FileContent, string, *repository.CodeBlock) (CProjectBuildResult, *appErrors.Error)
+type LinkedBuildFn func(*repository.CodeProject, []*repository.FileContent, string, *repository.CodeBlock) (LinkedProjectBuildResult, *appErrors.Error)
+type LinkedInterpretedBuildFn func(*repository.CodeProject, []*repository.FileContent, string, *repository.CodeBlock) (ProjectBuildResult, *appErrors.Error)
 
 type ProjectBuildResult struct {
 	DirectoryName      string
@@ -23,6 +24,13 @@ type ProjectBuildResult struct {
 }
 
 type CProjectBuildResult struct {
+	BinaryFileName     string
+	ResolvedFiles      string
+	ExecutionDirectory string
+	Args               []string
+}
+
+type LinkedProjectBuildResult struct {
 	BinaryFileName     string
 	ResolvedFiles      string
 	ExecutionDirectory string
@@ -120,18 +128,23 @@ func createCLangBuilder() CProjectBuildFn {
 }
 
 func createCompiledProject() LinkedBuildFn {
-	return func(cb *repository.CodeProject, contents []*repository.FileContent, state string, executingFile *repository.CodeBlock) (CProjectBuildResult, *appErrors.Error) {
+	return func(cb *repository.CodeProject, contents []*repository.FileContent, state string, executingFile *repository.CodeBlock) (LinkedProjectBuildResult, *appErrors.Error) {
 		executionDir := fmt.Sprintf("%s/%s", getStateDirectory(state), cb.Uuid)
 		ft := initFileTraverse(cb.Structure, executionDir)
 
 		paths := ft.createPaths()
 
-		if err := createDir(fmt.Sprintf("%s/%s", getStateDirectory(state), cb.Uuid)); err != nil {
-			return CProjectBuildResult{}, err
+		if err := createDir(executionDir); err != nil {
+			return LinkedProjectBuildResult{}, err
 		}
 
 		if err := createFsSystem(paths, contents); err != nil {
-			return CProjectBuildResult{}, nil
+			return LinkedProjectBuildResult{}, nil
+		}
+
+		fileName := fmt.Sprintf("%s.%s", executingFile.Uuid, cb.Environment.Extension)
+		if err := writeContent(fileName, executionDir, executingFile.Text); err != nil {
+			return LinkedProjectBuildResult{}, nil
 		}
 
 		resolvedFiles := ""
@@ -148,10 +161,56 @@ func createCompiledProject() LinkedBuildFn {
 			}
 		}
 
-		return CProjectBuildResult{
+		resolvedFiles += fileName
+
+		return LinkedProjectBuildResult{
 			BinaryFileName:     cb.Uuid,
 			ResolvedFiles:      resolvedFiles,
 			ExecutionDirectory: executionDir,
+		}, nil
+	}
+}
+
+func createLinkedInterpretedBuildResult() LinkedInterpretedBuildFn {
+	return func(cb *repository.CodeProject, contents []*repository.FileContent, state string, codeBlock *repository.CodeBlock) (ProjectBuildResult, *appErrors.Error) {
+		executionDir := fmt.Sprintf("%s/%s", getStateDirectory(state), cb.Uuid)
+		ft := initFileTraverse(cb.Structure, executionDir)
+
+		paths := ft.createPaths()
+
+		if err := createDir(fmt.Sprintf("%s/%s", getStateDirectory(state), cb.Uuid)); err != nil {
+			return ProjectBuildResult{}, err
+		}
+
+		if err := createFsSystem(paths, contents); err != nil {
+			return ProjectBuildResult{}, nil
+		}
+
+		fileName := fmt.Sprintf("%s.%s", codeBlock.Uuid, cb.Environment.Extension)
+		if err := writeContent(fileName, executionDir, codeBlock.Text); err != nil {
+			return ProjectBuildResult{}, nil
+		}
+
+		if cb.Environment.Name == "rust" {
+			if err := writeContent("Cargo.toml", executionDir, `
+[package]
+name = "All executions"
+version = "0.0.1"
+authors = [ "No name" ]
+
+[[bin]]
+name = "main"
+path = "main.rs"
+`); err != nil {
+				return ProjectBuildResult{}, err
+			}
+		}
+
+		return ProjectBuildResult{
+			DirectoryName:      cb.Uuid,
+			StateDirectory:     getStateDirectory(state),
+			ExecutionDirectory: executionDir,
+			FileName:           fileName,
 		}, nil
 	}
 }

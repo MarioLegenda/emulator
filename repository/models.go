@@ -110,8 +110,9 @@ type FileContent struct {
 }
 
 type SessionCodeProjectData struct {
-	CodeProject *CodeProject   `json:"codeProject"`
-	Content     []*FileContent `json:"fileContent"`
+	CodeProject   *CodeProject   `json:"codeProject"`
+	Content       []*FileContent `json:"fileContent"`
+	ExecutingFile *File          `json:"executingFile"`
 }
 
 type SingleFileSessionData struct {

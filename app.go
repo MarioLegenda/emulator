@@ -37,9 +37,7 @@ func InitRequiredDirectories(output bool) {
 
 	if !directoriesExist {
 		rest := []string{
-			os.Getenv("DEV_STATE_DIR"),
-			os.Getenv("PROD_STATE_DIR"),
-			os.Getenv("SESSION_STATE_DIR"),
+			os.Getenv("CODE_PROJECT_STATE_DIR"),
 			os.Getenv("SINGLE_FILE_STATE_DIR"),
 			os.Getenv("PACKAGES_DIR"),
 		}

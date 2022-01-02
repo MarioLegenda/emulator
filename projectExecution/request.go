@@ -2,7 +2,6 @@ package projectExecution
 
 import (
 	"errors"
-	"fmt"
 	validation "github.com/go-ozzo/ozzo-validation/v4"
 	"github.com/go-ozzo/ozzo-validation/v4/is"
 	"github.com/microcosm-cc/bluemonday"
@@ -14,7 +13,6 @@ type ProjectRunRequest struct {
 	FileUuid string `json:"fileUuid"`
 
 	sessionData               *repository.SessionCodeProjectData
-	executingFile             *repository.File
 	validatedTemporarySession repository.ValidatedTemporarySession
 }
 
@@ -56,35 +54,10 @@ func (l *ProjectRunRequest) Validate() error {
 		return nil
 	}
 
-	fileExists := func(request interface{}) error {
-		if l.sessionData != nil {
-			fileUuid := request.(string)
-
-			found := false
-			for _, f := range l.sessionData.CodeProject.Structure {
-				if f.Uuid == fileUuid {
-					found = true
-
-					l.executingFile = f
-
-					break
-				}
-			}
-
-			if !found {
-				return errors.New(fmt.Sprintf("File to be executed %s does not exist", fileUuid))
-			}
-		}
-
-		return nil
-	}
-
 	if err := validation.Validate(map[string]interface{}{
 		"sessionValid": l.Uuid,
-		"fileExists":   l.FileUuid,
 	}, validation.Map(
 		validation.Key("sessionValid", validation.By(sessionValid)),
-		validation.Key("fileExists", validation.By(fileExists)),
 	)); err != nil {
 		return err
 	}

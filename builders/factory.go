@@ -17,6 +17,10 @@ func CreateBuilder(t string) interface{} {
 		return createCompiledProject()
 	}
 
+	if t == "linked_interpreted_project" {
+		return createLinkedInterpretedBuildResult()
+	}
+
 	return nil
 }
 
