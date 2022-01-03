@@ -27,11 +27,9 @@ WORKDIR $APP_DIR
 RUN mkdir -p $APP_DIR/src
 COPY Cargo.toml .
 
-RUN addgroup dockerusergroup
-RUN chmod g+rwx $APP_DIR
-RUN chgrp -R dockerusergroup $APP_DIR
-RUN useradd -G dockerusergroup -d $APP_DIR -s /bin/bash dockeruser
-RUN chown -R dockeruser:dockerusergroup $APP_DIR && chown dockeruser:dockerusergroup /usr/local/rustup && chown dockeruser:dockerusergroup /usr/local/rustup
+RUN chmod g+r $APP_DIR
+RUN useradd -d $APP_DIR -s /bin/bash dockeruser
+RUN chown -R dockeruser:dockeruser $APP_DIR && chown dockeruser:dockeruser /usr/local/rustup && chown dockeruser:dockeruser /usr/local/rustup
 
 USER dockeruser
 ENV USER=dockeruser HOME=$APP_DIR

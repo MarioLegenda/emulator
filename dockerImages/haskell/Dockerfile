@@ -23,13 +23,11 @@ ENV PATH /usr/local/bin:$GHC_PATH:$CABAL_PATH:$PATH
 
 WORKDIR /app
 
-RUN addgroup dockerusergroup
-RUN chgrp -R dockerusergroup $APP_DIR
-RUN useradd -G dockerusergroup -d $APP_DIR -s /bin/bash dockeruser
-RUN chown -R dockeruser:dockerusergroup $APP_DIR && chown dockeruser:dockerusergroup $GHC_PATH && chown dockeruser:dockerusergroup $GHC_PATH
-RUN chown -R dockeruser:dockerusergroup $APP_DIR && chown dockeruser:dockerusergroup $CABAL_PATH && chown dockeruser:dockerusergroup $CABAL_PATH
+RUN useradd -d $APP_DIR -s /bin/bash dockeruser
+RUN chown -R dockeruser:dockeruser $APP_DIR && chown dockeruser:dockeruser $GHC_PATH && chown dockeruser:dockeruser $GHC_PATH
+RUN chown -R dockeruser:dockeruser $APP_DIR && chown dockeruser:dockeruser $CABAL_PATH && chown dockeruser:dockeruser $CABAL_PATH
 RUN chmod -R 777 $APP_DIR
 
-USER dockeruser:dockerusergroup
+USER dockeruser
 
 ENV USER=dockeruser HOME=$APP_DIR

@@ -3,7 +3,6 @@ package httpUtil
 import (
 	"encoding/json"
 	"io/ioutil"
-	"log"
 	"net/http"
 	"therebelsource/emulator/appErrors"
 	"therebelsource/emulator/linkedProjectExecution"
@@ -32,7 +31,7 @@ func (cr CurrentHttpRequest) SendResponse(response *ApiResponse) {
 	_, err := cr.w.Write(body)
 
 	if err != nil {
-		log.Fatal(err)
+		// TODO: log here a broken write
 	}
 }
 

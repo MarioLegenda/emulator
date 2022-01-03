@@ -31,11 +31,13 @@ func InitServer(r *mux.Router) *http.Server {
 		Debug: os.Getenv("APP_ENV") != "prod",
 	})
 
-	handler := c.Handler(http.TimeoutHandler(r, 15*time.Second, "A timeout occurred"))
+	handler := c.Handler(r)
 
 	srv := &http.Server{
-		Handler: handler,
-		Addr:    os.Getenv("SERVER_HOST") + ":" + os.Getenv("SERVER_PORT"),
+		Handler:      handler,
+		ReadTimeout:  120 * time.Second,
+		WriteTimeout: 120 * time.Second,
+		Addr:         os.Getenv("SERVER_HOST") + ":" + os.Getenv("SERVER_PORT"),
 	}
 
 	fmt.Println("")

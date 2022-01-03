@@ -6,13 +6,11 @@ WORKDIR $APP_DIR
 
 RUN apk add php7-cli
 
-RUN addgroup dockerusergroup
-RUN chgrp -R dockerusergroup $APP_DIR
-RUN adduser -D -G dockerusergroup -h $APP_DIR -s /bin/bash dockeruser
-RUN chown -R dockeruser:dockerusergroup $APP_DIR
+RUN adduser -D -h $APP_DIR -s /bin/bash dockeruser
+RUN chown -R dockeruser:dockeruser $APP_DIR
 
 RUN chmod -R g+r $APP_DIR
-RUN chown -R dockeruser:dockerusergroup /usr/bin/php && chown -R dockeruser /usr/bin/php
+RUN chown -R dockeruser:dockeruser /usr/bin/php && chown -R dockeruser /usr/bin/php
 
 RUN php -r "ini_set('upload_max_filesize', '0M');"
 RUN php -r "ini_set('memory_limit', '8M');"

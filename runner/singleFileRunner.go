@@ -13,15 +13,15 @@ import (
 type SingleFileRunFn func(br SingleFileBuildResult) (SingleFileRunResult, *appErrors.Error)
 
 type SingleFileRunResult struct {
-	Success bool `json:"success"`
-	Result string `json:"result"`
-	Timeout int `json:"timeout"`
+	Success bool   `json:"success"`
+	Result  string `json:"result"`
+	Timeout int    `json:"timeout"`
 }
 
 func createSingleFileRunner() SingleFileRunFn {
 	return func(br SingleFileBuildResult) (SingleFileRunResult, *appErrors.Error) {
 		context := context.TODO()
-		
+
 		timeout := getTimeout("blog", "single_file", "anonymous")
 
 		var outb, errb bytes.Buffer
@@ -34,7 +34,7 @@ func createSingleFileRunner() SingleFileRunFn {
 
 		go func() {
 			cmd := exec.Command("docker", br.Args...)
-			
+
 			cmd.Stderr = &errb
 			cmd.Stdout = &outb
 
@@ -97,7 +97,7 @@ func createSingleFileRunner() SingleFileRunFn {
 		case <-time.After(timeout):
 			runnerBalancer.addJob(job{
 				containerName: br.ContainerName,
-				pid:           <- pidC,
+				pid:           <-pidC,
 			})
 
 			runResult.Success = false
@@ -108,7 +108,7 @@ func createSingleFileRunner() SingleFileRunFn {
 		case <-context.Done():
 			runnerBalancer.addJob(job{
 				containerName: br.ContainerName,
-				pid:           <- pidC,
+				pid:           <-pidC,
 			})
 
 			runResult.Success = false
@@ -125,4 +125,3 @@ func createSingleFileRunner() SingleFileRunFn {
 		return runResult, nil
 	}
 }
-

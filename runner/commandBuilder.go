@@ -2,8 +2,37 @@ package runner
 
 import "fmt"
 
+const MAX_MEMORY = "40m"
+const MEMORY_RESERVATION = "10m"
+
 type CommandBuilder struct {
 	Commands *[]string
+}
+
+func (cb CommandBuilder) MaxMemory(mem string) CommandBuilder {
+	max := MAX_MEMORY
+
+	if mem != "" {
+		max = mem
+	}
+
+	*cb.Commands = append(*cb.Commands, fmt.Sprintf("--memory=%s", max))
+	*cb.Commands = append(*cb.Commands, "--memory-swap=0")
+	*cb.Commands = append(*cb.Commands, "--memory-swappiness=5")
+
+	return cb
+}
+
+func (cb CommandBuilder) MaxMemoryReservation(mem string) CommandBuilder {
+	max := MEMORY_RESERVATION
+
+	if mem != "" {
+		max = mem
+	}
+
+	*cb.Commands = append(*cb.Commands, fmt.Sprintf("--memory-reservation=%s", max))
+
+	return cb
 }
 
 func (cb CommandBuilder) NewVolume(dir string, permission string) CommandBuilder {
@@ -90,9 +119,9 @@ func (cb CommandBuilder) SendToStd(std string) CommandBuilder {
 	return cb
 }
 
-func (cb CommandBuilder) User(user string, group string) CommandBuilder {
+func (cb CommandBuilder) User(user string) CommandBuilder {
 	*cb.Commands = append(*cb.Commands, "--user")
-	*cb.Commands = append(*cb.Commands, fmt.Sprintf("%s:%s", user, group))
+	*cb.Commands = append(*cb.Commands, fmt.Sprintf("%s", user))
 
 	return cb
 }
@@ -100,4 +129,3 @@ func (cb CommandBuilder) User(user string, group string) CommandBuilder {
 func (cb CommandBuilder) Run() {
 	*cb.Commands = append([]string{"run"}, *cb.Commands...)
 }
-

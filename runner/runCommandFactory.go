@@ -5,7 +5,7 @@ import (
 	"strings"
 )
 
-type RunCommandFactory struct {}
+type RunCommandFactory struct{}
 
 func (cf *RunCommandFactory) CreateProjectNodeCommand(containerName string, projectName string, fileName string, lang *Language) []string {
 	cb := CommandBuilder{Commands: &[]string{}}
@@ -124,7 +124,6 @@ func (cf *RunCommandFactory) CreateHaskellProjectCommand(containerName string, v
 		NewNetwork("none").
 		AllocatePseudoTty().
 		RemoveAfterFinished().
-		User("dockeruser", "dockerusergroup").
 		NewVolume(volumePath, "rw").
 		Name(containerName).
 		Init().
@@ -146,7 +145,6 @@ func (cf *RunCommandFactory) CreateHaskellCommand(containerName string, projectN
 		NewNetwork("none").
 		AllocatePseudoTty().
 		RemoveAfterFinished().
-		User("dockeruser", "dockerusergroup").
 		NewVolume(projectName, "rw").
 		Name(containerName).
 		Init().
@@ -167,6 +165,7 @@ func (cf *RunCommandFactory) CreateGoCommand(containerName string, projectName s
 	cb.
 		NewNetwork("none").
 		AllocatePseudoTty().
+		User("dockeruser").
 		RemoveAfterFinished().
 		NewVolumeFull(projectName, fmt.Sprintf("app/src/%s", directoryName), "rw").
 		Name(containerName).
@@ -292,7 +291,6 @@ func (cf *RunCommandFactory) CreateRustCommand(containerName string, projectName
 	return args
 }
 
-
 func (cf *RunCommandFactory) CreateCommand(containerName, projectName string, fileName string, lang *Language, directoryName string) []string {
 	if lang.Name == Node14.Name || lang.Name == NodeLts.Name {
 		return cf.CreateProjectNodeCommand(containerName, projectName, fileName, lang)
@@ -318,4 +316,3 @@ func (cf *RunCommandFactory) CreateCommand(containerName, projectName string, fi
 
 	return []string{}
 }
-
