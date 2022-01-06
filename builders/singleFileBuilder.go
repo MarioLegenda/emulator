@@ -26,7 +26,11 @@ func createSingleFileBuilder() SingleFileRunFn {
 
 		tempExecutionDir := fmt.Sprintf("%s/%s", stateDir, dirName)
 
-		fileName := fmt.Sprintf("main.rs")
+		fileName := fmt.Sprintf("%s.%s", dirName, cb.Emulator.Extension)
+
+		if cb.Emulator.Name == "rust" {
+			fileName = "main.rs"
+		}
 
 		if err := os.MkdirAll(tempExecutionDir, os.ModePerm); err != nil {
 			return SingleFileBuildResult{}, appErrors.New(appErrors.ApplicationError, appErrors.FilesystemError, fmt.Sprintf("Cannot create execution dir: %s", err.Error()))
