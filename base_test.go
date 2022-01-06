@@ -349,7 +349,7 @@ func testCreateAccount() repository.ActiveSession {
 		appErrors.TerminateWithMessage(fmt.Sprintf("Cannot create account: %s", err.Error()))
 	}
 
-	if response.Status != 200 {
+	if response.Status != 201 {
 		appErrors.TerminateWithMessage(fmt.Sprintf("Cannot create account: Response status is %d", response.Status))
 	}
 
