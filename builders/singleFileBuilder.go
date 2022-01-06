@@ -12,11 +12,11 @@ type SingleFileRunFn func(cb *repository.CodeBlock, state string) (SingleFileBui
 type SingleFileDestroyFn func(br SingleFileBuildResult) *appErrors.Error
 
 type SingleFileBuildResult struct {
-	DirectoryName string
-	StateDirectory string
+	DirectoryName      string
+	StateDirectory     string
 	ExecutionDirectory string
-	FileName  string
-	Args []string
+	FileName           string
+	Args               []string
 }
 
 func createSingleFileBuilder() SingleFileRunFn {
@@ -26,7 +26,7 @@ func createSingleFileBuilder() SingleFileRunFn {
 
 		tempExecutionDir := fmt.Sprintf("%s/%s", stateDir, dirName)
 
-		fileName := fmt.Sprintf("%s.%s", dirName, cb.Emulator.Extension)
+		fileName := fmt.Sprintf("main.rs")
 
 		if err := os.MkdirAll(tempExecutionDir, os.ModePerm); err != nil {
 			return SingleFileBuildResult{}, appErrors.New(appErrors.ApplicationError, appErrors.FilesystemError, fmt.Sprintf("Cannot create execution dir: %s", err.Error()))
@@ -40,11 +40,26 @@ func createSingleFileBuilder() SingleFileRunFn {
 			return SingleFileBuildResult{}, err
 		}
 
+		if cb.Emulator.Name == "rust" {
+			if err := writeContent("Cargo.toml", tempExecutionDir, `
+[package]
+name = "All executions"
+version = "0.0.1"
+authors = [ "No name" ]
+
+[[bin]]
+name = "main"
+path = "main.rs"
+`); err != nil {
+				return SingleFileBuildResult{}, err
+			}
+		}
+
 		return SingleFileBuildResult{
-			DirectoryName: dirName,
+			DirectoryName:      dirName,
 			ExecutionDirectory: tempExecutionDir,
-			StateDirectory: getStateDirectory(state),
-			FileName:  fileName,
+			StateDirectory:     getStateDirectory(state),
+			FileName:           fileName,
 		}, nil
 	}
 }
