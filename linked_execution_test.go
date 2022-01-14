@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"github.com/google/uuid"
 	"github.com/onsi/ginkgo"
 	"github.com/onsi/gomega"
 	"net/http"
@@ -23,7 +24,7 @@ var _ = GinkgoDescribe("Linked project execution tests", func() {
 		link := testCreateBlog(activeSession)
 		pageUuid := link["page"].(map[string]interface{})["uuid"].(string)
 
-		cp := testCreateCodeProject(activeSession, runner.CLang)
+		cp := testCreateCodeProject(activeSession, uuid.New().String(), runner.CLang)
 
 		cpUuid := cp["uuid"].(string)
 		cb := testCreateCodeBlock(pageUuid, activeSession)
@@ -110,7 +111,7 @@ int main() {
 		link := testCreateBlog(activeSession)
 		pageUuid := link["page"].(map[string]interface{})["uuid"].(string)
 
-		cp := testCreateCodeProject(activeSession, runner.CPlus)
+		cp := testCreateCodeProject(activeSession, uuid.New().String(), runner.CPlus)
 		cpUuid := cp["uuid"].(string)
 		cb := testCreateCodeBlock(pageUuid, activeSession)
 		testUpdateCodeBlock(activeSession, pageUuid, cb["uuid"].(string), `
@@ -199,7 +200,7 @@ int main() {
 		link := testCreateBlog(activeSession)
 		pageUuid := link["page"].(map[string]interface{})["uuid"].(string)
 
-		cp := testCreateCodeProject(activeSession, runner.Haskell)
+		cp := testCreateCodeProject(activeSession, uuid.New().String(), runner.Haskell)
 		cpUuid := cp["uuid"].(string)
 		cb := testCreateCodeBlock(pageUuid, activeSession)
 		testUpdateCodeBlock(activeSession, pageUuid, cb["uuid"].(string), `
@@ -290,19 +291,21 @@ module Bar.FooBar where
 		link := testCreateBlog(activeSession)
 		pageUuid := link["page"].(map[string]interface{})["uuid"].(string)
 
-		cp := testCreateCodeProject(activeSession, runner.GoLang)
+		cp := testCreateCodeProject(activeSession, "my_cool_name", runner.GoLang)
 		cpUuid := cp["uuid"].(string)
 		cb := testCreateCodeBlock(pageUuid, activeSession)
-		testUpdateCodeBlock(activeSession, pageUuid, cb["uuid"].(string), `
+		testUpdateCodeBlock(activeSession, pageUuid, cb["uuid"].(string), fmt.Sprintf(`
 package main
+
+import "%s/%s"
 
 import "fmt"
 
 func main() {
     fmt.Println("Hello World!")
-    executeFn()
+    %s.ExecuteFn()
 }
-`)
+`, cp["uuid"].(string), "my_cool_name", "my_cool_name"))
 		testLinkCodeProject(activeSession, cp["uuid"].(string), pageUuid, cb["uuid"].(string))
 
 		var rootDirectory *repository.File
@@ -311,16 +314,16 @@ func main() {
 		gomega.Expect(json.Unmarshal(s, &rootDirectory)).Should(gomega.BeNil())
 
 		testUpdateFileContent(activeSession, cpUuid, rootDirectory.Children[0], fmt.Sprintf(`
-package main
+package my_cool_name
 `))
 
 		rootDirectoryFile1 := testCreateFile(activeSession, true, rootDirectory.Uuid, cpUuid, "rootDirectoryFile1.go")
 		testUpdateFileContent(activeSession, cpUuid, rootDirectoryFile1["uuid"].(string), fmt.Sprintf(`
-package main
+package my_cool_name
 
 import "fmt"
 
-func executeFn() {
+func ExecuteFn() {
     fmt.Println("Executing fn")
 }
 `))
@@ -386,7 +389,7 @@ func executeFn() {
 		link := testCreateBlog(activeSession)
 		pageUuid := link["page"].(map[string]interface{})["uuid"].(string)
 
-		cp := testCreateCodeProject(activeSession, runner.NodeLts)
+		cp := testCreateCodeProject(activeSession, uuid.New().String(), runner.NodeLts)
 		cpUuid := cp["uuid"].(string)
 		cb := testCreateCodeBlock(pageUuid, activeSession)
 		testUpdateCodeBlock(activeSession, pageUuid, cb["uuid"].(string), `

@@ -55,6 +55,12 @@ func createCommand(params interface{}, lang *runner.Language, containerName stri
 		return commandFactory.CreateHaskellProjectCommand(uuid.New().String(), br.ExecutionDirectory, lang)
 	}
 
+	if lang.Name == "go" {
+		br := params.(builders.ProjectBuildResult)
+
+		return commandFactory.CreateGoLinkedProjectCommand(containerName, br.ExecutionDirectory, lang, br.DirectoryName)
+	}
+
 	br := params.(builders.ProjectBuildResult)
 
 	return commandFactory.CreateCommand(containerName, br.ExecutionDirectory, br.FileName, lang, br.DirectoryName)

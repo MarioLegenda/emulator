@@ -159,20 +159,40 @@ func (cf *RunCommandFactory) CreateHaskellCommand(containerName string, projectN
 	return args
 }
 
-func (cf *RunCommandFactory) CreateGoCommand(containerName string, projectName string, lang *Language, directoryName string) []string {
+func (cf *RunCommandFactory) CreateGoLinkedProjectCommand(containerName string, projectName string, lang *Language, directoryName string) []string {
 	cb := CommandBuilder{Commands: &[]string{}}
 
 	cb.
 		NewNetwork("none").
 		AllocatePseudoTty().
-		User("dockeruser").
 		RemoveAfterFinished().
 		NewVolumeFull(projectName, fmt.Sprintf("app/src/%s", directoryName), "rw").
 		Name(containerName).
 		Init().
 		Tag(string(lang.Tag)).
 		Shell("/bin/sh").
-		Exec(fmt.Sprintf("go run %s | tee output.txt", directoryName)).
+		Exec(fmt.Sprintf("cd /app/src/%s && go mod init > /dev/null 2>&1 && go run %s | tee output.txt", directoryName, directoryName)).
+		SendToStd("/dev/stderr").
+		Run()
+
+	args := *cb.Commands
+
+	return args
+}
+
+func (cf *RunCommandFactory) CreateGoCommand(containerName string, projectName string, lang *Language, directoryName string) []string {
+	cb := CommandBuilder{Commands: &[]string{}}
+
+	cb.
+		NewNetwork("none").
+		AllocatePseudoTty().
+		RemoveAfterFinished().
+		NewVolumeFull(projectName, fmt.Sprintf("app/src/%s", directoryName), "rw").
+		Name(containerName).
+		Init().
+		Tag(string(lang.Tag)).
+		Shell("/bin/sh").
+		Exec(fmt.Sprintf("cd /app/src/%s && go mod init > /dev/null 2>&1 && go run %s | tee output.txt", directoryName, directoryName)).
 		SendToStd("/dev/stderr").
 		Run()
 

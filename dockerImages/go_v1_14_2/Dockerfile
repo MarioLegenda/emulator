@@ -1,7 +1,7 @@
 FROM ubuntu:bionic
 
 ENV APP_DIR /app
-ENV GOLANG_VERSION 1.14.2
+ENV GOLANG_VERSION 1.17.6
 ENV GOLANG_DOWNLOAD_URL https://golang.org/dl/go$GOLANG_VERSION.linux-amd64.tar.gz
 ENV GO_BIN_PATH /usr/local/go/bin
 

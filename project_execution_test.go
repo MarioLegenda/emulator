@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"github.com/google/uuid"
 	"github.com/onsi/ginkgo"
 	"github.com/onsi/gomega"
 	"net/http"
@@ -21,7 +22,7 @@ var _ = GinkgoDescribe("Project execution tests", func() {
 
 		activeSession := testCreateAccount()
 
-		cp := testCreateCodeProject(activeSession, runner.Node14)
+		cp := testCreateCodeProject(activeSession, uuid.New().String(), runner.Node14)
 
 		cpUuid := cp["uuid"].(string)
 
@@ -137,7 +138,7 @@ module.exports = {
 		defer testCleanup()
 
 		activeSession := testCreateAccount()
-		cp := testCreateCodeProject(activeSession, runner.Node14)
+		cp := testCreateCodeProject(activeSession, uuid.New().String(), runner.Node14)
 		cpUuid := cp["uuid"].(string)
 
 		var rootDirectory map[string]interface{}
@@ -246,7 +247,7 @@ console.log('subSubDirFile.js is executed');
 		defer testCleanup()
 
 		activeSession := testCreateAccount()
-		cp := testCreateCodeProject(activeSession, runner.GoLang)
+		cp := testCreateCodeProject(activeSession, uuid.New().String(), runner.GoLang)
 		cpUuid := cp["uuid"].(string)
 
 		var rootDirectory map[string]interface{}
@@ -318,7 +319,7 @@ console.log('subSubDirFile.js is executed');
 		defer testCleanup()
 
 		activeSession := testCreateAccount()
-		cp := testCreateCodeProject(activeSession, runner.Rust)
+		cp := testCreateCodeProject(activeSession, uuid.New().String(), runner.Rust)
 		cpUuid := cp["uuid"].(string)
 
 		var rootDirectory map[string]interface{}
@@ -390,7 +391,7 @@ console.log('subSubDirFile.js is executed');
 		defer testCleanup()
 
 		activeSession := testCreateAccount()
-		cp := testCreateCodeProject(activeSession, runner.CLang)
+		cp := testCreateCodeProject(activeSession, uuid.New().String(), runner.CLang)
 		cpUuid := cp["uuid"].(string)
 
 		var rootDirectory map[string]interface{}
@@ -463,7 +464,7 @@ console.log('subSubDirFile.js is executed');
 		defer testCleanup()
 
 		activeSession := testCreateAccount()
-		cp := testCreateCodeProject(activeSession, runner.CPlus)
+		cp := testCreateCodeProject(activeSession, uuid.New().String(), runner.CPlus)
 		cpUuid := cp["uuid"].(string)
 
 		var rootDirectory map[string]interface{}
@@ -536,7 +537,7 @@ console.log('subSubDirFile.js is executed');
 		defer testCleanup()
 
 		activeSession := testCreateAccount()
-		cp := testCreateCodeProject(activeSession, runner.Haskell)
+		cp := testCreateCodeProject(activeSession, uuid.New().String(), runner.Haskell)
 		cpUuid := cp["uuid"].(string)
 
 		var rootDirectory *repository.File
@@ -621,7 +622,7 @@ module Bar.FooBar where
 		defer testCleanup()
 
 		activeSession := testCreateAccount()
-		cp := testCreateCodeProject(activeSession, runner.Ruby)
+		cp := testCreateCodeProject(activeSession, uuid.New().String(), runner.Ruby)
 		cpUuid := cp["uuid"].(string)
 
 		var rootDirectory *repository.File
@@ -703,7 +704,7 @@ puts "Hello world!"
 		defer testCleanup()
 
 		activeSession := testCreateAccount()
-		cp := testCreateCodeProject(activeSession, runner.Php74)
+		cp := testCreateCodeProject(activeSession, uuid.New().String(), runner.Php74)
 		cpUuid := cp["uuid"].(string)
 
 		var rootDirectory *repository.File
@@ -782,7 +783,7 @@ echo "Hello world!";
 		defer testCleanup()
 
 		activeSession := testCreateAccount()
-		cp := testCreateCodeProject(activeSession, runner.Python2)
+		cp := testCreateCodeProject(activeSession, uuid.New().String(), runner.Python2)
 		cpUuid := cp["uuid"].(string)
 
 		var rootDirectory *repository.File
@@ -864,7 +865,7 @@ def greeting(name):
 		defer testCleanup()
 
 		activeSession := testCreateAccount()
-		cp := testCreateCodeProject(activeSession, runner.Python3)
+		cp := testCreateCodeProject(activeSession, uuid.New().String(), runner.Python3)
 		cpUuid := cp["uuid"].(string)
 
 		var rootDirectory *repository.File

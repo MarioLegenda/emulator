@@ -174,9 +174,17 @@ func createCompiledProject() LinkedBuildFn {
 func createLinkedInterpretedBuildResult() LinkedInterpretedBuildFn {
 	return func(cb *repository.CodeProject, contents []*repository.FileContent, state string, codeBlock *repository.CodeBlock) (ProjectBuildResult, *appErrors.Error) {
 		executionDir := fmt.Sprintf("%s/%s", getStateDirectory(state), cb.Uuid)
-		ft := initFileTraverse(cb.Structure, executionDir)
 
-		paths := ft.createPaths()
+		var paths map[string][]*repository.File
+		if cb.Environment.Name == "go" {
+			ft := initFileTraverse(cb.Structure, fmt.Sprintf("%s/%s", executionDir, cb.Name))
+
+			paths = ft.createPaths()
+		} else {
+			ft := initFileTraverse(cb.Structure, executionDir)
+
+			paths = ft.createPaths()
+		}
 
 		if err := createDir(fmt.Sprintf("%s/%s", getStateDirectory(state), cb.Uuid)); err != nil {
 			return ProjectBuildResult{}, err
