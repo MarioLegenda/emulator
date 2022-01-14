@@ -321,11 +321,12 @@ func testCreateAccount() repository.ActiveSession {
 		appErrors.TerminateWithMessage(fmt.Sprintf("Cannot create account: %s", err.Error()))
 	}
 
+	email := testGetEmail()
 	bm := map[string]interface{}{
 		"name":     "name",
 		"lastName": "Last name",
-		"email":    testGetEmail(),
-		"password": "mypassword",
+		"email":    email,
+		"password": "blues_wissper2020",
 	}
 
 	body, err := json.Marshal(bm)
@@ -353,12 +354,56 @@ func testCreateAccount() repository.ActiveSession {
 		appErrors.TerminateWithMessage(fmt.Sprintf("Cannot create account: Response status is %d", response.Status))
 	}
 
+	return testLogin(email)
+}
+
+func testLogin(email string) repository.ActiveSession {
+	url := fmt.Sprintf("%s/auth/login", repository.CreateApiUrl())
+
+	client, err := httpClient.NewHttpClient(&tls.Config{
+		InsecureSkipVerify: true,
+	})
+
+	if err != nil {
+		appErrors.TerminateWithMessage(fmt.Sprintf("Cannot login: %s", err.Error()))
+	}
+
+	bm := map[string]interface{}{
+		"email":    email,
+		"password": "blues_wissper2020",
+	}
+
+	body, err := json.Marshal(bm)
+
+	gomega.Expect(err).To(gomega.BeNil())
+
+	response, clientError := client.MakeJsonRequest(&httpClient.JsonRequest{
+		Url:    url,
+		Method: "POST",
+		Body:   body,
+	})
+
+	if clientError != nil {
+		appErrors.TerminateWithMessage(fmt.Sprintf("Cannot login: %s", err.Error()))
+	}
+
+	if response.Status != 200 {
+		appErrors.TerminateWithMessage(fmt.Sprintf("Cannot login: Response status is %d", response.Status))
+	}
+
+	var apiResponse map[string]interface{}
+	err = json.Unmarshal(response.Body, &apiResponse)
+
+	if err != nil {
+		appErrors.TerminateWithMessage(fmt.Sprintf("Cannot login: %s", err.Error()))
+	}
+
 	d := apiResponse["data"]
 
 	b, err := json.Marshal(d)
 
 	if err != nil {
-		appErrors.TerminateWithMessage(fmt.Sprintf("Cannot create page: %s", err.Error()))
+		appErrors.TerminateWithMessage(fmt.Sprintf("Cannot login: %s", err.Error()))
 	}
 
 	var data repository.ActiveSession
