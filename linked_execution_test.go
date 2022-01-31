@@ -23,6 +23,7 @@ var _ = GinkgoDescribe("Linked project execution tests", func() {
 		activeSession := testCreateAccount()
 		link := testCreateBlog(activeSession)
 		pageUuid := link["page"].(map[string]interface{})["uuid"].(string)
+		blogUuid := link["blog"].(map[string]interface{})["uuid"].(string)
 
 		cp := testCreateCodeProject(activeSession, uuid.New().String(), runner.CLang)
 
@@ -35,7 +36,7 @@ int main() {
    return 0;
 }
 `)
-		testLinkCodeProject(activeSession, cp["uuid"].(string), pageUuid, cb["uuid"].(string))
+		testLinkCodeProject(activeSession, cp["uuid"].(string), pageUuid, cb["uuid"].(string), blogUuid)
 
 		var rootDirectory map[string]interface{}
 		s, err := json.Marshal(cp["rootDirectory"])
@@ -110,6 +111,7 @@ int main() {
 		activeSession := testCreateAccount()
 		link := testCreateBlog(activeSession)
 		pageUuid := link["page"].(map[string]interface{})["uuid"].(string)
+		blogUuid := link["blog"].(map[string]interface{})["uuid"].(string)
 
 		cp := testCreateCodeProject(activeSession, uuid.New().String(), runner.CPlus)
 		cpUuid := cp["uuid"].(string)
@@ -122,7 +124,7 @@ int main() {
     return 0;
 }
 `)
-		testLinkCodeProject(activeSession, cp["uuid"].(string), pageUuid, cb["uuid"].(string))
+		testLinkCodeProject(activeSession, cp["uuid"].(string), pageUuid, cb["uuid"].(string), blogUuid)
 
 		var rootDirectory map[string]interface{}
 		s, err := json.Marshal(cp["rootDirectory"])
@@ -199,6 +201,7 @@ int main() {
 		activeSession := testCreateAccount()
 		link := testCreateBlog(activeSession)
 		pageUuid := link["page"].(map[string]interface{})["uuid"].(string)
+		blogUuid := link["blog"].(map[string]interface{})["uuid"].(string)
 
 		cp := testCreateCodeProject(activeSession, uuid.New().String(), runner.Haskell)
 		cpUuid := cp["uuid"].(string)
@@ -209,7 +212,7 @@ import Bar.FooBar
 
 main = putStrLn "Hello, World!"
 `)
-		testLinkCodeProject(activeSession, cp["uuid"].(string), pageUuid, cb["uuid"].(string))
+		testLinkCodeProject(activeSession, cp["uuid"].(string), pageUuid, cb["uuid"].(string), blogUuid)
 
 		var rootDirectory *repository.File
 		s, err := json.Marshal(cp["rootDirectory"])
@@ -290,6 +293,7 @@ module Bar.FooBar where
 		activeSession := testCreateAccount()
 		link := testCreateBlog(activeSession)
 		pageUuid := link["page"].(map[string]interface{})["uuid"].(string)
+		blogUuid := link["blog"].(map[string]interface{})["uuid"].(string)
 
 		cp := testCreateCodeProject(activeSession, "my_cool_name", runner.GoLang)
 		cpUuid := cp["uuid"].(string)
@@ -306,7 +310,7 @@ func main() {
     %s.ExecuteFn()
 }
 `, cp["uuid"].(string), "my_cool_name", "my_cool_name"))
-		testLinkCodeProject(activeSession, cp["uuid"].(string), pageUuid, cb["uuid"].(string))
+		testLinkCodeProject(activeSession, cp["uuid"].(string), pageUuid, cb["uuid"].(string), blogUuid)
 
 		var rootDirectory *repository.File
 		s, err := json.Marshal(cp["rootDirectory"])
@@ -388,6 +392,7 @@ func ExecuteFn() {
 		activeSession := testCreateAccount()
 		link := testCreateBlog(activeSession)
 		pageUuid := link["page"].(map[string]interface{})["uuid"].(string)
+		blogUuid := link["blog"].(map[string]interface{})["uuid"].(string)
 
 		cp := testCreateCodeProject(activeSession, uuid.New().String(), runner.NodeLts)
 		cpUuid := cp["uuid"].(string)
@@ -395,7 +400,7 @@ func ExecuteFn() {
 		testUpdateCodeBlock(activeSession, pageUuid, cb["uuid"].(string), `
 require('./rootDirectoryFile1.js');
 `)
-		testLinkCodeProject(activeSession, cp["uuid"].(string), pageUuid, cb["uuid"].(string))
+		testLinkCodeProject(activeSession, cp["uuid"].(string), pageUuid, cb["uuid"].(string), blogUuid)
 
 		var rootDirectory map[string]interface{}
 		s, err := json.Marshal(cp["rootDirectory"])

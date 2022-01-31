@@ -525,7 +525,7 @@ func testUpdateCodeBlock(activeSession repository.ActiveSession, pageUuid string
 	return data
 }
 
-func testLinkCodeProject(activeSession repository.ActiveSession, codeProjectUuid string, pageUuid string, blockUuid string) map[string]interface{} {
+func testLinkCodeProject(activeSession repository.ActiveSession, codeProjectUuid string, pageUuid string, blockUuid string, blogUuid string) map[string]interface{} {
 	url := fmt.Sprintf("%s/code-project/link-project", repository.CreateApiUrl())
 
 	client, err := httpClient.NewHttpClient(&tls.Config{
@@ -537,8 +537,8 @@ func testLinkCodeProject(activeSession repository.ActiveSession, codeProjectUuid
 	}
 
 	bm := map[string]interface{}{
+		"blogUuid":        blogUuid,
 		"codeProjectUuid": codeProjectUuid,
-		"pageUuid":        pageUuid,
 		"blockUuid":       blockUuid,
 	}
 
