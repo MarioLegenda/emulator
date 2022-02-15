@@ -187,6 +187,38 @@ func (cr CurrentHttpRequest) ReadLinkedProjectExecutionRequest() *linkedProjectE
 	return t
 }
 
+func (cr CurrentHttpRequest) ReadPublicLinkedProjectExecution() *linkedProjectExecution.PublicLinkedProjectRunRequest {
+	body := cr.ReadBodyOrSendError()
+
+	if body == nil {
+		return nil
+	}
+
+	var m linkedProjectExecution.PublicLinkedProjectRunRequest
+	t := &m
+
+	err := json.Unmarshal(body, t)
+
+	if err != nil {
+		requestErr := appErrors.New(appErrors.ApplicationError, appErrors.ApplicationRuntimeError, "Request data is invalid")
+		apiResponse := CreateErrorResponse(cr, requestErr, nil)
+
+		cr.SendResponse(apiResponse)
+
+		return nil
+	}
+
+	err = t.Validate()
+
+	if err != nil {
+		cr.sendValidationError(err)
+
+		return nil
+	}
+
+	return t
+}
+
 func (cr CurrentHttpRequest) sendValidationError(err error) {
 	b, _ := json.Marshal(err)
 

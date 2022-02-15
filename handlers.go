@@ -127,3 +127,27 @@ func executeLinkedProjectHandler(w http.ResponseWriter, r *http.Request) {
 
 	cr.SendResponse(apiResponse)
 }
+
+func executePublicLinkedProjectHandler(w http.ResponseWriter, r *http.Request) {
+	cr := httpUtil.InitCurrentRequest(w, r)
+
+	requestModel := cr.ReadPublicLinkedProjectExecution()
+
+	if requestModel == nil {
+		return
+	}
+
+	runResult, err := linkedProjectExecution.ExecutionService.RunPublicProject(requestModel)
+
+	if err != nil {
+		apiResponse := httpUtil.CreateErrorResponse(cr, err, err.GetData())
+
+		cr.SendResponse(apiResponse)
+
+		return
+	}
+
+	apiResponse := httpUtil.CreateSuccessResponse(cr, staticTypes.RESPONSE_RESOURCE, runResult, http.StatusOK, "Emulator run result")
+
+	cr.SendResponse(apiResponse)
+}

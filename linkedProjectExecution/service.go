@@ -90,6 +90,7 @@ func (s Service) RunProject(model *LinkedProjectRunRequest) (runner.ProjectRunRe
 			ExecutionDirectory: buildResult.ExecutionDirectory,
 			Environment:        model.sessionData.CodeProject.Environment,
 			Args:               args,
+			Timeout:            model.validatedTemporarySession.Timeout,
 		})
 
 		if err != nil {
@@ -126,6 +127,7 @@ func (s Service) RunProject(model *LinkedProjectRunRequest) (runner.ProjectRunRe
 			ExecutionDirectory: buildResult.ExecutionDirectory,
 			Environment:        model.sessionData.CodeProject.Environment,
 			Args:               args,
+			Timeout:            model.validatedTemporarySession.Timeout,
 		})
 
 		if err != nil {
@@ -162,6 +164,7 @@ func (s Service) RunProject(model *LinkedProjectRunRequest) (runner.ProjectRunRe
 			ExecutionDirectory: buildResult.ExecutionDirectory,
 			Environment:        model.sessionData.CodeProject.Environment,
 			Args:               args,
+			Timeout:            model.validatedTemporarySession.Timeout,
 		})
 
 		if err != nil {
@@ -196,6 +199,154 @@ func (s Service) RunProject(model *LinkedProjectRunRequest) (runner.ProjectRunRe
 		Environment:        model.sessionData.CodeProject.Environment,
 		StateDirectory:     buildResult.StateDirectory,
 		Args:               createCommand(buildResult, model.sessionData.CodeProject.Environment, containerName),
+		Timeout:            model.validatedTemporarySession.Timeout,
+	})
+
+	if err != nil {
+		return runner.ProjectRunResult{}, err
+	}
+
+	return runner.ProjectRunResult{
+		Success: runResult.Success,
+		Result:  runResult.Result,
+		Timeout: runResult.Timeout,
+	}, nil
+}
+
+func (s Service) RunPublicProject(model *PublicLinkedProjectRunRequest) (runner.ProjectRunResult, *appErrors.Error) {
+	if model.sessionData.CodeProject.Environment.Name == "c" {
+		projectBuilder := builders.CreateBuilder("linked_compiled_project").(builders.LinkedBuildFn)
+
+		containerName := uuid.New().String()
+
+		buildResult, err := projectBuilder(model.sessionData.CodeProject, model.sessionData.Content, builders.PROJECT_EXECUTION_STATE, model.sessionData.CodeBlock)
+		defer goDestroy(buildResult.ExecutionDirectory)
+
+		args := createCommand(buildResult, model.sessionData.CodeProject.Environment, containerName)
+
+		buildResult.Args = args
+
+		if err != nil {
+			return runner.ProjectRunResult{}, err
+		}
+
+		builtRunner := runner.CreateRunner("singleFile").(runner.SingleFileRunFn)
+
+		runResult, err := builtRunner(runner.SingleFileBuildResult{
+			ContainerName:      containerName,
+			ExecutionDirectory: buildResult.ExecutionDirectory,
+			Environment:        model.sessionData.CodeProject.Environment,
+			Args:               args,
+			Timeout:            model.validatedTemporarySession.Timeout,
+		})
+
+		if err != nil {
+			return runner.ProjectRunResult{}, err
+		}
+
+		return runner.ProjectRunResult{
+			Success: runResult.Success,
+			Result:  runResult.Result,
+			Timeout: runResult.Timeout,
+		}, nil
+	}
+
+	if model.sessionData.CodeProject.Environment.Name == "c++" {
+		projectBuilder := builders.CreateBuilder("linked_compiled_project").(builders.LinkedBuildFn)
+
+		containerName := uuid.New().String()
+
+		buildResult, err := projectBuilder(model.sessionData.CodeProject, model.sessionData.Content, builders.PROJECT_EXECUTION_STATE, model.sessionData.CodeBlock)
+		defer goDestroy(buildResult.ExecutionDirectory)
+
+		args := createCommand(buildResult, model.sessionData.CodeProject.Environment, containerName)
+
+		buildResult.Args = args
+
+		if err != nil {
+			return runner.ProjectRunResult{}, err
+		}
+
+		builtRunner := runner.CreateRunner("singleFile").(runner.SingleFileRunFn)
+
+		runResult, err := builtRunner(runner.SingleFileBuildResult{
+			ContainerName:      containerName,
+			ExecutionDirectory: buildResult.ExecutionDirectory,
+			Environment:        model.sessionData.CodeProject.Environment,
+			Args:               args,
+			Timeout:            model.validatedTemporarySession.Timeout,
+		})
+
+		if err != nil {
+			return runner.ProjectRunResult{}, err
+		}
+
+		return runner.ProjectRunResult{
+			Success: runResult.Success,
+			Result:  runResult.Result,
+			Timeout: runResult.Timeout,
+		}, nil
+	}
+
+	if model.sessionData.CodeProject.Environment.Name == "haskell" {
+		projectBuilder := builders.CreateBuilder("linked_compiled_project").(builders.LinkedBuildFn)
+
+		containerName := uuid.New().String()
+
+		buildResult, err := projectBuilder(model.sessionData.CodeProject, model.sessionData.Content, builders.PROJECT_EXECUTION_STATE, model.sessionData.CodeBlock)
+		defer goDestroy(buildResult.ExecutionDirectory)
+
+		args := createCommand(buildResult, model.sessionData.CodeProject.Environment, containerName)
+
+		buildResult.Args = args
+
+		if err != nil {
+			return runner.ProjectRunResult{}, err
+		}
+
+		builtRunner := runner.CreateRunner("singleFile").(runner.SingleFileRunFn)
+
+		runResult, err := builtRunner(runner.SingleFileBuildResult{
+			ContainerName:      containerName,
+			ExecutionDirectory: buildResult.ExecutionDirectory,
+			Environment:        model.sessionData.CodeProject.Environment,
+			Args:               args,
+			Timeout:            model.validatedTemporarySession.Timeout,
+		})
+
+		if err != nil {
+			return runner.ProjectRunResult{}, err
+		}
+
+		return runner.ProjectRunResult{
+			Success: runResult.Success,
+			Result:  runResult.Result,
+			Timeout: runResult.Timeout,
+		}, nil
+	}
+
+	projectBuilder := builders.CreateBuilder("linked_interpreted_project").(builders.LinkedInterpretedBuildFn)
+
+	buildResult, err := projectBuilder(model.sessionData.CodeProject, model.sessionData.Content, builders.PROJECT_EXECUTION_STATE, model.sessionData.CodeBlock)
+	defer goDestroy(buildResult.ExecutionDirectory)
+
+	if err != nil {
+		return runner.ProjectRunResult{}, err
+	}
+
+	builtRunner := runner.CreateRunner("singleFile").(runner.SingleFileRunFn)
+
+	containerName := uuid.New().String()
+
+	runResult, err := builtRunner(runner.SingleFileBuildResult{
+		ContainerName:      containerName,
+		DirectoryName:      buildResult.DirectoryName,
+		ExecutionDirectory: buildResult.ExecutionDirectory,
+		FileName:           buildResult.FileName,
+		Environment:        model.sessionData.CodeProject.Environment,
+		StateDirectory:     buildResult.StateDirectory,
+		Args:               createCommand(buildResult, model.sessionData.CodeProject.Environment, containerName),
+		Timeout:            model.validatedTemporarySession.Timeout,
 	})
 
 	if err != nil {

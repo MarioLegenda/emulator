@@ -18,4 +18,5 @@ func registerBlogRoutes(r *mux.Router) {
 	r.HandleFunc("/api/environment-emulator/public/execute/single-file", executePublicSingleFileRunResult).Methods("POST")
 	r.HandleFunc("/api/environment-emulator/execute/project", executeProjectHandler).Methods("POST")
 	r.HandleFunc("/api/environment-emulator/execute/linked-project", executeLinkedProjectHandler).Methods("POST")
+	r.HandleFunc("/api/environment-emulator/public/execute/linked-project", executePublicLinkedProjectHandler).Methods("POST")
 }
