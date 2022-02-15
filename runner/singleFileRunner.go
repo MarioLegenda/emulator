@@ -22,7 +22,12 @@ func createSingleFileRunner() SingleFileRunFn {
 	return func(br SingleFileBuildResult) (SingleFileRunResult, *appErrors.Error) {
 		context := context.TODO()
 
-		timeout := getTimeout("blog", "single_file", "anonymous")
+		userState := "anonymous"
+		if br.Timeout == 15 {
+			userState = "authenticated"
+		}
+
+		timeout := getTimeout("blog", "single_file", userState)
 
 		var outb, errb bytes.Buffer
 		var out string

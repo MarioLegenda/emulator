@@ -56,6 +56,30 @@ func executeSingleCodeBlockHandler(w http.ResponseWriter, r *http.Request) {
 	cr.SendResponse(apiResponse)
 }
 
+func executePublicSingleFileRunResult(w http.ResponseWriter, r *http.Request) {
+	cr := httpUtil.InitCurrentRequest(w, r)
+
+	requestModel := cr.ReadPublicSingleFileRunResult()
+
+	if requestModel == nil {
+		return
+	}
+
+	runResult, err := singleFileExecution.SingleFileExecutionService.RunPublicSingleFile(requestModel)
+
+	if err != nil {
+		apiResponse := httpUtil.CreateErrorResponse(cr, err, err.GetData())
+
+		cr.SendResponse(apiResponse)
+
+		return
+	}
+
+	apiResponse := httpUtil.CreateSuccessResponse(cr, staticTypes.RESPONSE_RESOURCE, runResult, http.StatusOK, "Emulator run result")
+
+	cr.SendResponse(apiResponse)
+}
+
 func executeProjectHandler(w http.ResponseWriter, r *http.Request) {
 	cr := httpUtil.InitCurrentRequest(w, r)
 

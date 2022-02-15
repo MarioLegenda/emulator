@@ -43,7 +43,7 @@ func (cf *RunCommandFactory) CreateCCommand(containerName string, projectName st
 		Init().
 		Tag(string(lang.Tag)).
 		Shell("/bin/sh").
-		Exec(fmt.Sprintf("gcc -o %s %s &> output.txt && ./%s &> output.txt", execName, fileName, execName)).
+		Exec(fmt.Sprintf("gcc -o %s %s > output.txt && ./%s > output.txt", execName, fileName, execName)).
 		SendToStd("/dev/stderr").
 		Run()
 
@@ -64,7 +64,7 @@ func (cf *RunCommandFactory) CreateCProjectCommand(containerName string, project
 		Init().
 		Tag(string(lang.Tag)).
 		Shell("/bin/sh").
-		Exec(fmt.Sprintf("gcc -o %s %s &> output.txt && ./%s &> output.txt", projectName, paths, projectName)).
+		Exec(fmt.Sprintf("gcc -o %s %s > output.txt && ./%s > output.txt", projectName, paths, projectName)).
 		SendToStd("/dev/stderr").
 		Run()
 
@@ -87,7 +87,7 @@ func (cf *RunCommandFactory) CreateCPlusCommand(containerName string, projectNam
 		Init().
 		Tag(string(lang.Tag)).
 		Shell("/bin/sh").
-		Exec(fmt.Sprintf("g++ -o %s %s &> output.txt && ./%s &> output.txt", execName, fileName, execName)).
+		Exec(fmt.Sprintf("g++ -o %s %s > output.txt && ./%s > output.txt", execName, fileName, execName)).
 		SendToStd("/dev/stderr").
 		Run()
 
@@ -108,7 +108,7 @@ func (cf *RunCommandFactory) CreateCPlusProjectCommand(containerName string, pro
 		Init().
 		Tag(string(lang.Tag)).
 		Shell("/bin/sh").
-		Exec(fmt.Sprintf("g++ -o %s %s &> output.txt && ./%s &> output.txt", projectName, paths, projectName)).
+		Exec(fmt.Sprintf("g++ -o %s %s > output.txt && ./%s > output.txt", projectName, paths, projectName)).
 		SendToStd("/dev/stderr").
 		Run()
 

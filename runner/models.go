@@ -133,6 +133,7 @@ type SingleFileBuildResult struct {
 	FileName           string
 	Environment        *Language
 	StateDirectory     string
+	Timeout            int
 	Args               []string
 }
 
