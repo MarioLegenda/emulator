@@ -30,8 +30,8 @@ type Account struct {
 
 	Confirmed bool `json:"confirmed"`
 
-	CreatedAt *string `json:"createdAt"`
-	UpdatedAt *string `json:"updatedAt"`
+	CreatedAt int64  `json:"createdAt"`
+	UpdatedAt *int64 `json:"updatedAt"`
 }
 
 type TemporarySession struct {
@@ -83,8 +83,8 @@ type CodeProject struct {
 
 	RootDirectory *File `json:"rootDirectory" bson:"-"`
 
-	CreatedAt *string `json:"createdAt" bson:"createdAt"`
-	UpdatedAt *string `json:"updatedAt" bson:"updatedAt"`
+	CreatedAt int64  `json:"createdAt" bson:"createdAt"`
+	UpdatedAt *int64 `json:"updatedAt" bson:"updatedAt"`
 }
 
 type File struct {
@@ -99,8 +99,8 @@ type File struct {
 	Parent   *string  `json:"parent" bson:"parent"`
 	Children []string `json:"children" bson:"children"`
 
-	CreatedAt *string `json:"createdAt" bson:"createdAt"`
-	UpdatedAt *string `json:"updatedAt" bson:"updatedAt"`
+	CreatedAt int64  `json:"createdAt" bson:"createdAt"`
+	UpdatedAt *int64 `json:"updatedAt" bson:"updatedAt"`
 }
 
 type FileContent struct {
