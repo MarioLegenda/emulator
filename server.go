@@ -21,6 +21,10 @@ func InitServer(r *mux.Router) *http.Server {
 		origins = []string{"https://dev.therebelsource.local:8000"}
 	}
 
+	if os.Getenv("APP_ENV") == "staging" {
+		origins = []string{"https://staging-rebelsource.com"}
+	}
+
 	c := cors.New(cors.Options{
 		AllowedOrigins:   origins,
 		AllowCredentials: true,
