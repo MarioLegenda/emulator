@@ -312,7 +312,7 @@ func (cf *RunCommandFactory) CreateRustCommand(containerName string, projectName
 }
 
 func (cf *RunCommandFactory) CreateCommand(containerName, projectName string, fileName string, lang *Language, directoryName string) []string {
-	if lang.Name == Node14.Name || lang.Name == NodeLts.Name {
+	if lang.Name == Node14.Name || lang.Name == NodeLts.Name || lang.Name == NodeEsm.Name {
 		return cf.CreateProjectNodeCommand(containerName, projectName, fileName, lang)
 	} else if lang.Name == GoLang.Name {
 		return cf.CreateGoCommand(containerName, projectName, lang, directoryName)

@@ -36,6 +36,16 @@ var NodeLts = Language{
 	Extension:     "js",
 }
 
+var NodeEsm = Language{
+	Name:          "node_latest_esm",
+	Text:          "Javascript (Node ESM)",
+	Tag:           "node:node_latest",
+	InDevelopment: false,
+	InMaintenance: false,
+	Language:      "javascript",
+	Extension:     "mjs",
+}
+
 var GoLang = Language{
 	Name:          "go",
 	Text:          "Go v1.*.*",
