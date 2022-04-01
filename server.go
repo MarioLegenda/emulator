@@ -32,7 +32,7 @@ func InitServer(r *mux.Router) *http.Server {
 		ExposedHeaders:   []string{"Content-Length", "Content-Range", "Content-Type", "Cookie", "Set-Cookie"},
 		AllowedHeaders:   []string{"Content-Range", "Set-Cookie", "Cookie", "Range", "Content-Type", "User-Agent", "X-Requested-With", "Cache-Control", "If-Modified-Since", "Keep-Alive", "DNT", "Origin", "Authorization", "x-rebel-source-auth", "Accept"},
 		// Enable Debugging for testing, consider disabling in production
-		Debug: os.Getenv("APP_ENV") != "prod",
+		Debug: os.Getenv("APP_ENV") != "prod" && os.Getenv("APP_ENV") != "staging",
 	})
 
 	handler := c.Handler(r)
