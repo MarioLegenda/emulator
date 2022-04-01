@@ -2,6 +2,7 @@ package builders
 
 import (
 	"fmt"
+	"github.com/google/uuid"
 	"os"
 	"strings"
 	"therebelsource/emulator/appErrors"
@@ -39,7 +40,8 @@ type LinkedProjectBuildResult struct {
 
 func createProjectBuilder() ProjectBuildFn {
 	return func(cb *repository.CodeProject, contents []*repository.FileContent, state string, executingFile *repository.File) (ProjectBuildResult, *appErrors.Error) {
-		executionDir := fmt.Sprintf("%s/%s", getStateDirectory(state), cb.Uuid)
+		execDirConstant := uuid.New().String()
+		executionDir := fmt.Sprintf("%s/%s", getStateDirectory(state), execDirConstant)
 		ft := initFileTraverse(cb.Structure, executionDir)
 
 		paths := ft.createPaths()
@@ -57,8 +59,8 @@ func createProjectBuilder() ProjectBuildFn {
 		if executingFile.Depth != 1 {
 			for path, files := range paths {
 				for _, file := range files {
-					if file.Uuid == executingFile.Uuid {
-						s := strings.Split(path, cb.Uuid)
+					if file.Uuid == execDirConstant {
+						s := strings.Split(path, execDirConstant)
 
 						fileName = fmt.Sprintf("/app%s/%s", s[1], executingFile.Name)
 					}
@@ -92,7 +94,8 @@ path = "main.rs"
 
 func createCLangBuilder() CProjectBuildFn {
 	return func(cb *repository.CodeProject, contents []*repository.FileContent, state string, executingFile *repository.File) (CProjectBuildResult, *appErrors.Error) {
-		executionDir := fmt.Sprintf("%s/%s", getStateDirectory(state), cb.Uuid)
+		execDirConstant := uuid.New().String()
+		executionDir := fmt.Sprintf("%s/%s", getStateDirectory(state), execDirConstant)
 		ft := initFileTraverse(cb.Structure, executionDir)
 
 		paths := ft.createPaths()
@@ -107,7 +110,7 @@ func createCLangBuilder() CProjectBuildFn {
 
 		resolvedFiles := ""
 		for dir, files := range paths {
-			s := strings.Split(dir, cb.Uuid)
+			s := strings.Split(dir, execDirConstant)
 			dockerPath := s[1]
 
 			for _, file := range files {
@@ -129,7 +132,8 @@ func createCLangBuilder() CProjectBuildFn {
 
 func createCompiledProject() LinkedBuildFn {
 	return func(cb *repository.CodeProject, contents []*repository.FileContent, state string, executingFile *repository.CodeBlock) (LinkedProjectBuildResult, *appErrors.Error) {
-		executionDir := fmt.Sprintf("%s/%s", getStateDirectory(state), cb.Uuid)
+		execDirConstant := uuid.New().String()
+		executionDir := fmt.Sprintf("%s/%s", getStateDirectory(state), execDirConstant)
 		ft := initFileTraverse(cb.Structure, executionDir)
 
 		paths := ft.createPaths()
@@ -149,7 +153,7 @@ func createCompiledProject() LinkedBuildFn {
 
 		resolvedFiles := ""
 		for dir, files := range paths {
-			s := strings.Split(dir, cb.Uuid)
+			s := strings.Split(dir, execDirConstant)
 			dockerPath := s[1]
 
 			for _, file := range files {
@@ -173,7 +177,8 @@ func createCompiledProject() LinkedBuildFn {
 
 func createLinkedInterpretedBuildResult() LinkedInterpretedBuildFn {
 	return func(cb *repository.CodeProject, contents []*repository.FileContent, state string, codeBlock *repository.CodeBlock) (ProjectBuildResult, *appErrors.Error) {
-		executionDir := fmt.Sprintf("%s/%s", getStateDirectory(state), cb.Uuid)
+		execDirConstant := uuid.New().String()
+		executionDir := fmt.Sprintf("%s/%s", getStateDirectory(state), execDirConstant)
 
 		var paths map[string][]*repository.File
 		if cb.Environment.Name == "go" {
