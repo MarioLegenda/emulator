@@ -78,6 +78,9 @@ func createSingleFileRunner() SingleFileRunFn {
 				} else if br.Environment.Name == "rust" {
 					success = true
 					out = outS
+				} else if br.Environment.Name == "c_sharp_mono" {
+					success = true
+					out = outS
 				} else if br.Environment.Name == "haskell" {
 					split := strings.Split(outS, "...")
 

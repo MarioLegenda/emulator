@@ -145,6 +145,79 @@ console.log('mile');
 		gomega.Expect(result.Result).Should(gomega.Equal("mile\n"))
 	})
 
+	GinkgoIt("Should public execute a single file in a C# (Mono) environment", func() {
+		testPrepare()
+		defer testCleanup()
+
+		activeSession := testCreateAccount()
+
+		pg := testCreateEmptyPage(activeSession)
+		cb := testCreateCodeBlock(pg["uuid"].(string), activeSession)
+		testAddEmulatorToCodeBlock(pg["uuid"].(string), cb["uuid"].(string), ``, runner.CSharpMono, activeSession)
+		sessionUuid := testCreateTemporarySession(activeSession, pg["uuid"].(string), cb["uuid"].(string), "single_file")
+
+		bm := map[string]interface{}{
+			"uuid": sessionUuid,
+			"text": `
+using System;
+
+public class HelloWorld
+{
+    public static void Main(string[] args)
+    {
+        Console.WriteLine ("Hello World");
+    }
+}
+`,
+		}
+
+		body, err := json.Marshal(bm)
+
+		gomega.Expect(err).To(gomega.BeNil())
+
+		req, err := http.NewRequest("POST", "/api/environment-emulator/public/execute/single-file", bytes.NewReader(body))
+
+		if err != nil {
+			ginkgo.Fail(err.Error())
+
+			return
+		}
+
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(executePublicSingleFileRunResult)
+
+		handler.ServeHTTP(rr, req)
+
+		b := rr.Body.Bytes()
+
+		var apiResponse httpUtil.ApiResponse
+		err = json.Unmarshal(b, &apiResponse)
+
+		gomega.Expect(err).To(gomega.BeNil())
+
+		gomega.Expect(rr.Code).To(gomega.Equal(http.StatusOK))
+		gomega.Expect(rr.Body).To(gomega.Not(gomega.BeNil()))
+
+		gomega.Expect(apiResponse.Method).To(gomega.Equal("POST"))
+		gomega.Expect(apiResponse.Type).To(gomega.Equal(staticTypes.RESPONSE_RESOURCE))
+		gomega.Expect(apiResponse.Message).To(gomega.Equal("Emulator run result"))
+		gomega.Expect(apiResponse.MasterCode).To(gomega.Equal(0))
+		gomega.Expect(apiResponse.Code).To(gomega.Equal(0))
+		gomega.Expect(apiResponse.Status).To(gomega.Equal(http.StatusOK))
+		gomega.Expect(apiResponse.Pagination).To(gomega.BeNil())
+
+		b, err = json.Marshal(apiResponse.Data)
+
+		gomega.Expect(err).To(gomega.BeNil())
+
+		var result runner.SingleFileRunResult
+		gomega.Expect(json.Unmarshal(b, &result)).To(gomega.BeNil())
+
+		gomega.Expect(result.Timeout).Should(gomega.Equal(5))
+		gomega.Expect(result.Success).Should(gomega.BeTrue())
+		gomega.Expect(result.Result).Should(gomega.Equal("Hello World\r\n"))
+	})
+
 	GinkgoIt("Should execute a single file in a node 14.x environment", func() {
 		testPrepare()
 		defer testCleanup()

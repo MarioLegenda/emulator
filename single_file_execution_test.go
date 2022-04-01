@@ -407,7 +407,7 @@ public class HelloWorld
 
 		gomega.Expect(result.Timeout).Should(gomega.Equal(5))
 		gomega.Expect(result.Success).Should(gomega.BeTrue())
-		gomega.Expect(result.Result).Should(gomega.Equal("mile\n"))
+		gomega.Expect(result.Result).Should(gomega.Equal("mile\r\n"))
 	})
 
 	GinkgoIt("Should execute a single file in a Python2 environment", func() {
