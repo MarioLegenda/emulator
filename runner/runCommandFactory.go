@@ -201,6 +201,27 @@ func (cf *RunCommandFactory) CreateGoCommand(containerName string, projectName s
 	return args
 }
 
+func (cf *RunCommandFactory) CreateCSharpCommand(containerName string, projectName string, lang *Language, directoryName string) []string {
+	cb := CommandBuilder{Commands: &[]string{}}
+
+	cb.
+		NewNetwork("none").
+		AllocatePseudoTty().
+		RemoveAfterFinished().
+		NewVolumeFull(projectName, fmt.Sprintf("app/src/%s", directoryName), "rw").
+		Name(containerName).
+		Init().
+		Tag(string(lang.Tag)).
+		Shell("/bin/sh").
+		Exec(fmt.Sprintf("cd /app/src/%s && mcs -out:app.exe -pkg:dotnet -recurse:'*.cs' && mono app.exe | tee output.txt", directoryName)).
+		SendToStd("/dev/stderr").
+		Run()
+
+	args := *cb.Commands
+
+	return args
+}
+
 func (cf *RunCommandFactory) CreatePython2Command(containerName string, projectName string, fileName string, lang *Language) []string {
 	cb := CommandBuilder{Commands: &[]string{}}
 
@@ -332,6 +353,8 @@ func (cf *RunCommandFactory) CreateCommand(containerName, projectName string, fi
 		return cf.CreateCCommand(containerName, projectName, fileName, lang)
 	} else if lang.Name == CPlus.Name {
 		return cf.CreateCPlusCommand(containerName, projectName, fileName, lang)
+	} else if lang.Name == CSharpMono.Name {
+		return cf.CreateCSharpCommand(containerName, projectName, lang, directoryName)
 	}
 
 	return []string{}

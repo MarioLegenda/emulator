@@ -16,6 +16,7 @@ func getEnvironmentsHandler(w http.ResponseWriter, r *http.Request) {
 	var languages []runner.Language
 
 	languages = append(languages, runner.Node14)
+	languages = append(languages, runner.CSharpMono)
 	languages = append(languages, runner.NodeEsm)
 	languages = append(languages, runner.NodeLts)
 	languages = append(languages, runner.Haskell)

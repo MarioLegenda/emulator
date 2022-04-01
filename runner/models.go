@@ -136,6 +136,16 @@ var CPlus = Language{
 	Extension:     "cpp",
 }
 
+var CSharpMono = Language{
+	Name:          "c_sharp_mono",
+	Text:          "C# (Mono)",
+	Tag:           "c_sharp_mono:c_sharp_mono",
+	InDevelopment: false,
+	InMaintenance: false,
+	Language:      "csharp",
+	Extension:     "cs",
+}
+
 type SingleFileBuildResult struct {
 	ContainerName      string
 	DirectoryName      string
