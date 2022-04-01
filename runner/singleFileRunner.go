@@ -92,6 +92,9 @@ func createSingleFileRunner() SingleFileRunFn {
 				} else {
 					output, err := readFile(fmt.Sprintf("%s/%s", br.ExecutionDirectory, "output.txt"))
 
+					fmt.Println(br.ExecutionDirectory)
+					fmt.Println(err)
+
 					if err != nil {
 						success = false
 						out = ""
