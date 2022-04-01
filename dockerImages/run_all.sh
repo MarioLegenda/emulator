@@ -13,3 +13,4 @@ cd "$dir/rust" && /usr/bin/docker image build -t rust:rust .
 cd "$dir/haskell" && /usr/bin/docker image build -t haskell:haskell .
 cd "$dir/c" && /usr/bin/docker image build -t c:c .
 cd "$dir/c++" && /usr/bin/docker image build -t c-plus:c-plus .
+cd "$dir/c_sharp_mono" && /usr/bin/docker image build -t c_sharp_mono:c_sharp_mono .
