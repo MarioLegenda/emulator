@@ -20,7 +20,7 @@ func (cf *RunCommandFactory) CreateProjectNodeCommand(containerName string, proj
 		Init().
 		Tag(string(lang.Tag)).
 		Shell("/bin/sh").
-		Exec(fmt.Sprintf("node %s &> output.txt", fileName)).
+		Exec(fmt.Sprintf("node %s > output.txt", fileName)).
 		SendToStd("/dev/stderr").
 		Run()
 

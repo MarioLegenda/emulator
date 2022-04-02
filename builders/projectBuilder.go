@@ -191,7 +191,7 @@ func createLinkedInterpretedBuildResult() LinkedInterpretedBuildFn {
 			paths = ft.createPaths()
 		}
 
-		if err := createDir(fmt.Sprintf("%s/%s", getStateDirectory(state), cb.Uuid)); err != nil {
+		if err := createDir(executionDir); err != nil {
 			return ProjectBuildResult{}, err
 		}
 
