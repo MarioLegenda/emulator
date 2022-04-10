@@ -10,6 +10,8 @@ require (
 	github.com/microcosm-cc/bluemonday v1.0.16
 	github.com/onsi/ginkgo v1.16.5
 	github.com/onsi/gomega v1.17.0
+	github.com/rs/cors v1.8.0
+	github.com/sethvargo/go-limiter v0.7.2
 )
 
 require (
@@ -18,7 +20,6 @@ require (
 	github.com/fsnotify/fsnotify v1.4.9 // indirect
 	github.com/gorilla/css v1.0.0 // indirect
 	github.com/nxadm/tail v1.4.8 // indirect
-	github.com/rs/cors v1.8.0 // indirect
 	golang.org/x/net v0.0.0-20210614182718-04defd469f4e // indirect
 	golang.org/x/sys v0.0.0-20210423082822-04245dca01da // indirect
 	golang.org/x/text v0.3.6 // indirect

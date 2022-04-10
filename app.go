@@ -7,6 +7,7 @@ import (
 	"os"
 	errorHandler "therebelsource/emulator/appErrors"
 	"therebelsource/emulator/projectExecution"
+	"therebelsource/emulator/rateLimiter"
 	"therebelsource/emulator/singleFileExecution"
 )
 
@@ -70,6 +71,8 @@ func InitRequiredDirectories(output bool) {
 func App() {
 	LoadEnv()
 	InitRequiredDirectories(true)
+
+	rateLimiter.InitRateLimiter()
 
 	singleFileExecution.InitService()
 	projectExecution.InitService()
