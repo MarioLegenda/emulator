@@ -39,8 +39,8 @@ func InitServer(r *mux.Router) *http.Server {
 
 	srv := &http.Server{
 		Handler:      handler,
-		ReadTimeout:  120 * time.Second,
-		WriteTimeout: 120 * time.Second,
+		ReadTimeout:  5 * time.Second,
+		WriteTimeout: 5 * time.Second,
 		Addr:         os.Getenv("SERVER_HOST") + ":" + os.Getenv("SERVER_PORT"),
 	}
 
