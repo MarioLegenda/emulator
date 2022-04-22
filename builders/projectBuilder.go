@@ -59,7 +59,7 @@ func createProjectBuilder() ProjectBuildFn {
 		if executingFile.Depth != 1 {
 			for path, files := range paths {
 				for _, file := range files {
-					if file.Uuid == execDirConstant {
+					if file.Uuid == executingFile.Uuid {
 						s := strings.Split(path, execDirConstant)
 
 						fileName = fmt.Sprintf("/app%s/%s", s[1], executingFile.Name)

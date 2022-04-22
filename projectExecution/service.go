@@ -57,7 +57,9 @@ func createCommand(params interface{}, lang *runner.Language, containerName stri
 
 	br := params.(builders.ProjectBuildResult)
 
-	return commandFactory.CreateCommand(containerName, br.ExecutionDirectory, br.FileName, lang, br.DirectoryName)
+	cmd := commandFactory.CreateCommand(containerName, br.ExecutionDirectory, br.FileName, lang, br.DirectoryName)
+
+	return cmd
 }
 
 func (s Service) RunProject(model *ProjectRunRequest) (runner.ProjectRunResult, *appErrors.Error) {
