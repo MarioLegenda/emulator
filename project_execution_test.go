@@ -620,6 +620,172 @@ public class NewClass {
 		gomega.Expect(result.Result).Should(gomega.Equal("Hello world\r\n"))
 	})
 
+	GinkgoIt("Should run a project execution as a session in a Go environment with a package", func() {
+		testPrepare()
+		defer testCleanup()
+
+		activeSession := testCreateAccount()
+		cp := testCreateCodeProject(activeSession, uuid.New().String(), runner.GoLang)
+		cpUuid := cp["uuid"].(string)
+
+		var rootDirectory map[string]interface{}
+		s, err := json.Marshal(cp["rootDirectory"])
+		gomega.Expect(err).Should(gomega.BeNil())
+		gomega.Expect(json.Unmarshal(s, &rootDirectory)).Should(gomega.BeNil())
+
+		packageName := testCreateFile(activeSession, false, rootDirectory["uuid"].(string), cpUuid, "somePackage")
+		packageFile := testCreateFile(activeSession, true, packageName["uuid"].(string), cpUuid, "someFunc.go")
+		testUpdateFileContent(activeSession, cpUuid, packageFile["uuid"].(string), `
+package somePackage
+
+import "fmt"
+
+func MyFunc() {
+	fmt.Println("Output from somePackage")
+}
+`)
+
+		rootDirectoryChildren := rootDirectory["children"].([]interface{})
+		testUpdateFileContent(activeSession, cpUuid, rootDirectoryChildren[0].(string), fmt.Sprintf(`
+package main
+
+import pcg "%s/somePackage"
+import "fmt"
+
+func main() {
+    fmt.Println("Hello world")
+
+	pcg.MyFunc()
+}
+`, cp["packageName"].(string)))
+
+		sessionUuid := testCreateProjectTemporarySession(repository.ActiveSession{}, cp["uuid"].(string), rootDirectoryChildren[0].(string))
+		bm := map[string]interface{}{
+			"uuid":     sessionUuid,
+			"fileUuid": rootDirectoryChildren[0].(string),
+		}
+
+		body, err := json.Marshal(bm)
+
+		gomega.Expect(err).To(gomega.BeNil())
+
+		req, err := http.NewRequest("POST", "/api/environment-emulator/execute/project", bytes.NewReader(body))
+
+		if err != nil {
+			ginkgo.Fail(err.Error())
+
+			return
+		}
+
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(executeProjectHandler)
+
+		handler.ServeHTTP(rr, req)
+
+		b := rr.Body.Bytes()
+
+		var apiResponse httpUtil.ApiResponse
+		err = json.Unmarshal(b, &apiResponse)
+
+		gomega.Expect(err).To(gomega.BeNil())
+
+		gomega.Expect(rr.Code).To(gomega.Equal(http.StatusOK))
+		gomega.Expect(rr.Body).To(gomega.Not(gomega.BeNil()))
+
+		gomega.Expect(apiResponse.Method).To(gomega.Equal("POST"))
+		gomega.Expect(apiResponse.Type).To(gomega.Equal(staticTypes.RESPONSE_RESOURCE))
+		gomega.Expect(apiResponse.Message).To(gomega.Equal("Emulator run result"))
+		gomega.Expect(apiResponse.MasterCode).To(gomega.Equal(0))
+		gomega.Expect(apiResponse.Code).To(gomega.Equal(0))
+		gomega.Expect(apiResponse.Status).To(gomega.Equal(http.StatusOK))
+		gomega.Expect(apiResponse.Pagination).To(gomega.BeNil())
+
+		b, err = json.Marshal(apiResponse.Data)
+
+		gomega.Expect(err).To(gomega.BeNil())
+
+		var result runner.SingleFileRunResult
+		gomega.Expect(json.Unmarshal(b, &result)).To(gomega.BeNil())
+
+		gomega.Expect(result.Timeout).Should(gomega.Equal(5))
+		gomega.Expect(result.Success).Should(gomega.BeTrue())
+		gomega.Expect(result.Result).Should(gomega.Equal("Hello world\r\nOutput from somePackage\r\n"))
+	})
+
+	GinkgoIt("Should run a project execution as a session in a Go environment multiple times with the same code project", func() {
+		testPrepare()
+		defer testCleanup()
+
+		activeSession := testCreateAccount()
+		cp := testCreateCodeProject(activeSession, uuid.New().String(), runner.GoLang)
+		cpUuid := cp["uuid"].(string)
+
+		var rootDirectory map[string]interface{}
+		s, err := json.Marshal(cp["rootDirectory"])
+		gomega.Expect(err).Should(gomega.BeNil())
+		gomega.Expect(json.Unmarshal(s, &rootDirectory)).Should(gomega.BeNil())
+
+		rootDirectoryFile1 := testCreateFile(activeSession, true, rootDirectory["uuid"].(string), cpUuid, "rootDirectoryFile1.go")
+		testUpdateFileContent(activeSession, cpUuid, rootDirectoryFile1["uuid"].(string), fmt.Sprintf(`
+	package main
+
+`))
+
+		for i := 0; i < 5; i++ {
+			sessionUuid := testCreateProjectTemporarySession(repository.ActiveSession{}, cp["uuid"].(string), rootDirectoryFile1["uuid"].(string))
+			bm := map[string]interface{}{
+				"uuid":     sessionUuid,
+				"fileUuid": rootDirectoryFile1["uuid"].(string),
+			}
+
+			body, err := json.Marshal(bm)
+
+			gomega.Expect(err).To(gomega.BeNil())
+
+			req, err := http.NewRequest("POST", "/api/environment-emulator/execute/project", bytes.NewReader(body))
+
+			if err != nil {
+				ginkgo.Fail(err.Error())
+
+				return
+			}
+
+			rr := httptest.NewRecorder()
+			handler := http.HandlerFunc(executeProjectHandler)
+
+			handler.ServeHTTP(rr, req)
+
+			b := rr.Body.Bytes()
+
+			var apiResponse httpUtil.ApiResponse
+			err = json.Unmarshal(b, &apiResponse)
+
+			gomega.Expect(err).To(gomega.BeNil())
+
+			gomega.Expect(rr.Code).To(gomega.Equal(http.StatusOK))
+			gomega.Expect(rr.Body).To(gomega.Not(gomega.BeNil()))
+
+			gomega.Expect(apiResponse.Method).To(gomega.Equal("POST"))
+			gomega.Expect(apiResponse.Type).To(gomega.Equal(staticTypes.RESPONSE_RESOURCE))
+			gomega.Expect(apiResponse.Message).To(gomega.Equal("Emulator run result"))
+			gomega.Expect(apiResponse.MasterCode).To(gomega.Equal(0))
+			gomega.Expect(apiResponse.Code).To(gomega.Equal(0))
+			gomega.Expect(apiResponse.Status).To(gomega.Equal(http.StatusOK))
+			gomega.Expect(apiResponse.Pagination).To(gomega.BeNil())
+
+			b, err = json.Marshal(apiResponse.Data)
+
+			gomega.Expect(err).To(gomega.BeNil())
+
+			var result runner.SingleFileRunResult
+			gomega.Expect(json.Unmarshal(b, &result)).To(gomega.BeNil())
+
+			gomega.Expect(result.Timeout).Should(gomega.Equal(5))
+			gomega.Expect(result.Success).Should(gomega.BeTrue())
+			gomega.Expect(result.Result).Should(gomega.Equal("Hello world\r\n"))
+		}
+	})
+
 	GinkgoIt("Should run a project execution as a session in a Rust environment", func() {
 		testPrepare()
 		defer testCleanup()

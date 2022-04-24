@@ -173,7 +173,18 @@ func (s Service) RunProject(model *ProjectRunRequest) (runner.ProjectRunResult, 
 
 	projectBuilder := builders.CreateBuilder("project").(builders.ProjectBuildFn)
 
-	buildResult, err := projectBuilder(model.sessionData.CodeProject, model.sessionData.Content, builders.PROJECT_EXECUTION_STATE, model.sessionData.ExecutingFile)
+	executingDir := uuid.New().String()
+	if model.sessionData.CodeProject.Environment.Name == "go" {
+		executingDir = model.sessionData.PackageName
+	}
+
+	buildResult, err := projectBuilder(
+		model.sessionData.CodeProject,
+		model.sessionData.Content,
+		builders.PROJECT_EXECUTION_STATE,
+		model.sessionData.ExecutingFile,
+		executingDir,
+	)
 	defer goDestroy(buildResult.ExecutionDirectory)
 
 	if err != nil {

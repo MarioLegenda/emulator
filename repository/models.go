@@ -113,6 +113,7 @@ type SessionCodeProjectData struct {
 	CodeProject   *CodeProject   `json:"codeProject"`
 	Content       []*FileContent `json:"fileContent"`
 	ExecutingFile *File          `json:"executingFile"`
+	PackageName   string         `json:"packageName"`
 }
 
 type SingleFileSessionData struct {

@@ -9,7 +9,7 @@ import (
 	"therebelsource/emulator/repository"
 )
 
-type ProjectBuildFn func(*repository.CodeProject, []*repository.FileContent, string, *repository.File) (ProjectBuildResult, *appErrors.Error)
+type ProjectBuildFn func(*repository.CodeProject, []*repository.FileContent, string, *repository.File, string) (ProjectBuildResult, *appErrors.Error)
 type CProjectBuildFn func(*repository.CodeProject, []*repository.FileContent, string, *repository.File) (CProjectBuildResult, *appErrors.Error)
 type ProjectDestroyFn func(dir string) *appErrors.Error
 
@@ -39,8 +39,9 @@ type LinkedProjectBuildResult struct {
 }
 
 func createProjectBuilder() ProjectBuildFn {
-	return func(cb *repository.CodeProject, contents []*repository.FileContent, state string, executingFile *repository.File) (ProjectBuildResult, *appErrors.Error) {
-		execDirConstant := uuid.New().String()
+	return func(cb *repository.CodeProject, contents []*repository.FileContent, state string, executingFile *repository.File, executingDir string) (ProjectBuildResult, *appErrors.Error) {
+		execDirConstant := executingDir
+
 		executionDir := fmt.Sprintf("%s/%s", getStateDirectory(state), execDirConstant)
 		ft := initFileTraverse(cb.Structure, executionDir)
 
@@ -83,8 +84,13 @@ path = "main.rs"
 			}
 		}
 
+		directoryName := cb.Uuid
+		if cb.Environment.Name == "go" {
+			directoryName = executingDir
+		}
+
 		return ProjectBuildResult{
-			DirectoryName:      cb.Uuid,
+			DirectoryName:      directoryName,
 			StateDirectory:     getStateDirectory(state),
 			ExecutionDirectory: executionDir,
 			FileName:           fileName,
