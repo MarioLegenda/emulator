@@ -207,7 +207,7 @@ int main() {
 		gomega.Expect(result.Result).Should(gomega.Equal("shit!"))
 	})
 
-	GinkgoIt("Should run a linked code block execution as a session in a Go environment", func() {
+	GinkgoIt("Should run a public linked code block execution as a session in a Go environment", func() {
 		testPrepare()
 		defer testCleanup()
 
@@ -222,16 +222,16 @@ int main() {
 		testUpdateCodeBlock(activeSession, pageUuid, cb["uuid"].(string), fmt.Sprintf(`
 package main
 
-import "%s/%s"
+import c "%s/%s"
 
 import "fmt"
 
 func main() {
     fmt.Println("Hello World!")
-    %s.ExecuteFn()
+    c.ExecuteFn()
 }
-`, cp["uuid"].(string), "my_cool_name", "my_cool_name"))
-		testLinkCodeProject(activeSession, cp["uuid"].(string), pageUuid, cb["uuid"].(string), blogUuid)
+`, cp["packageName"].(string), "myPackage"))
+		cbLink := testLinkCodeProject(activeSession, cp["uuid"].(string), pageUuid, cb["uuid"].(string), blogUuid)
 
 		var rootDirectory *repository.File
 		s, err := json.Marshal(cp["rootDirectory"])
@@ -239,12 +239,13 @@ func main() {
 		gomega.Expect(json.Unmarshal(s, &rootDirectory)).Should(gomega.BeNil())
 
 		testUpdateFileContent(activeSession, cpUuid, rootDirectory.Children[0], fmt.Sprintf(`
-package my_cool_name
+package main
 `))
 
-		rootDirectoryFile1 := testCreateFile(activeSession, true, rootDirectory.Uuid, cpUuid, "rootDirectoryFile1.go")
+		packageName := testCreateFile(activeSession, false, rootDirectory.Uuid, cpUuid, "myPackage")
+		rootDirectoryFile1 := testCreateFile(activeSession, true, packageName["uuid"].(string), cpUuid, "rootDirectoryFile1.go")
 		testUpdateFileContent(activeSession, cpUuid, rootDirectoryFile1["uuid"].(string), fmt.Sprintf(`
-package my_cool_name
+package myPackage
 
 import "fmt"
 
@@ -260,12 +261,12 @@ func ExecuteFn() {
 			"text": fmt.Sprintf(`
 package main
 
-import "%s/%s"
+import c "%s/%s"
 
 func main() {
-    %s.ExecuteFn()
+    c.ExecuteFn()
 }
-`, cp["uuid"].(string), "my_cool_name", "my_cool_name"),
+`, cbLink["packageName"].(string), "myPackage"),
 		}
 
 		body, err := json.Marshal(bm)

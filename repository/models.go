@@ -56,9 +56,10 @@ type CodeBlock struct {
 
 	Text string `json:"text"`
 
-	IsGist   bool `json:"isGist"`
-	IsCode   bool `json:"isCode"`
-	Readonly bool `json:"readonly"`
+	IsGist      bool   `json:"isGist"`
+	IsCode      bool   `json:"isCode"`
+	Readonly    bool   `json:"readonly"`
+	PackageName string `json:"packageName"`
 
 	GistData *GistData        `json:"gistData"`
 	Emulator *runner.Language `json:"emulator"`
@@ -73,18 +74,19 @@ type GistData struct {
 }
 
 type CodeProject struct {
-	Uuid           string           `json:"uuid" bson:"uuid"`
-	ShortId        string           `json:"shortId" bson:"shortId"`
-	Name           string           `json:"name" bson:"name"`
-	Description    string           `json:"description" bson:"description"`
-	Environment    *runner.Language `json:"environment" bson:"environment"`
-	Structure      []*File          `json:"structure" bson:"structure"`
-	StructureCount int              `json:"structureCount" bson:"structureCount"`
+	Uuid           string           `json:"uuid"`
+	ShortId        string           `json:"shortId"`
+	Name           string           `json:"name"`
+	Description    string           `json:"description"`
+	Environment    *runner.Language `json:"environment"`
+	Structure      []*File          `json:"structure"`
+	StructureCount int              `json:"structureCount"`
+	PackageName    string           `json:"packageName"`
 
-	RootDirectory *File `json:"rootDirectory" bson:"-"`
+	RootDirectory *File `json:"rootDirectory"`
 
-	CreatedAt int64  `json:"createdAt" bson:"createdAt"`
-	UpdatedAt *int64 `json:"updatedAt" bson:"updatedAt"`
+	CreatedAt int64  `json:"createdAt"`
+	UpdatedAt *int64 `json:"updatedAt"`
 }
 
 type File struct {

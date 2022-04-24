@@ -399,7 +399,7 @@ func testLogin(email string) repository.ActiveSession {
 	}
 
 	d := apiResponse["data"]
-	
+
 	b, err := json.Marshal(d)
 
 	if err != nil {

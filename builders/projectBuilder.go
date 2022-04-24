@@ -14,7 +14,7 @@ type CProjectBuildFn func(*repository.CodeProject, []*repository.FileContent, st
 type ProjectDestroyFn func(dir string) *appErrors.Error
 
 type LinkedBuildFn func(*repository.CodeProject, []*repository.FileContent, string, *repository.CodeBlock) (LinkedProjectBuildResult, *appErrors.Error)
-type LinkedInterpretedBuildFn func(*repository.CodeProject, []*repository.FileContent, string, *repository.CodeBlock) (ProjectBuildResult, *appErrors.Error)
+type LinkedInterpretedBuildFn func(*repository.CodeProject, []*repository.FileContent, string, *repository.CodeBlock, string) (ProjectBuildResult, *appErrors.Error)
 
 type ProjectBuildResult struct {
 	DirectoryName      string
@@ -182,13 +182,13 @@ func createCompiledProject() LinkedBuildFn {
 }
 
 func createLinkedInterpretedBuildResult() LinkedInterpretedBuildFn {
-	return func(cb *repository.CodeProject, contents []*repository.FileContent, state string, codeBlock *repository.CodeBlock) (ProjectBuildResult, *appErrors.Error) {
-		execDirConstant := uuid.New().String()
+	return func(cb *repository.CodeProject, contents []*repository.FileContent, state string, codeBlock *repository.CodeBlock, executingDir string) (ProjectBuildResult, *appErrors.Error) {
+		execDirConstant := executingDir
 		executionDir := fmt.Sprintf("%s/%s", getStateDirectory(state), execDirConstant)
 
 		var paths map[string][]*repository.File
 		if cb.Environment.Name == "go" {
-			ft := initFileTraverse(cb.Structure, fmt.Sprintf("%s/%s", executionDir, cb.Name))
+			ft := initFileTraverse(cb.Structure, executionDir)
 
 			paths = ft.createPaths()
 		} else {
@@ -226,7 +226,7 @@ path = "main.rs"
 		}
 
 		return ProjectBuildResult{
-			DirectoryName:      cb.Uuid,
+			DirectoryName:      executingDir,
 			StateDirectory:     getStateDirectory(state),
 			ExecutionDirectory: executionDir,
 			FileName:           fileName,

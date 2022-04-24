@@ -180,7 +180,18 @@ func (s Service) RunProject(model *LinkedProjectRunRequest) (runner.ProjectRunRe
 
 	projectBuilder := builders.CreateBuilder("linked_interpreted_project").(builders.LinkedInterpretedBuildFn)
 
-	buildResult, err := projectBuilder(model.sessionData.CodeProject, model.sessionData.Content, builders.PROJECT_EXECUTION_STATE, model.sessionData.CodeBlock)
+	executingDir := uuid.New().String()
+	if model.sessionData.CodeProject.Environment.Name == "go" {
+		executingDir = model.sessionData.CodeBlock.PackageName
+	}
+
+	buildResult, err := projectBuilder(
+		model.sessionData.CodeProject,
+		model.sessionData.Content,
+		builders.PROJECT_EXECUTION_STATE, model.sessionData.CodeBlock,
+		executingDir,
+	)
+
 	defer goDestroy(buildResult.ExecutionDirectory)
 
 	if err != nil {
@@ -327,7 +338,19 @@ func (s Service) RunPublicProject(model *PublicLinkedProjectRunRequest) (runner.
 
 	projectBuilder := builders.CreateBuilder("linked_interpreted_project").(builders.LinkedInterpretedBuildFn)
 
-	buildResult, err := projectBuilder(model.sessionData.CodeProject, model.sessionData.Content, builders.PROJECT_EXECUTION_STATE, model.sessionData.CodeBlock)
+	executingDir := uuid.New().String()
+	if model.sessionData.CodeProject.Environment.Name == "go" {
+		executingDir = model.sessionData.CodeBlock.PackageName
+	}
+
+	buildResult, err := projectBuilder(
+		model.sessionData.CodeProject,
+		model.sessionData.Content,
+		builders.PROJECT_EXECUTION_STATE,
+		model.sessionData.CodeBlock,
+		executingDir,
+	)
+
 	defer goDestroy(buildResult.ExecutionDirectory)
 
 	if err != nil {

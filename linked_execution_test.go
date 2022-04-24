@@ -298,32 +298,31 @@ module Bar.FooBar where
 		cp := testCreateCodeProject(activeSession, "my_cool_name", runner.GoLang)
 		cpUuid := cp["uuid"].(string)
 		cb := testCreateCodeBlock(pageUuid, activeSession)
+		cbLink := testLinkCodeProject(activeSession, cp["uuid"].(string), pageUuid, cb["uuid"].(string), blogUuid)
+
 		testUpdateCodeBlock(activeSession, pageUuid, cb["uuid"].(string), fmt.Sprintf(`
 package main
 
-import "%s/%s"
-
-import "fmt"
+import c "%s/%s"
 
 func main() {
-    fmt.Println("Hello World!")
-    %s.ExecuteFn()
+    c.ExecuteFn()
 }
-`, cp["uuid"].(string), "my_cool_name", "my_cool_name"))
-		testLinkCodeProject(activeSession, cp["uuid"].(string), pageUuid, cb["uuid"].(string), blogUuid)
+`, cbLink["packageName"].(string), "myPackage"))
 
 		var rootDirectory *repository.File
 		s, err := json.Marshal(cp["rootDirectory"])
 		gomega.Expect(err).Should(gomega.BeNil())
 		gomega.Expect(json.Unmarshal(s, &rootDirectory)).Should(gomega.BeNil())
 
-		testUpdateFileContent(activeSession, cpUuid, rootDirectory.Children[0], fmt.Sprintf(`
-package my_cool_name
-`))
+		testUpdateFileContent(activeSession, cpUuid, rootDirectory.Children[0], fmt.Sprintf(fmt.Sprintf(`
+package main
+`)))
 
-		rootDirectoryFile1 := testCreateFile(activeSession, true, rootDirectory.Uuid, cpUuid, "rootDirectoryFile1.go")
+		packageDir := testCreateFile(activeSession, false, rootDirectory.Uuid, cpUuid, "myPackage")
+		rootDirectoryFile1 := testCreateFile(activeSession, true, packageDir["uuid"].(string), cpUuid, "rootDirectoryFile1.go")
 		testUpdateFileContent(activeSession, cpUuid, rootDirectoryFile1["uuid"].(string), fmt.Sprintf(`
-package my_cool_name
+package myPackage
 
 import "fmt"
 
@@ -382,7 +381,7 @@ func ExecuteFn() {
 
 		gomega.Expect(result.Timeout).Should(gomega.Equal(5))
 		gomega.Expect(result.Success).Should(gomega.BeTrue())
-		gomega.Expect(result.Result).Should(gomega.Equal("Hello World!\r\nExecuting fn\r\n"))
+		gomega.Expect(result.Result).Should(gomega.Equal("Executing fn\r\n"))
 	})
 
 	GinkgoIt("Should run a linked code block execution as a session in a NodeJS environment", func() {

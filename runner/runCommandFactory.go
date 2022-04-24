@@ -192,7 +192,6 @@ func (cf *RunCommandFactory) CreateGoCommand(containerName string, projectName s
 		Init().
 		Tag(string(lang.Tag)).
 		Shell("/bin/sh").
-		//Exec(fmt.Sprintf("cd /app/src/%s && go mod init > /dev/null 2>&1 && go run %s | tee output.txt", directoryName, directoryName)).
 		Exec(fmt.Sprintf("cd /app/src/%s && go mod init > /dev/null 2>&1 && go run %s | tee output.txt", directoryName, directoryName)).
 		SendToStd("/dev/stderr").
 		Run()
