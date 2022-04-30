@@ -66,6 +66,8 @@ func createSingleFileRunner() SingleFileRunFn {
 			outE := errb.String()
 			outS := outb.String()
 
+			fmt.Println(outE, outS)
+
 			if outE != "" {
 				success = false
 				out = outE
@@ -75,6 +77,17 @@ func createSingleFileRunner() SingleFileRunFn {
 				if br.Environment.Name == "go" {
 					success = true
 					out = outS
+
+					if out == "" {
+						output, err := readFile(fmt.Sprintf("%s/%s", br.ExecutionDirectory, "output.txt"))
+
+						if err != nil {
+							success = false
+							out = ""
+						} else {
+							out = output
+						}
+					}
 				} else if br.Environment.Name == "rust" {
 					success = true
 					out = outS
