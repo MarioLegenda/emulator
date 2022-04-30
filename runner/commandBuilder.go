@@ -4,6 +4,7 @@ import "fmt"
 
 const MAX_MEMORY = "40m"
 const MEMORY_RESERVATION = "10m"
+const MAX_CPU = "1.0"
 
 type CommandBuilder struct {
 	Commands *[]string
@@ -18,7 +19,18 @@ func (cb CommandBuilder) MaxMemory(mem string) CommandBuilder {
 
 	*cb.Commands = append(*cb.Commands, fmt.Sprintf("--memory=%s", max))
 	*cb.Commands = append(*cb.Commands, "--memory-swap=0")
-	*cb.Commands = append(*cb.Commands, "--memory-swappiness=5")
+
+	return cb
+}
+
+func (cb CommandBuilder) MaxCPU(maxCpu string) CommandBuilder {
+	c := MAX_CPU
+
+	if maxCpu != "" {
+		c = maxCpu
+	}
+
+	*cb.Commands = append(*cb.Commands, fmt.Sprintf("--cpus=%s", c))
 
 	return cb
 }
