@@ -283,7 +283,7 @@ module Bar.FooBar where
 
 		gomega.Expect(result.Timeout).Should(gomega.Equal(5))
 		gomega.Expect(result.Success).Should(gomega.BeTrue())
-		gomega.Expect(result.Result).Should(gomega.Equal("\r\nHello, World!\r\n"))
+		gomega.Expect(result.Result).Should(gomega.Equal("\nHello, World!\n"))
 	})
 
 	GinkgoIt("Should run a linked code block execution as a session in a Go environment", func() {
@@ -381,7 +381,7 @@ func ExecuteFn() {
 
 		gomega.Expect(result.Timeout).Should(gomega.Equal(5))
 		gomega.Expect(result.Success).Should(gomega.BeTrue())
-		gomega.Expect(result.Result).Should(gomega.Equal("Executing fn\r\n"))
+		gomega.Expect(result.Result).Should(gomega.Equal("Executing fn\n"))
 	})
 
 	GinkgoIt("Should run a linked code block execution as a session in a NodeJS environment", func() {
@@ -714,6 +714,6 @@ public class NewClass {
 
 		gomega.Expect(result.Timeout).Should(gomega.Equal(5))
 		gomega.Expect(result.Success).Should(gomega.BeTrue())
-		gomega.Expect(result.Result).Should(gomega.Equal("Hello World\r\n"))
+		gomega.Expect(result.Result).Should(gomega.Equal("Hello World\n"))
 	})
 })

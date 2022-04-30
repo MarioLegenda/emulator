@@ -16,7 +16,6 @@ func (cf *RunCommandFactory) CreateProjectNodeCommand(containerName string, proj
 		MaxMemory("").
 		MaxMemoryReservation("").
 		MaxCPU("").
-		AllocatePseudoTty().
 		RemoveAfterFinished().
 		NewVolume(projectName, "rw").
 		Name(containerName).
@@ -39,8 +38,8 @@ func (cf *RunCommandFactory) CreateCCommand(containerName string, projectName st
 
 	cb.
 		NewNetwork("none").
-		AllocatePseudoTty().
 		RemoveAfterFinished().
+		AllocatePseudoTty().
 		MaxMemory("").
 		MaxMemoryReservation("").
 		MaxCPU("").
@@ -63,9 +62,9 @@ func (cf *RunCommandFactory) CreateCProjectCommand(containerName string, project
 
 	cb.
 		NewNetwork("none").
-		AllocatePseudoTty().
 		MaxMemory("").
 		MaxMemoryReservation("").
+		AllocatePseudoTty().
 		MaxCPU("").
 		RemoveAfterFinished().
 		NewVolume(volumePath, "rw").
@@ -89,8 +88,8 @@ func (cf *RunCommandFactory) CreateCPlusCommand(containerName string, projectNam
 
 	cb.
 		NewNetwork("none").
-		AllocatePseudoTty().
 		MaxMemory("").
+		AllocatePseudoTty().
 		MaxMemoryReservation("").
 		MaxCPU("").
 		RemoveAfterFinished().
@@ -113,8 +112,8 @@ func (cf *RunCommandFactory) CreateCPlusProjectCommand(containerName string, pro
 
 	cb.
 		NewNetwork("none").
-		AllocatePseudoTty().
 		MaxMemory("").
+		AllocatePseudoTty().
 		MaxMemoryReservation("").
 		MaxCPU("").
 		RemoveAfterFinished().
@@ -137,7 +136,6 @@ func (cf *RunCommandFactory) CreateHaskellProjectCommand(containerName string, v
 
 	cb.
 		NewNetwork("none").
-		AllocatePseudoTty().
 		RemoveAfterFinished().
 		NewVolume(volumePath, "rw").
 		Name(containerName).
@@ -158,7 +156,6 @@ func (cf *RunCommandFactory) CreateHaskellCommand(containerName string, projectN
 
 	cb.
 		NewNetwork("none").
-		AllocatePseudoTty().
 		RemoveAfterFinished().
 		NewVolume(projectName, "rw").
 		Name(containerName).
@@ -179,7 +176,6 @@ func (cf *RunCommandFactory) CreateGoLinkedProjectCommand(containerName string, 
 
 	cb.
 		NewNetwork("none").
-		AllocatePseudoTty().
 		MaxMemory("").
 		MaxMemoryReservation("").
 		MaxCPU("").
@@ -203,7 +199,6 @@ func (cf *RunCommandFactory) CreateGoCommand(containerName string, projectName s
 
 	cb.
 		NewNetwork("none").
-		AllocatePseudoTty().
 		MaxMemory("").
 		MaxMemoryReservation("").
 		MaxCPU("").
@@ -227,7 +222,6 @@ func (cf *RunCommandFactory) CreateCSharpCommand(containerName string, projectNa
 
 	cb.
 		NewNetwork("none").
-		AllocatePseudoTty().
 		MaxMemory("").
 		MaxMemoryReservation("").
 		MaxCPU("").
@@ -255,7 +249,6 @@ func (cf *RunCommandFactory) CreatePython2Command(containerName string, projectN
 		MaxMemory("").
 		MaxMemoryReservation("").
 		MaxCPU("").
-		AllocatePseudoTty().
 		RemoveAfterFinished().
 		NewVolume(projectName, "rw").
 		Name(containerName).
@@ -281,7 +274,6 @@ func (cf *RunCommandFactory) CreatePython3Command(containerName string, projectN
 		MaxMemory("").
 		MaxMemoryReservation("").
 		MaxCPU("").
-		AllocatePseudoTty().
 		RemoveAfterFinished().
 		NewVolume(projectName, "rw").
 		Name(containerName).
@@ -306,7 +298,6 @@ func (cf *RunCommandFactory) CreateRubyCommand(containerName string, projectName
 		MaxMemory("").
 		MaxMemoryReservation("").
 		MaxCPU("").
-		AllocatePseudoTty().
 		RemoveAfterFinished().
 		NewVolume(projectName, "rw").
 		Name(containerName).
@@ -331,7 +322,6 @@ func (cf *RunCommandFactory) CreatePHP74Command(containerName string, projectNam
 		MaxMemory("").
 		MaxMemoryReservation("").
 		MaxCPU("").
-		AllocatePseudoTty().
 		RemoveAfterFinished().
 		NewVolume(projectName, "rw").
 		Name(containerName).
@@ -352,7 +342,6 @@ func (cf *RunCommandFactory) CreateRustCommand(containerName string, projectName
 
 	cb.
 		NewNetwork("none").
-		AllocatePseudoTty().
 		MaxMemory("").
 		MaxMemoryReservation("").
 		MaxCPU("").

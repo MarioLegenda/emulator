@@ -545,7 +545,7 @@ public class NewClass {
 
 		gomega.Expect(result.Timeout).Should(gomega.Equal(5))
 		gomega.Expect(result.Success).Should(gomega.BeTrue())
-		gomega.Expect(result.Result).Should(gomega.Equal("Hello World\r\n"))
+		gomega.Expect(result.Result).Should(gomega.Equal("Hello World\n"))
 	})
 
 	GinkgoIt("Should run a project execution as a session in a Go environment", func() {
@@ -617,7 +617,7 @@ public class NewClass {
 
 		gomega.Expect(result.Timeout).Should(gomega.Equal(5))
 		gomega.Expect(result.Success).Should(gomega.BeTrue())
-		gomega.Expect(result.Result).Should(gomega.Equal("Hello world\r\n"))
+		gomega.Expect(result.Result).Should(gomega.Equal("Hello world\n"))
 	})
 
 	GinkgoIt("Should run a project execution as a session in a Go environment with a package", func() {
@@ -709,7 +709,7 @@ func main() {
 
 		gomega.Expect(result.Timeout).Should(gomega.Equal(5))
 		gomega.Expect(result.Success).Should(gomega.BeTrue())
-		gomega.Expect(result.Result).Should(gomega.Equal("Hello world\r\nOutput from somePackage\r\n"))
+		gomega.Expect(result.Result).Should(gomega.Equal("Hello world\nOutput from somePackage\n"))
 	})
 
 	GinkgoIt("Should run a project execution as a session in a Go environment multiple times with the same code project", func() {
@@ -782,7 +782,7 @@ func main() {
 
 			gomega.Expect(result.Timeout).Should(gomega.Equal(5))
 			gomega.Expect(result.Success).Should(gomega.BeTrue())
-			gomega.Expect(result.Result).Should(gomega.Equal("Hello world\r\n"))
+			gomega.Expect(result.Result).Should(gomega.Equal("Hello world\n"))
 		}
 	})
 
@@ -855,7 +855,7 @@ func main() {
 
 		gomega.Expect(result.Timeout).Should(gomega.Equal(5))
 		gomega.Expect(result.Success).Should(gomega.BeTrue())
-		gomega.Expect(result.Result).Should(gomega.Equal("Hello World!\r\n"))
+		gomega.Expect(result.Result).Should(gomega.Equal("Hello World!\n"))
 	})
 
 	GinkgoIt("Should run a project execution as a session in a C environment", func() {
@@ -1086,7 +1086,7 @@ module Bar.FooBar where
 
 		gomega.Expect(result.Timeout).Should(gomega.Equal(5))
 		gomega.Expect(result.Success).Should(gomega.BeTrue())
-		gomega.Expect(result.Result).Should(gomega.Equal("\r\nHello, World!\r\n"))
+		gomega.Expect(result.Result).Should(gomega.Equal("\nHello, World!\n"))
 	})
 
 	GinkgoIt("Should run a project execution as a session in a Ruby environment", func() {

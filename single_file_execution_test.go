@@ -335,7 +335,7 @@ func main() {
 
 		gomega.Expect(result.Timeout).Should(gomega.Equal(5))
 		gomega.Expect(result.Success).Should(gomega.BeTrue())
-		gomega.Expect(result.Result).Should(gomega.Equal("mile\r\n"))
+		gomega.Expect(result.Result).Should(gomega.Equal("mile\n"))
 	})
 
 	GinkgoIt("Should execute a single file in a C# (Mono) environment", func() {
@@ -407,7 +407,7 @@ public class HelloWorld
 
 		gomega.Expect(result.Timeout).Should(gomega.Equal(5))
 		gomega.Expect(result.Success).Should(gomega.BeTrue())
-		gomega.Expect(result.Result).Should(gomega.Equal("mile\r\n"))
+		gomega.Expect(result.Result).Should(gomega.Equal("mile\n"))
 	})
 
 	GinkgoIt("Should execute a single file in a Python2 environment", func() {
@@ -593,7 +593,7 @@ public class HelloWorld
 
 		gomega.Expect(result.Timeout).Should(gomega.Equal(5))
 		gomega.Expect(result.Success).Should(gomega.BeTrue())
-		gomega.Expect(result.Result).Should(gomega.Equal("\r\nmile\r\n"))
+		gomega.Expect(result.Result).Should(gomega.Equal("\nmile\n"))
 	})
 
 	GinkgoIt("Should execute a single file in a C environment", func() {

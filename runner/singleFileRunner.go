@@ -39,6 +39,7 @@ func createSingleFileRunner() SingleFileRunFn {
 
 		go func() {
 			cmd := exec.Command("docker", br.Args...)
+			fmt.Println(cmd.String())
 
 			cmd.Stderr = &errb
 			cmd.Stdout = &outb

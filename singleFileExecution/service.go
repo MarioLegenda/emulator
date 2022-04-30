@@ -65,7 +65,7 @@ func (s Service) RunSingleFile(model *SingleFileRunRequest) (runner.SingleFileRu
 
 func (s Service) RunPublicSingleFile(model *PublicSingleFileRunRequest) (runner.SingleFileRunResult, *appErrors.Error) {
 	model.Sanitize()
-	
+
 	builder := builders.CreateBuilder("single_file").(builders.SingleFileRunFn)
 
 	buildResult, err := builder(model.codeBlock, "single_file")
