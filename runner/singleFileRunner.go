@@ -65,9 +65,7 @@ func createSingleFileRunner() SingleFileRunFn {
 			res = res
 			outE := errb.String()
 			outS := outb.String()
-
-			fmt.Println(outE, outS)
-
+			
 			if outE != "" {
 				success = false
 				out = outE
