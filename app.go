@@ -6,8 +6,10 @@ import (
 	"log"
 	"os"
 	errorHandler "therebelsource/emulator/appErrors"
+	"therebelsource/emulator/containerFactory"
 	"therebelsource/emulator/projectExecution"
 	"therebelsource/emulator/rateLimiter"
+	"therebelsource/emulator/runner"
 	"therebelsource/emulator/singleFileExecution"
 )
 
@@ -76,6 +78,9 @@ func App() {
 
 	singleFileExecution.InitService()
 	projectExecution.InitService()
+
+	containerFactory.InitService(3)
+	containerFactory.PackageService.CreateContainers(string(runner.Node14.Tag))
 
 	WatchServerShutdown(InitServer(RegisterRoutes()))
 }
