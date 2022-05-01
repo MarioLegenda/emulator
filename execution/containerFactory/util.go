@@ -2,7 +2,6 @@ package containerFactory
 
 import (
 	"fmt"
-	"log"
 	"os"
 	"os/exec"
 	"regexp"
@@ -26,8 +25,8 @@ func isContainerRunning(name string) bool {
 	out, err := cmd.CombinedOutput()
 
 	if err != nil {
-		fmt.Println("Exec error")
-		log.Fatal(err)
+		fmt.Println(err)
+		return false
 	}
 
 	o := strings.Trim(string(out), " ")

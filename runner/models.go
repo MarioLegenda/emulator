@@ -39,7 +39,7 @@ var NodeLts = Language{
 var NodeEsm = Language{
 	Name:          "node_latest_esm",
 	Text:          "Javascript (Node ESM)",
-	Tag:           "node:node_latest",
+	Tag:           "node:node_latest_esm",
 	InDevelopment: false,
 	InMaintenance: false,
 	Language:      "javascript",

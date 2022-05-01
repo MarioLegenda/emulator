@@ -10,7 +10,7 @@ import (
 	"os"
 	"os/signal"
 	errorHandler "therebelsource/emulator/appErrors"
-	"therebelsource/emulator/containerFactory"
+	"therebelsource/emulator/execution"
 	"therebelsource/emulator/runner"
 	"time"
 )
@@ -83,7 +83,7 @@ func WatchServerShutdown(srv *http.Server) {
 	fmt.Println("Container balancer stopped!")
 
 	fmt.Println("Stopping emulator workers...")
-	containerFactory.PackageService.StopContainers()
+	execution.PackageService.Close()
 	fmt.Println("Emulator workers stopped")
 
 	os.Exit(0)

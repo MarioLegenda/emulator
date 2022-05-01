@@ -14,8 +14,3 @@ RUN chown -R dockeruser:dockeruser /usr/bin/node && chown -R dockeruser /usr/bin
 
 USER dockeruser
 ENV USER=dockeruser HOME=$APP_DIR
-
-RUN chmod +x $APP_DIR/perms.sh
-
-CMD /app/perms.sh
-RUN rm /app/perms.sh
