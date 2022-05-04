@@ -10,6 +10,7 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
+	"syscall"
 	errorHandler "therebelsource/emulator/appErrors"
 	"therebelsource/emulator/execution"
 	"therebelsource/emulator/runner"
@@ -66,7 +67,7 @@ func InitServer(r *mux.Router) *http.Server {
 
 func WatchServerShutdown(srv *http.Server) {
 	c := make(chan os.Signal, 1)
-	signal.Notify(c, os.Interrupt)
+	signal.Notify(c, os.Interrupt, syscall.SIGINT, syscall.SIGTERM)
 	<-c
 
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
