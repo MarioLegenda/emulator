@@ -89,5 +89,7 @@ func WatchServerShutdown(srv *http.Server) {
 	execution.PackageService.Close()
 	fmt.Println("Emulator workers stopped")
 
+	daemon.SdNotify(false, daemon.SdNotifyStopping)
+
 	os.Exit(0)
 }
