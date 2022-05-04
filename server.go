@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"fmt"
+	"github.com/coreos/go-systemd/daemon"
 	"github.com/gorilla/mux"
 	"github.com/rs/cors"
 	"log"
@@ -52,6 +53,8 @@ func InitServer(r *mux.Router) *http.Server {
 	// Run our server in a goroutine so that it doesn't block.
 	go func() {
 		fmt.Printf("Starting server on %s:%v...\n", os.Getenv("SERVER_HOST"), os.Getenv("SERVER_PORT"))
+
+		daemon.SdNotify(false, daemon.SdNotifyReady)
 
 		if err := srv.ListenAndServe(); err != nil {
 			log.Println(err)

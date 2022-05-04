@@ -1,7 +1,6 @@
 package singleFileExecution
 
 import (
-	"fmt"
 	"github.com/google/uuid"
 	"therebelsource/emulator/appErrors"
 	"therebelsource/emulator/builders"
@@ -16,11 +15,7 @@ func createCommand(params interface{}, lang *runner.Language, containerName stri
 
 	br := params.(builders.SingleFileBuildResult)
 
-	cmd := commandFactory.CreateCommand(containerName, br.ExecutionDirectory, br.FileName, lang, br.DirectoryName)
-
-	fmt.Println(cmd)
-	
-	return cmd
+	return commandFactory.CreateCommand(containerName, br.ExecutionDirectory, br.FileName, lang, br.DirectoryName)
 }
 
 type Service struct{}
