@@ -8,8 +8,9 @@ import (
 )
 
 type NodeSingleFileBuildResult struct {
-	Directory string
-	FileName  string
+	ContainerDirectory string
+	ExecutionDirectory string
+	FileName           string
 }
 
 type NodeSingleFileBuildParams struct {
@@ -18,7 +19,7 @@ type NodeSingleFileBuildParams struct {
 	StateDir  string
 }
 
-func InitParams(ext string, text string, stateDir string) NodeSingleFileBuildParams {
+func InitNodeParams(ext string, text string, stateDir string) NodeSingleFileBuildParams {
 	return NodeSingleFileBuildParams{
 		Extension: ext,
 		Text:      text,
@@ -44,7 +45,8 @@ func NodeSingleFileBuild(params NodeSingleFileBuildParams) (NodeSingleFileBuildR
 	}
 
 	return NodeSingleFileBuildResult{
-		Directory: tempExecutionDir,
-		FileName:  fileName,
+		ContainerDirectory: fmt.Sprintf("/app/%s", dirName),
+		ExecutionDirectory: tempExecutionDir,
+		FileName:           fileName,
 	}, nil
 }

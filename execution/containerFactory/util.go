@@ -25,7 +25,6 @@ func isContainerRunning(name string) bool {
 	out, err := cmd.CombinedOutput()
 
 	if err != nil {
-		fmt.Println(err)
 		return false
 	}
 

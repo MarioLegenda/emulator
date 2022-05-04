@@ -19,6 +19,9 @@ Application codes
 const ApplicationRuntimeError = 1
 const NotFoundError = 2
 const FilesystemError = 3
+const TimeoutError = 4
+const ExecutionStartError = 5
+const ShutdownError = 6
 
 type AppError map[string]string
 

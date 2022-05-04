@@ -4,6 +4,7 @@ import (
 	"github.com/google/uuid"
 	"therebelsource/emulator/appErrors"
 	"therebelsource/emulator/builders"
+	"therebelsource/emulator/execution"
 	"therebelsource/emulator/runner"
 )
 
@@ -25,6 +26,22 @@ func InitService() {
 
 func (s Service) RunSingleFile(model *SingleFileRunRequest) (runner.SingleFileRunResult, *appErrors.Error) {
 	model.Sanitize()
+
+	if model.codeBlock.Emulator.Name == "node_latest" {
+		res := execution.PackageService.RunJob(execution.Job{
+			BuilderType:       "single_file",
+			ExecutionType:     "single_file",
+			EmulatorName:      string(model.codeBlock.Emulator.Name),
+			EmulatorExtension: model.codeBlock.Emulator.Extension,
+			EmulatorText:      model.codeBlock.Text,
+		})
+
+		return runner.SingleFileRunResult{
+			Success: res.Success,
+			Result:  res.Result,
+			Timeout: 0,
+		}, nil
+	}
 
 	builder := builders.CreateBuilder("single_file").(builders.SingleFileRunFn)
 
@@ -65,6 +82,22 @@ func (s Service) RunSingleFile(model *SingleFileRunRequest) (runner.SingleFileRu
 
 func (s Service) RunPublicSingleFile(model *PublicSingleFileRunRequest) (runner.SingleFileRunResult, *appErrors.Error) {
 	model.Sanitize()
+
+	if model.codeBlock.Emulator.Name == "node_latest" {
+		res := execution.PackageService.RunJob(execution.Job{
+			BuilderType:       "single_file",
+			ExecutionType:     "single_file",
+			EmulatorName:      string(model.codeBlock.Emulator.Name),
+			EmulatorExtension: model.codeBlock.Emulator.Extension,
+			EmulatorText:      model.Text,
+		})
+
+		return runner.SingleFileRunResult{
+			Success: res.Success,
+			Result:  res.Result,
+			Timeout: 0,
+		}, nil
+	}
 
 	builder := builders.CreateBuilder("single_file").(builders.SingleFileRunFn)
 

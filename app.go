@@ -80,7 +80,6 @@ func App() {
 	projectExecution.InitService()
 
 	err := execution.Init(5)
-
 	if err != nil {
 		appErrors.TerminateWithMessage("Cannot boot executioner. Server cannot start!")
 	}

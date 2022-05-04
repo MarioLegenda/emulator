@@ -12,9 +12,8 @@ import (
 )
 
 type Service interface {
-	CreateContainers(string) bool
+	CreateContainers(string, int) bool
 	Close()
-	WorkerNum() int
 	Containers() map[string]container
 }
 
@@ -22,7 +21,6 @@ var PackageService Service
 
 type service struct {
 	containers map[string]container
-	workerNum  int
 }
 
 type message struct {
@@ -35,27 +33,24 @@ type container struct {
 	pid    chan int
 	dir    string
 
-	Tag  string
-	Name string
+	Tag       string
+	Name      string
+	WorkerNum int
 }
 
 func InitService(workerNum int) {
-	s := &service{containers: make(map[string]container), workerNum: workerNum}
+	s := &service{containers: make(map[string]container)}
 
 	PackageService = s
-}
-
-func (d *service) WorkerNum() int {
-	return d.workerNum
 }
 
 func (d *service) Containers() map[string]container {
 	return d.containers
 }
 
-func (d *service) CreateContainers(tag string) bool {
-	fmt.Println(fmt.Sprintf("Creating %d workers for %s", d.workerNum, tag))
-	for i := 0; i < d.workerNum; i++ {
+func (d *service) CreateContainers(tag string, workerNum int) bool {
+	fmt.Println(fmt.Sprintf("Creating %d workers for %s", workerNum, tag))
+	for i := 0; i < workerNum; i++ {
 		name := uuid.New().String()
 
 		containerDir := fmt.Sprintf("%s/%s", os.Getenv("SINGLE_FILE_STATE_DIR"), name)
@@ -72,14 +67,15 @@ func (d *service) CreateContainers(tag string) bool {
 			pid:    make(chan int),
 			dir:    containerDir,
 
-			Tag:  tag,
-			Name: name,
+			Tag:       tag,
+			Name:      name,
+			WorkerNum: workerNum,
 		}
 
 		createContainer(container)
 
 		select {
-		case <-time.After(5 * time.Second):
+		case <-time.After(1 * time.Second):
 			if !isContainerRunning(name) {
 				d.Close()
 

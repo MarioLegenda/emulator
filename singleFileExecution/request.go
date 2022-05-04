@@ -33,7 +33,6 @@ func (l *PublicSingleFileRunRequest) Sanitize() {
 	p := bluemonday.StrictPolicy()
 
 	l.Uuid = p.Sanitize(l.Uuid)
-	l.Text = p.Sanitize(l.Text)
 }
 
 func (l *SingleFileRunRequest) Validate() error {
