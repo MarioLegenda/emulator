@@ -55,7 +55,7 @@ func InitServer(r *mux.Router) *http.Server {
 	go func() {
 		fmt.Printf("Starting server on %s:%v...\n", os.Getenv("SERVER_HOST"), os.Getenv("SERVER_PORT"))
 
-		if os.Getenv("APP_ENV") == "prod" {
+		if os.Getenv("APP_ENV") == "prod" || os.Getenv("APP_ENV") == "staging" {
 			daemon.SdNotify(false, daemon.SdNotifyReady)
 		}
 
@@ -91,7 +91,7 @@ func WatchServerShutdown(srv *http.Server) {
 	fmt.Println("Server is terminated. App shutting down!")
 	fmt.Println("")
 
-	if os.Getenv("APP_ENV") == "prod" {
+	if os.Getenv("APP_ENV") == "prod" || os.Getenv("APP_ENV") == "staging" {
 		daemon.SdNotify(false, daemon.SdNotifyStopping)
 	}
 
