@@ -75,7 +75,7 @@ func (d *service) CreateContainers(tag string, workerNum int) bool {
 		createContainer(container)
 
 		select {
-		case <-time.After(1 * time.Second):
+		case <-time.After(5 * time.Second):
 			if !isContainerRunning(name) {
 				d.Close()
 

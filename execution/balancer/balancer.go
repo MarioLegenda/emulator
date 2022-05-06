@@ -1,7 +1,6 @@
 package balancer
 
 import (
-	"fmt"
 	"sync"
 	"therebelsource/emulator/appErrors"
 	"therebelsource/emulator/execution/balancer/runners"
@@ -102,8 +101,6 @@ func (b *balancer) StartWorkers() {
 				}
 
 				b.lock.Lock()
-				fmt.Println(res)
-				fmt.Println("STOPPING WORKER")
 				b.controller[worker.index] = b.controller[worker.index] - 1
 				b.lock.Unlock()
 

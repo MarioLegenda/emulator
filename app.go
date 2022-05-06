@@ -79,7 +79,7 @@ func App() {
 	singleFileExecution.InitService()
 	projectExecution.InitService()
 
-	err := execution.Init(5, 1)
+	err := execution.Init(20, 1)
 	if err != nil {
 		appErrors.TerminateWithMessage("Cannot boot executioner. Server cannot start!")
 	}

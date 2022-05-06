@@ -1,9 +1,9 @@
 package runners
 
 import (
-	"bytes"
 	"context"
 	"fmt"
+	"io"
 	"os/exec"
 	"therebelsource/emulator/appErrors"
 	"time"
@@ -15,7 +15,7 @@ func NodeRunner(params NodeExecParams) Result {
 	ctx, cancel := context.WithDeadline(context.Background(), time.Now().Add(5*time.Second))
 	defer cancel()
 
-	var outb, errb bytes.Buffer
+	var outb, errb string
 	var out string
 	var success bool
 	var runResult Result
@@ -23,25 +23,48 @@ func NodeRunner(params NodeExecParams) Result {
 	tc := make(chan string)
 	pidC := make(chan int, 1)
 
-	go func() {
-		cmd := exec.Command("docker", []string{"exec", params.ContainerName, "node", fmt.Sprintf("%s/%s", params.ContainerDirectory, params.ExecutionFile)}...)
-		fmt.Println(cmd.String())
+	process := fmt.Sprintf("%s/%s", params.ContainerDirectory, params.ExecutionFile)
 
-		cmd.Stderr = &errb
-		cmd.Stdout = &outb
+	go func() {
+		cmd := exec.Command("docker", []string{"exec", params.ContainerName, "node", process}...)
+
+		errPipe, err := cmd.StderrPipe()
+
+		if err != nil {
+			runResult.Error = appErrors.New(appErrors.ApplicationError, appErrors.ExecutionStartError, "Execution failed!")
+
+			tc <- "error"
+
+			return
+		}
+
+		outPipe, err := cmd.StdoutPipe()
+
+		if err != nil {
+			runResult.Error = appErrors.New(appErrors.ApplicationError, appErrors.ExecutionStartError, "Execution failed!")
+
+			tc <- "error"
+
+			return
+		}
 
 		startErr := cmd.Start()
 		pidC <- cmd.Process.Pid
+
+		a, _ := io.ReadAll(errPipe)
+		b, _ := io.ReadAll(outPipe)
+		errb = string(a)
+		outb = string(b)
 
 		if startErr == nil {
 			waitErr := cmd.Wait()
 
 			if waitErr != nil {
-				fmt.Println(waitErr)
 				runResult.Error = appErrors.New(appErrors.ApplicationError, appErrors.ExecutionStartError, "Execution failed!")
 
 				tc <- "error"
-				//fmt.Printf("Wait error: %s\n", waitErr.Error())
+
+				return
 			}
 		}
 
@@ -59,20 +82,17 @@ func NodeRunner(params NodeExecParams) Result {
 	select {
 	case res := <-tc:
 		if res == "error" {
-			destroy(params.ExecutionDirectory)
+			destroyContainerProcess(extractExecDirUniqueIdentifier(params.ExecutionDirectory))
 			destroy(params.ExecutionDirectory)
 			return runResult
 		}
 
-		outE := errb.String()
-		outS := outb.String()
-
-		if outE != "" {
+		if errb != "" {
 			success = false
-			out = outE
-		} else if outS != "" {
+			out = errb
+		} else if outb != "" {
 			success = true
-			out = outS
+			out = outb
 		} else {
 			success = true
 
@@ -91,6 +111,7 @@ func NodeRunner(params NodeExecParams) Result {
 
 		break
 	case <-ctx.Done():
+		destroyContainerProcess(extractExecDirUniqueIdentifier(params.ExecutionFile))
 		closeExecSession(<-pidC)
 		destroy(params.ExecutionDirectory)
 		close(pidC)
