@@ -18,6 +18,7 @@ type Job struct {
 
 	EmulatorName      string
 	EmulatorExtension string
+	EmulatorTag       string
 	EmulatorText      string
 }
 
@@ -27,8 +28,8 @@ type Execution interface {
 }
 
 type execution struct {
-	controller []int32
-	balancers  []balancer.Balancer
+	controller map[string][]int32
+	balancers  map[string][]balancer.Balancer
 	lock       sync.Mutex
 	close      bool
 }
@@ -41,7 +42,8 @@ type containerBlueprint struct {
 func Init(workerNum int, containerNum int) *appErrors.Error {
 	containerFactory.InitService()
 	s := &execution{
-		balancers: make([]balancer.Balancer, 0),
+		balancers:  make(map[string][]balancer.Balancer),
+		controller: make(map[string][]int32),
 	}
 
 	err := s.init(workerNum, containerNum)
@@ -58,6 +60,9 @@ func Init(workerNum int, containerNum int) *appErrors.Error {
 func (e *execution) RunJob(j Job) runners.Result {
 	e.lock.Lock()
 
+	balancers := e.balancers[j.EmulatorTag]
+	controller := e.controller[j.EmulatorTag]
+
 	if e.close {
 		e.lock.Unlock()
 
@@ -69,18 +74,18 @@ func (e *execution) RunJob(j Job) runners.Result {
 	}
 
 	idx := 0
-	first := e.controller[0]
-	for i, r := range e.controller {
+	first := controller[0]
+	for i, r := range controller {
 		if r < first {
 			idx = i
 		}
 	}
 
-	e.controller[idx] = e.controller[idx] + 1
+	e.controller[j.EmulatorTag][idx] = e.controller[j.EmulatorTag][idx] + 1
 
 	e.lock.Unlock()
 
-	b := e.balancers[idx]
+	b := balancers[idx]
 
 	output := make(chan runners.Result)
 	b.AddJob(balancer.Job{
@@ -96,7 +101,7 @@ func (e *execution) RunJob(j Job) runners.Result {
 	close(output)
 
 	e.lock.Lock()
-	e.controller[idx] = e.controller[idx] - 1
+	e.controller[j.EmulatorTag][idx] = e.controller[j.EmulatorTag][idx] - 1
 	e.lock.Unlock()
 
 	return out
@@ -113,8 +118,10 @@ func (e *execution) Close() {
 	e.close = true
 	e.lock.Unlock()
 
-	for _, b := range e.balancers {
-		b.Close()
+	for _, balancers := range e.balancers {
+		for _, b := range balancers {
+			b.Close()
+		}
 	}
 
 	containerFactory.PackageService.Close()
@@ -125,6 +132,10 @@ func (e *execution) init(workerNum int, containerNum int) *appErrors.Error {
 		{
 			workerNum: containerNum,
 			tag:       string(runner.NodeLts.Tag),
+		},
+		{
+			workerNum: containerNum,
+			tag:       string(runner.GoLang.Tag),
 		},
 	}
 
@@ -141,8 +152,11 @@ func (e *execution) init(workerNum int, containerNum int) *appErrors.Error {
 	for _, c := range containers {
 		b := balancer.NewBalancer(c.Name, workerNum)
 		b.StartWorkers()
-		e.balancers = append(e.balancers, b)
-		e.controller = append(e.controller, 0)
+		e.balancers[c.Tag] = make([]balancer.Balancer, 0)
+		e.balancers[c.Tag] = append(e.balancers[c.Tag], b)
+
+		e.controller[c.Tag] = make([]int32, 0)
+		e.controller[c.Tag] = append(e.controller[c.Tag], 0)
 	}
 
 	return nil

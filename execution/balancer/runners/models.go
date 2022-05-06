@@ -15,6 +15,13 @@ type NodeExecParams struct {
 	ExecutionFile      string
 }
 
+type GoExecParams struct {
+	ContainerName      string
+	ExecutionDirectory string
+	ContainerDirectory string
+	ExecutionFile      string
+}
+
 type name string
 
 type language struct {
@@ -31,4 +38,8 @@ var nodeLts = language{
 
 var nodeEsm = language{
 	name: "node_latest_esm",
+}
+
+var goLang = language{
+	name: "go",
 }

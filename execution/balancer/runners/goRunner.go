@@ -9,7 +9,7 @@ import (
 	"time"
 )
 
-func nodeRunner(params NodeExecParams) Result {
+func goRunner(params GoExecParams) Result {
 	ctx, cancel := context.WithDeadline(context.Background(), time.Now().Add(5*time.Second))
 	defer cancel()
 
@@ -21,10 +21,10 @@ func nodeRunner(params NodeExecParams) Result {
 	tc := make(chan string)
 	pidC := make(chan int, 1)
 
-	process := fmt.Sprintf("%s/%s", params.ContainerDirectory, params.ExecutionFile)
+	fmt.Println(params.ContainerName)
 
 	go func() {
-		cmd := exec.Command("docker", []string{"exec", params.ContainerName, "node", process}...)
+		cmd := exec.Command("docker", []string{"exec", params.ContainerName, fmt.Sprintf("cd %s && go mod init > /dev/null 2>&1 && go run %s | tee output.txt", params.ContainerDirectory, params.ContainerDirectory)}...)
 
 		errPipe, err := cmd.StderrPipe()
 
@@ -54,10 +54,14 @@ func nodeRunner(params NodeExecParams) Result {
 		errb = string(a)
 		outb = string(b)
 
+		fmt.Println(errb)
+		fmt.Println(outb)
+
 		if startErr == nil {
 			waitErr := cmd.Wait()
 
 			if waitErr != nil {
+				fmt.Println(waitErr)
 				runResult.Error = appErrors.New(appErrors.ApplicationError, appErrors.ExecutionStartError, "Execution failed!")
 
 				tc <- "error"
@@ -81,7 +85,7 @@ func nodeRunner(params NodeExecParams) Result {
 	case res := <-tc:
 		if res == "error" {
 			destroyContainerProcess(extractExecDirUniqueIdentifier(params.ExecutionDirectory))
-			destroy(params.ExecutionDirectory)
+			//destroy(params.ExecutionDirectory)
 			return runResult
 		}
 
@@ -105,13 +109,13 @@ func nodeRunner(params NodeExecParams) Result {
 		}
 
 		closeExecSession(<-pidC)
-		destroy(params.ExecutionDirectory)
+		//destroy(params.ExecutionDirectory)
 
 		break
 	case <-ctx.Done():
 		destroyContainerProcess(extractExecDirUniqueIdentifier(params.ExecutionFile))
 		closeExecSession(<-pidC)
-		destroy(params.ExecutionDirectory)
+		//destroy(params.ExecutionDirectory)
 		close(pidC)
 		return Result{
 			Result:  "",
