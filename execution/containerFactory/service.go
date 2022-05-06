@@ -38,7 +38,7 @@ type container struct {
 	WorkerNum int
 }
 
-func InitService(workerNum int) {
+func InitService() {
 	s := &service{containers: make(map[string]container)}
 
 	PackageService = s

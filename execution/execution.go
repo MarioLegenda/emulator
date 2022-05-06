@@ -2,6 +2,7 @@ package execution
 
 import (
 	"fmt"
+	"sync"
 	"therebelsource/emulator/appErrors"
 	"therebelsource/emulator/execution/balancer"
 	"therebelsource/emulator/execution/balancer/runners"
@@ -26,7 +27,10 @@ type Execution interface {
 }
 
 type execution struct {
-	balancers map[string]balancer.Balancer
+	controller []int32
+	balancers  []balancer.Balancer
+	lock       sync.Mutex
+	close      bool
 }
 
 type containerBlueprint struct {
@@ -34,13 +38,13 @@ type containerBlueprint struct {
 	tag       string
 }
 
-func Init(workerNum int) *appErrors.Error {
-	containerFactory.InitService(workerNum)
+func Init(workerNum int, containerNum int) *appErrors.Error {
+	containerFactory.InitService()
 	s := &execution{
-		balancers: make(map[string]balancer.Balancer),
+		balancers: make([]balancer.Balancer, 0),
 	}
 
-	err := s.init()
+	err := s.init(workerNum, containerNum)
 
 	if err != nil {
 		return err
@@ -52,24 +56,63 @@ func Init(workerNum int) *appErrors.Error {
 }
 
 func (e *execution) RunJob(j Job) runners.Result {
-	for _, b := range e.balancers {
-		output := make(chan runners.Result)
-		b.AddJob(balancer.Job{
-			BuilderType:       j.BuilderType,
-			ExecutionType:     j.ExecutionType,
-			EmulatorName:      j.EmulatorName,
-			EmulatorExtension: j.EmulatorExtension,
-			EmulatorText:      j.EmulatorText,
-			Output:            output,
-		})
+	e.lock.Lock()
 
-		return <-output
+	if e.close {
+		e.lock.Unlock()
+
+		return runners.Result{
+			Result:  "",
+			Success: false,
+			Error:   appErrors.New(appErrors.ApplicationError, appErrors.TimeoutError, "Code execution timeout!"),
+		}
 	}
 
-	return runners.Result{}
+	idx := 0
+	first := e.controller[0]
+	for i, r := range e.controller {
+		if r < first {
+			idx = i
+		}
+	}
+
+	e.controller[idx] = e.controller[idx] + 1
+
+	e.lock.Unlock()
+
+	b := e.balancers[idx]
+
+	output := make(chan runners.Result)
+	b.AddJob(balancer.Job{
+		BuilderType:       j.BuilderType,
+		ExecutionType:     j.ExecutionType,
+		EmulatorName:      j.EmulatorName,
+		EmulatorExtension: j.EmulatorExtension,
+		EmulatorText:      j.EmulatorText,
+		Output:            output,
+	})
+
+	out := <-output
+	close(output)
+
+	e.lock.Lock()
+	e.controller[idx] = e.controller[idx] - 1
+	e.lock.Unlock()
+
+	return out
 }
 
 func (e *execution) Close() {
+	defer func() {
+		if err := recover(); err != nil {
+			// send to slack/log
+		}
+	}()
+
+	e.lock.Lock()
+	e.close = true
+	e.lock.Unlock()
+
 	for _, b := range e.balancers {
 		b.Close()
 	}
@@ -77,10 +120,10 @@ func (e *execution) Close() {
 	containerFactory.PackageService.Close()
 }
 
-func (e *execution) init() *appErrors.Error {
+func (e *execution) init(workerNum int, containerNum int) *appErrors.Error {
 	blueprints := []containerBlueprint{
 		{
-			workerNum: 5,
+			workerNum: containerNum,
 			tag:       string(runner.NodeLts.Tag),
 		},
 	}
@@ -96,9 +139,10 @@ func (e *execution) init() *appErrors.Error {
 	containers := containerFactory.PackageService.Containers()
 
 	for _, c := range containers {
-		b := balancer.NewBalancer(c.Name, 5)
+		b := balancer.NewBalancer(c.Name, workerNum)
 		b.StartWorkers()
-		e.balancers[c.Name] = b
+		e.balancers = append(e.balancers, b)
+		e.controller = append(e.controller, 0)
 	}
 
 	return nil

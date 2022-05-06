@@ -42,8 +42,8 @@ func InitServer(r *mux.Router) *http.Server {
 
 	srv := &http.Server{
 		Handler:      handler,
-		ReadTimeout:  20 * time.Second,
-		WriteTimeout: 20 * time.Second,
+		ReadTimeout:  120 * time.Second,
+		WriteTimeout: 120 * time.Second,
 		Addr:         os.Getenv("SERVER_HOST") + ":" + os.Getenv("SERVER_PORT"),
 	}
 
@@ -55,7 +55,9 @@ func InitServer(r *mux.Router) *http.Server {
 	go func() {
 		fmt.Printf("Starting server on %s:%v...\n", os.Getenv("SERVER_HOST"), os.Getenv("SERVER_PORT"))
 
-		daemon.SdNotify(false, daemon.SdNotifyReady)
+		if os.Getenv("APP_ENV") == "prod" {
+			daemon.SdNotify(false, daemon.SdNotifyReady)
+		}
 
 		if err := srv.ListenAndServe(); err != nil {
 			log.Println(err)
@@ -70,19 +72,7 @@ func WatchServerShutdown(srv *http.Server) {
 	signal.Notify(c, os.Interrupt, syscall.SIGINT, syscall.SIGTERM)
 	<-c
 
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-	defer cancel()
-
-	err := srv.Shutdown(ctx)
-
-	if err != nil {
-		fmt.Println(errorHandler.ConstructError(errorHandler.ServerError, 0, err.Error()))
-	}
-
-	fmt.Println("Server is terminated.")
-	fmt.Println("")
 	fmt.Println("Stopping container balancer...")
-
 	runner.StopContainerBalancer()
 	fmt.Println("Container balancer stopped!")
 
@@ -90,7 +80,20 @@ func WatchServerShutdown(srv *http.Server) {
 	execution.PackageService.Close()
 	fmt.Println("Emulator workers stopped")
 
-	daemon.SdNotify(false, daemon.SdNotifyStopping)
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+	err := srv.Shutdown(ctx)
+
+	if err != nil {
+		fmt.Println(errorHandler.ConstructError(errorHandler.ServerError, 0, err.Error()))
+	}
+
+	fmt.Println("Server is terminated. App shutting down!")
+	fmt.Println("")
+
+	if os.Getenv("APP_ENV") == "prod" {
+		daemon.SdNotify(false, daemon.SdNotifyStopping)
+	}
 
 	os.Exit(0)
 }

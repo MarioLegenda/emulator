@@ -9,6 +9,8 @@ import (
 	"time"
 )
 
+var t string = "ps aux | awk '/app\\/71db77e0-38bc-44ff-a65f-9d33ed6b7477\\/71db77e0-38bc-44ff-a65f-9d33ed6b7477.js/ { print $2}'"
+
 func NodeRunner(params NodeExecParams) Result {
 	ctx, cancel := context.WithDeadline(context.Background(), time.Now().Add(5*time.Second))
 	defer cancel()
@@ -23,6 +25,7 @@ func NodeRunner(params NodeExecParams) Result {
 
 	go func() {
 		cmd := exec.Command("docker", []string{"exec", params.ContainerName, "node", fmt.Sprintf("%s/%s", params.ContainerDirectory, params.ExecutionFile)}...)
+		fmt.Println(cmd.String())
 
 		cmd.Stderr = &errb
 		cmd.Stdout = &outb
@@ -34,6 +37,10 @@ func NodeRunner(params NodeExecParams) Result {
 			waitErr := cmd.Wait()
 
 			if waitErr != nil {
+				fmt.Println(waitErr)
+				runResult.Error = appErrors.New(appErrors.ApplicationError, appErrors.ExecutionStartError, "Execution failed!")
+
+				tc <- "error"
 				//fmt.Printf("Wait error: %s\n", waitErr.Error())
 			}
 		}
@@ -86,6 +93,7 @@ func NodeRunner(params NodeExecParams) Result {
 	case <-ctx.Done():
 		closeExecSession(<-pidC)
 		destroy(params.ExecutionDirectory)
+		close(pidC)
 		return Result{
 			Result:  "",
 			Success: false,

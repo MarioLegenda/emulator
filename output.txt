@@ -1,3 +1,0 @@
-Welcome to Node.js v14.17.3.
-Type ".help" for more information.
-[1G[0J> [3G

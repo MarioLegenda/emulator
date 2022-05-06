@@ -36,10 +36,16 @@ func (s Service) RunSingleFile(model *SingleFileRunRequest) (runner.SingleFileRu
 			EmulatorText:      model.codeBlock.Text,
 		})
 
+		result := res.Result
+
+		if result == "" && res.Error != nil && appErrors.TimeoutError == res.Error.Code {
+			result = "timeout"
+		}
+
 		return runner.SingleFileRunResult{
 			Success: res.Success,
-			Result:  res.Result,
-			Timeout: 0,
+			Result:  result,
+			Timeout: 5,
 		}, nil
 	}
 
@@ -92,10 +98,16 @@ func (s Service) RunPublicSingleFile(model *PublicSingleFileRunRequest) (runner.
 			EmulatorText:      model.Text,
 		})
 
+		result := res.Result
+
+		if result == "" && res.Error != nil && appErrors.TimeoutError == res.Error.Code {
+			result = "timeout"
+		}
+
 		return runner.SingleFileRunResult{
 			Success: res.Success,
-			Result:  res.Result,
-			Timeout: 0,
+			Result:  result,
+			Timeout: 5,
 		}, nil
 	}
 

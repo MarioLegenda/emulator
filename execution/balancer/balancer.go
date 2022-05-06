@@ -1,16 +1,13 @@
 package balancer
 
 import (
-	"context"
 	"fmt"
-	"os"
 	"sync"
-	"sync/atomic"
 	"therebelsource/emulator/appErrors"
-	"therebelsource/emulator/execution/balancer/builders"
 	"therebelsource/emulator/execution/balancer/runners"
-	"time"
 )
+
+var closing bool
 
 type Balancer interface {
 	StartWorkers()
@@ -40,7 +37,6 @@ type balancer struct {
 	name       string
 	controller []int32
 	lock       sync.Mutex
-	close      bool
 }
 
 func NewBalancer(name string, initialWorkers int) Balancer {
@@ -56,12 +52,7 @@ func NewBalancer(name string, initialWorkers int) Balancer {
 			name:  name,
 			index: i,
 		})
-
-		var p int32
-
-		atomic.StoreInt32(&p, 0)
-
-		b.controller = append(b.controller, p)
+		b.controller = append(b.controller, 0)
 	}
 
 	return b
@@ -74,51 +65,49 @@ func (b *balancer) StartWorkers() {
 		go func(worker worker, wg *sync.WaitGroup) {
 			wg.Done()
 
-			var current int32 = 0
-			for job := range worker.input {
-				if current == 0 && b.close {
+			for {
+				job := <-worker.input
+
+				if closing {
 					job.Output <- runners.Result{
 						Result:  "",
 						Success: false,
 						Error:   appErrors.New(appErrors.ApplicationError, appErrors.ShutdownError, "Worker is shutting down!"),
 					}
-					return
+
+					continue
 				}
 
-				build, err := builders.NodeSingleFileBuild(builders.InitNodeParams(
-					job.EmulatorExtension,
-					job.EmulatorText,
-					fmt.Sprintf("%s/%s", os.Getenv("SINGLE_FILE_STATE_DIR"), worker.name),
-				))
+				res := runners.Run(runners.Params{
+					BuilderType:       job.BuilderType,
+					ExecutionType:     job.ExecutionType,
+					ContainerName:     worker.name,
+					EmulatorName:      job.EmulatorName,
+					EmulatorExtension: job.EmulatorExtension,
+					EmulatorText:      job.EmulatorText,
+				})
 
-				if err != nil {
+				if res.Error != nil {
+					b.lock.Lock()
+					b.controller[worker.index] = b.controller[worker.index] - 1
+					b.lock.Unlock()
+
 					job.Output <- runners.Result{
 						Result:  "",
 						Success: false,
-						Error:   err,
+						Error:   res.Error,
 					}
 
-					b.lock.Lock()
-					b.controller[worker.index] = b.controller[worker.index] - 1
-					current = b.controller[worker.index]
-					b.lock.Unlock()
-
-					return
+					continue
 				}
 
-				res := runners.NodeRunner(runners.NodeExecParams{
-					ExecutionDirectory: build.ExecutionDirectory,
-					ContainerDirectory: build.ContainerDirectory,
-					ExecutionFile:      build.FileName,
-					ContainerName:      worker.name,
-				})
+				b.lock.Lock()
+				fmt.Println(res)
+				fmt.Println("STOPPING WORKER")
+				b.controller[worker.index] = b.controller[worker.index] - 1
+				b.lock.Unlock()
 
 				job.Output <- res
-
-				b.lock.Lock()
-				b.controller[worker.index] = b.controller[worker.index] - 1
-				current = b.controller[worker.index]
-				b.lock.Unlock()
 			}
 		}(w, &wg)
 	}
@@ -128,12 +117,6 @@ func (b *balancer) StartWorkers() {
 
 func (b *balancer) AddJob(j Job) {
 	b.lock.Lock()
-
-	if b.close {
-		b.lock.Unlock()
-
-		return
-	}
 
 	idx := 0
 	first := b.controller[0]
@@ -152,36 +135,20 @@ func (b *balancer) AddJob(j Job) {
 
 func (b *balancer) Close() {
 	b.lock.Lock()
-	b.close = true
+	closing = true
 	b.lock.Unlock()
 
-	isClosed := make(chan bool)
-	ctx, _ := context.WithDeadline(context.Background(), time.Now().Add(20*time.Second))
-	go func() {
-		for {
-			select {
-			case <-ctx.Done():
-				isClosed <- true
-			default:
-				l := len(b.controller) - 1
-				a := 0
-				for _, r := range b.controller {
-					if r == 0 {
-						a++
-					}
+	l := len(b.controller)
+	for {
+		a := 0
+		for _, r := range b.controller {
+			if r == 0 {
+				a++
+			}
 
-					if a == l {
-						isClosed <- true
-						return
-					}
-				}
+			if a == l {
+				return
 			}
 		}
-	}()
-
-	<-isClosed
-
-	for _, w := range b.workers {
-		close(w.input)
 	}
 }
