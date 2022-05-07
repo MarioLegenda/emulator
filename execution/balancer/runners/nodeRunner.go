@@ -9,6 +9,13 @@ import (
 	"time"
 )
 
+type NodeExecParams struct {
+	ContainerName      string
+	ExecutionDirectory string
+	ContainerDirectory string
+	ExecutionFile      string
+}
+
 func nodeRunner(params NodeExecParams) Result {
 	ctx, cancel := context.WithDeadline(context.Background(), time.Now().Add(5*time.Second))
 	defer cancel()

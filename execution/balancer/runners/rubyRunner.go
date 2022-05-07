@@ -9,14 +9,14 @@ import (
 	"time"
 )
 
-type GoExecParams struct {
+type RubyExecParams struct {
 	ContainerName      string
 	ExecutionDirectory string
 	ContainerDirectory string
 	ExecutionFile      string
 }
 
-func goRunner(params GoExecParams) Result {
+func rubyRunner(params RubyExecParams) Result {
 	ctx, cancel := context.WithDeadline(context.Background(), time.Now().Add(5*time.Second))
 	defer cancel()
 
@@ -26,8 +26,11 @@ func goRunner(params GoExecParams) Result {
 	tc := make(chan string)
 	pidC := make(chan int, 1)
 
+	process := fmt.Sprintf("%s/%s", params.ContainerDirectory, params.ExecutionFile)
+
 	go func() {
-		cmd := exec.Command("docker", []string{"exec", params.ContainerName, "/bin/bash", "-c", fmt.Sprintf("cd %s && go mod init app/%s >/dev/null 2>&1 && go build && ./%s", params.ContainerDirectory, params.ContainerDirectory, params.ContainerDirectory)}...)
+		cmd := exec.Command("docker", []string{"exec", params.ContainerName, "ruby", process}...)
+		
 		errPipe, err := cmd.StderrPipe()
 
 		if err != nil {
@@ -49,14 +52,14 @@ func goRunner(params GoExecParams) Result {
 		}
 
 		startErr := cmd.Start()
-		pidC <- cmd.Process.Pid
-
-		a, _ := io.ReadAll(errPipe)
-		b, _ := io.ReadAll(outPipe)
-		errb = string(a)
-		outb = string(b)
-
 		if startErr == nil {
+			pidC <- cmd.Process.Pid
+
+			a, _ := io.ReadAll(errPipe)
+			b, _ := io.ReadAll(outPipe)
+			errb = string(a)
+			outb = string(b)
+
 			waitErr := cmd.Wait()
 
 			if waitErr != nil {
@@ -89,7 +92,7 @@ func goRunner(params GoExecParams) Result {
 				runResult.Error = nil
 			}
 
-			destroyContainerProcess(extractUniqueIdentifier(params.ContainerDirectory, false), true)
+			destroyContainerProcess(extractUniqueIdentifier(params.ExecutionDirectory, true), false)
 			destroy(params.ExecutionDirectory)
 			return runResult
 		}
@@ -106,7 +109,7 @@ func goRunner(params GoExecParams) Result {
 
 		break
 	case <-ctx.Done():
-		destroyContainerProcess(extractUniqueIdentifier(params.ContainerDirectory, false), true)
+		destroyContainerProcess(extractUniqueIdentifier(params.ExecutionFile, true), false)
 		closeExecSession(<-pidC)
 		destroy(params.ExecutionDirectory)
 		close(pidC)

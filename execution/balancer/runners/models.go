@@ -8,20 +8,6 @@ type Result struct {
 	Error   *appErrors.Error
 }
 
-type NodeExecParams struct {
-	ContainerName      string
-	ExecutionDirectory string
-	ContainerDirectory string
-	ExecutionFile      string
-}
-
-type GoExecParams struct {
-	ContainerName      string
-	ExecutionDirectory string
-	ContainerDirectory string
-	ExecutionFile      string
-}
-
 type name string
 
 type language struct {
@@ -42,4 +28,8 @@ var nodeEsm = language{
 
 var goLang = language{
 	name: "go",
+}
+
+var ruby = language{
+	name: "ruby",
 }

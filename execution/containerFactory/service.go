@@ -49,7 +49,7 @@ func (d *service) Containers() map[string]container {
 }
 
 func (d *service) CreateContainers(tag string, workerNum int) bool {
-	fmt.Println(fmt.Sprintf("Creating %d containers for %s", workerNum, tag))
+	fmt.Println(fmt.Sprintf("Creating %d container(s) for %s", workerNum, tag))
 	for i := 0; i < workerNum; i++ {
 		name := uuid.New().String()
 

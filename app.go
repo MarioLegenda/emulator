@@ -5,7 +5,6 @@ import (
 	"github.com/joho/godotenv"
 	"log"
 	"os"
-	"syscall"
 	"therebelsource/emulator/appErrors"
 	errorHandler "therebelsource/emulator/appErrors"
 	"therebelsource/emulator/execution"
@@ -72,8 +71,6 @@ func InitRequiredDirectories(output bool) {
 }
 
 func App() {
-	fmt.Println(int(syscall.SIGINT))
-
 	LoadEnv()
 	InitRequiredDirectories(true)
 
