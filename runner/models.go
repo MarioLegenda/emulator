@@ -16,16 +16,6 @@ type Language struct {
 	Extension     string        `json:"extension"`
 }
 
-var Node14 = Language{
-	Name:          "node_v14_x",
-	Text:          "Javascript (Node v14.x)",
-	Tag:           "node:node_v14_x",
-	InDevelopment: false,
-	InMaintenance: false,
-	Language:      "javascript",
-	Extension:     "js",
-}
-
 var NodeLts = Language{
 	Name:          "node_latest",
 	Text:          "Javascript (Node latest)",
