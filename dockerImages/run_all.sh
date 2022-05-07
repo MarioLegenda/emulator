@@ -1,8 +1,8 @@
 #!/bin/bash
 
-dir="/var/www/go/src/therebelsource/emulator/dockerImages"
+dir=$PWD
 
-cd "$dir/go_v1_17_6" && /usr/bin/docker image build -t go:go_v1_17_6 .
+cd "$dir/go_v18" && /usr/bin/docker image build -t go:go_v18 .
 cd "$dir/node_latest" && /usr/bin/docker image build -t node:node_latest .
 cd "$dir/node_latest" && /usr/bin/docker image build -t node:node_latest_esm .
 cd "$dir/python2" && /usr/bin/docker image build -t python:python2 .

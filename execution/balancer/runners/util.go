@@ -68,8 +68,8 @@ func pidExists(pid int) (bool, error) {
 	return false, err
 }
 
-func destroyContainerProcess(processName string) {
-	pids, ok := getContainerProcessPid(processName)
+func destroyContainerProcess(processName string, isSingleCommand bool) {
+	pids, ok := getContainerProcessPid(processName, isSingleCommand)
 
 	if !ok {
 		return
@@ -83,12 +83,12 @@ func destroyContainerProcess(processName string) {
 		}
 
 		if exists {
-			syscall.Kill(pid, 9)
+			syscall.Kill(pid, 2)
 		}
 	}
 }
 
-func getContainerProcessPid(processName string) ([]int, bool) {
+func getContainerProcessPid(processName string, isSingleCommand bool) ([]int, bool) {
 	cmd := exec.Command("/usr/bin/ps", "aux")
 	pids := make([]int, 0)
 
@@ -101,7 +101,12 @@ func getContainerProcessPid(processName string) ([]int, bool) {
 	a := strings.Split(string(out), "\n")
 
 	for _, i := range a {
-		match, _ := regexp.MatchString(fmt.Sprintf("(app.*%s)$", processName), i)
+		p := "(app.*%s)$"
+		if isSingleCommand {
+			p = "(%s)$"
+		}
+
+		match, _ := regexp.MatchString(fmt.Sprintf(p, processName), i)
 
 		if match {
 			m1 := regexp.MustCompile(`\s+`)
@@ -124,8 +129,28 @@ func getContainerProcessPid(processName string) ([]int, bool) {
 	return pids, true
 }
 
-func extractExecDirUniqueIdentifier(dir string) string {
-	s := strings.Split(dir, "/")
+func extractUniqueIdentifier(idf string, isDir bool) string {
+	if isDir {
+		s := strings.Split(idf, "/")
 
-	return s[len(s)-1]
+		return s[len(s)-1]
+	}
+
+	return idf
+}
+
+func makeRunDecision(errOut string, stdOut string, execDir string) string {
+	if errOut != "" {
+		return errOut
+	} else if stdOut != "" {
+		return stdOut
+	} else {
+		output, err := readFile(fmt.Sprintf("%s/%s", execDir, "output.txt"))
+
+		if err != nil {
+			return ""
+		} else {
+			return output
+		}
+	}
 }

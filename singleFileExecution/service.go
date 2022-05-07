@@ -1,6 +1,7 @@
 package singleFileExecution
 
 import (
+	"fmt"
 	"github.com/google/uuid"
 	"therebelsource/emulator/appErrors"
 	"therebelsource/emulator/builders"
@@ -59,6 +60,8 @@ func (s Service) RunSingleFile(model *SingleFileRunRequest) (runner.SingleFileRu
 			EmulatorExtension: model.codeBlock.Emulator.Extension,
 			EmulatorText:      model.codeBlock.Text,
 		})
+
+		fmt.Println(res)
 
 		result := res.Result
 

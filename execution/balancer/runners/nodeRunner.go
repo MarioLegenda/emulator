@@ -14,8 +14,6 @@ func nodeRunner(params NodeExecParams) Result {
 	defer cancel()
 
 	var outb, errb string
-	var out string
-	var success bool
 	var runResult Result
 
 	tc := make(chan string)
@@ -80,28 +78,23 @@ func nodeRunner(params NodeExecParams) Result {
 	select {
 	case res := <-tc:
 		if res == "error" {
-			destroyContainerProcess(extractExecDirUniqueIdentifier(params.ExecutionDirectory))
+			out := makeRunDecision(errb, outb, params.ExecutionDirectory)
+			if out != "" {
+				runResult.Success = true
+				runResult.Result = out
+				runResult.Error = nil
+			}
+
+			destroyContainerProcess(extractUniqueIdentifier(params.ExecutionDirectory, true), false)
 			destroy(params.ExecutionDirectory)
 			return runResult
 		}
 
-		if errb != "" {
-			success = false
-			out = errb
-		} else if outb != "" {
-			success = true
-			out = outb
-		} else {
-			success = true
-
-			output, err := readFile(fmt.Sprintf("%s/%s", params.ExecutionDirectory, "output.txt"))
-
-			if err != nil {
-				success = false
-				out = ""
-			} else {
-				out = output
-			}
+		out := makeRunDecision(errb, outb, params.ExecutionDirectory)
+		if out != "" {
+			runResult.Success = true
+			runResult.Result = out
+			runResult.Error = nil
 		}
 
 		closeExecSession(<-pidC)
@@ -109,7 +102,7 @@ func nodeRunner(params NodeExecParams) Result {
 
 		break
 	case <-ctx.Done():
-		destroyContainerProcess(extractExecDirUniqueIdentifier(params.ExecutionFile))
+		destroyContainerProcess(extractUniqueIdentifier(params.ExecutionFile, true), false)
 		closeExecSession(<-pidC)
 		destroy(params.ExecutionDirectory)
 		close(pidC)
@@ -120,8 +113,6 @@ func nodeRunner(params NodeExecParams) Result {
 		}
 	}
 
-	runResult.Result = out
-	runResult.Success = success
 	runResult.Error = nil
 
 	return runResult

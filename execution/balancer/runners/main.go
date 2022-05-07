@@ -48,8 +48,6 @@ func Run(params Params) Result {
 			fmt.Sprintf("%s/%s", os.Getenv("SINGLE_FILE_STATE_DIR"), params.ContainerName),
 		))
 
-		fmt.Println(err)
-
 		if err != nil {
 			return Result{
 				Result:  "",

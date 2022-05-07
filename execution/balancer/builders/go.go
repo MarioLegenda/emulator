@@ -45,7 +45,7 @@ func GoSingleFileBuild(params GoSingleFileBuildParams) (GoSingleFileBuildResult,
 	}
 
 	return GoSingleFileBuildResult{
-		ContainerDirectory: fmt.Sprintf("/app/%s", dirName),
+		ContainerDirectory: dirName,
 		ExecutionDirectory: tempExecutionDir,
 		FileName:           fileName,
 	}, nil

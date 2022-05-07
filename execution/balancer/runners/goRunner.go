@@ -14,19 +14,13 @@ func goRunner(params GoExecParams) Result {
 	defer cancel()
 
 	var outb, errb string
-	var out string
-	var success bool
 	var runResult Result
 
 	tc := make(chan string)
 	pidC := make(chan int, 1)
 
-	fmt.Println(params.ContainerName)
-
 	go func() {
-		cmd := exec.Command("docker", []string{"exec", params.ContainerName, fmt.Sprintf("cd %s && go mod init > /dev/null 2>&1 && go run . | tee output.txt", params.ContainerDirectory)}...)
-		//cmd := exec.Command("docker", []string{"exec", params.ContainerName, fmt.Sprintf("cd %s", params.ContainerDirectory)}...)
-		fmt.Println(cmd.String())
+		cmd := exec.Command("docker", []string{"exec", params.ContainerName, "/bin/bash", "-c", fmt.Sprintf("cd %s && go mod init app/%s >/dev/null 2>&1 && go build && ./%s", params.ContainerDirectory, params.ContainerDirectory, params.ContainerDirectory)}...)
 		errPipe, err := cmd.StderrPipe()
 
 		if err != nil {
@@ -55,14 +49,10 @@ func goRunner(params GoExecParams) Result {
 		errb = string(a)
 		outb = string(b)
 
-		fmt.Println(errb)
-		fmt.Println(outb)
-
 		if startErr == nil {
 			waitErr := cmd.Wait()
 
 			if waitErr != nil {
-				fmt.Println(waitErr)
 				runResult.Error = appErrors.New(appErrors.ApplicationError, appErrors.ExecutionStartError, "Execution failed!")
 
 				tc <- "error"
@@ -85,38 +75,33 @@ func goRunner(params GoExecParams) Result {
 	select {
 	case res := <-tc:
 		if res == "error" {
-			destroyContainerProcess(extractExecDirUniqueIdentifier(params.ExecutionDirectory))
-			//destroy(params.ExecutionDirectory)
+			out := makeRunDecision(errb, outb, params.ExecutionDirectory)
+			if out != "" {
+				runResult.Success = true
+				runResult.Result = out
+				runResult.Error = nil
+			}
+
+			destroyContainerProcess(extractUniqueIdentifier(params.ContainerDirectory, false), true)
+			destroy(params.ExecutionDirectory)
 			return runResult
 		}
 
-		if errb != "" {
-			success = false
-			out = errb
-		} else if outb != "" {
-			success = true
-			out = outb
-		} else {
-			success = true
-
-			output, err := readFile(fmt.Sprintf("%s/%s", params.ExecutionDirectory, "output.txt"))
-
-			if err != nil {
-				success = false
-				out = ""
-			} else {
-				out = output
-			}
+		out := makeRunDecision(errb, outb, params.ExecutionDirectory)
+		if out != "" {
+			runResult.Success = true
+			runResult.Result = out
+			runResult.Error = nil
 		}
 
 		closeExecSession(<-pidC)
-		//destroy(params.ExecutionDirectory)
+		destroy(params.ExecutionDirectory)
 
 		break
 	case <-ctx.Done():
-		destroyContainerProcess(extractExecDirUniqueIdentifier(params.ExecutionFile))
+		destroyContainerProcess(extractUniqueIdentifier(params.ContainerDirectory, false), true)
 		closeExecSession(<-pidC)
-		//destroy(params.ExecutionDirectory)
+		destroy(params.ExecutionDirectory)
 		close(pidC)
 		return Result{
 			Result:  "",
@@ -125,8 +110,6 @@ func goRunner(params GoExecParams) Result {
 		}
 	}
 
-	runResult.Result = out
-	runResult.Success = success
 	runResult.Error = nil
 
 	return runResult
