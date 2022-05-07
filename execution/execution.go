@@ -145,6 +145,10 @@ func (e *execution) init(workerNum int, containerNum int) *appErrors.Error {
 			workerNum: containerNum,
 			tag:       string(runner.Php74.Tag),
 		},
+		{
+			workerNum: containerNum,
+			tag:       string(runner.Python2.Tag),
+		},
 	}
 
 	for _, blueprint := range blueprints {

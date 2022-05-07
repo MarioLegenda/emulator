@@ -92,7 +92,7 @@ func phpRunner(params PhpExecParams) Result {
 				runResult.Error = nil
 			}
 
-			destroyContainerProcess(extractUniqueIdentifier(params.ExecutionDirectory, true), false)
+			destroyContainerProcess(extractUniqueIdentifier(process, true), true)
 			destroy(params.ExecutionDirectory)
 			return runResult
 		}
@@ -109,7 +109,7 @@ func phpRunner(params PhpExecParams) Result {
 
 		break
 	case <-ctx.Done():
-		destroyContainerProcess(extractUniqueIdentifier(params.ExecutionFile, true), false)
+		destroyContainerProcess(extractUniqueIdentifier(process, true), true)
 		closeExecSession(<-pidC)
 		destroy(params.ExecutionDirectory)
 		close(pidC)

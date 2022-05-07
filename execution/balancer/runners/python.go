@@ -9,14 +9,14 @@ import (
 	"time"
 )
 
-type RubyExecParams struct {
+type PythonExecParams struct {
 	ContainerName      string
 	ExecutionDirectory string
 	ContainerDirectory string
 	ExecutionFile      string
 }
 
-func rubyRunner(params RubyExecParams) Result {
+func pythonRunner(params PythonExecParams) Result {
 	ctx, cancel := context.WithDeadline(context.Background(), time.Now().Add(5*time.Second))
 	defer cancel()
 
@@ -29,7 +29,7 @@ func rubyRunner(params RubyExecParams) Result {
 	process := fmt.Sprintf("%s/%s", params.ContainerDirectory, params.ExecutionFile)
 
 	go func() {
-		cmd := exec.Command("docker", []string{"exec", params.ContainerName, "ruby", process}...)
+		cmd := exec.Command("docker", []string{"exec", params.ContainerName, "python", process}...)
 
 		errPipe, err := cmd.StderrPipe()
 

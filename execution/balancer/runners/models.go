@@ -37,3 +37,7 @@ var ruby = language{
 var php = language{
 	name: "php74",
 }
+
+var python2 = language{
+	name: "python2",
+}
