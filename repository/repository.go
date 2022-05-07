@@ -50,8 +50,6 @@ func (r Repository) GetCodeBlock(sessionUuid string) (*CodeBlock, *appErrors.Err
 		return nil, appErrors.New(appErrors.ApplicationError, appErrors.ApplicationRuntimeError, clientError.GetMessage())
 	}
 
-	fmt.Println(string(response.Body))
-
 	if response.Status != 200 {
 		return nil, appErrors.New(appErrors.ApplicationError, appErrors.ApplicationRuntimeError, fmt.Sprintf("Request did not succeed with status: %d", response.Status))
 	}
@@ -283,9 +281,7 @@ func (r Repository) ValidateTemporarySession(sessionUuid string) (ValidatedTempo
 	if clientError != nil {
 		return ValidatedTemporarySession{}, appErrors.New(appErrors.ApplicationError, appErrors.ApplicationRuntimeError, clientError.GetMessage())
 	}
-
-	fmt.Println(string(response.Body))
-
+	
 	if response.Status != 200 {
 		return ValidatedTemporarySession{}, appErrors.New(appErrors.ApplicationError, appErrors.ApplicationRuntimeError, fmt.Sprintf("Request did not succeed with status: %d", response.Status))
 	}

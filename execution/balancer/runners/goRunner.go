@@ -24,8 +24,9 @@ func goRunner(params GoExecParams) Result {
 	fmt.Println(params.ContainerName)
 
 	go func() {
-		cmd := exec.Command("docker", []string{"exec", params.ContainerName, fmt.Sprintf("cd %s && go mod init > /dev/null 2>&1 && go run %s | tee output.txt", params.ContainerDirectory, params.ContainerDirectory)}...)
-
+		cmd := exec.Command("docker", []string{"exec", params.ContainerName, fmt.Sprintf("cd %s && go mod init > /dev/null 2>&1 && go run . | tee output.txt", params.ContainerDirectory)}...)
+		//cmd := exec.Command("docker", []string{"exec", params.ContainerName, fmt.Sprintf("cd %s", params.ContainerDirectory)}...)
+		fmt.Println(cmd.String())
 		errPipe, err := cmd.StderrPipe()
 
 		if err != nil {

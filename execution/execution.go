@@ -83,9 +83,9 @@ func (e *execution) RunJob(j Job) runners.Result {
 
 	e.controller[j.EmulatorTag][idx] = e.controller[j.EmulatorTag][idx] + 1
 
-	e.lock.Unlock()
-
 	b := balancers[idx]
+
+	e.lock.Unlock()
 
 	output := make(chan runners.Result)
 	b.AddJob(balancer.Job{
@@ -150,6 +150,7 @@ func (e *execution) init(workerNum int, containerNum int) *appErrors.Error {
 	containers := containerFactory.PackageService.Containers()
 
 	for _, c := range containers {
+		fmt.Println(fmt.Sprintf("Creating %d workers for %s", workerNum, c.Tag))
 		b := balancer.NewBalancer(c.Name, workerNum)
 		b.StartWorkers()
 		e.balancers[c.Tag] = make([]balancer.Balancer, 0)

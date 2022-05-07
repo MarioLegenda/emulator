@@ -47,14 +47,14 @@ func nodeRunner(params NodeExecParams) Result {
 		}
 
 		startErr := cmd.Start()
-		pidC <- cmd.Process.Pid
-
-		a, _ := io.ReadAll(errPipe)
-		b, _ := io.ReadAll(outPipe)
-		errb = string(a)
-		outb = string(b)
-
 		if startErr == nil {
+			pidC <- cmd.Process.Pid
+
+			a, _ := io.ReadAll(errPipe)
+			b, _ := io.ReadAll(outPipe)
+			errb = string(a)
+			outb = string(b)
+
 			waitErr := cmd.Wait()
 
 			if waitErr != nil {

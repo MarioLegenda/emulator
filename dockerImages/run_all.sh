@@ -1,6 +1,6 @@
 #!/bin/bash
 
-dir="/home/mario/go-emulator/dockerImages"
+dir="/var/www/go/src/therebelsource/emulator/dockerImages"
 
 cd "$dir/go_v1_17_6" && /usr/bin/docker image build -t go:go_v1_17_6 .
 cd "$dir/node_latest" && /usr/bin/docker image build -t node:node_latest .

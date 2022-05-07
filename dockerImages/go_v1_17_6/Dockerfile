@@ -24,15 +24,18 @@ RUN curl -fsSL "$GOLANG_DOWNLOAD_URL" -o golang.tar.gz \
 ENV GOPATH /app
 ENV PATH $GOPATH/bin:/usr/local/go/bin:$PATH
 
-RUN mkdir -p "$GOPATH/src" "$GOPATH/bin" && chmod -R o+r "$GOPATH/src"
+RUN mkdir -p "$GOPATH/src" "$GOPATH/bin" && chmod -R o+rw "$GOPATH/src"
+RUN mkdir -p "$APP_DIR/src" "$APP_DIR/pkg"
 
 RUN go env -w GOPATH=$APP_DIR
 
 WORKDIR /app
 
+RUN mkdir -p "$GOPATH/src" "$GOPATH/bin" && chmod -R o+rw "$GOPATH/src" && chmod -R o+rw ""
+
 RUN useradd -d $APP_DIR -s /bin/bash dockeruser
-RUN chmod -R u+r $APP_DIR
-RUN chown -R dockeruser:dockeruser $APP_DIR && chown dockeruser:dockeruser /usr/local/go/bin && chown dockeruser:dockeruser /usr/local/go/bin
+RUN chmod -R u+rw $APP_DIR
+RUN chown -R dockeruser:dockeruser $APP_DIR && chown dockeruser:dockeruser /usr/local/go/bin && chown dockeruser:dockeruser /usr/local/go/bin && chown dockeruser:dockeruser /tmp
 
 USER dockeruser
 

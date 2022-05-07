@@ -29,7 +29,7 @@ func InitGoParams(ext string, text string, stateDir string) GoSingleFileBuildPar
 
 func GoSingleFileBuild(params GoSingleFileBuildParams) (GoSingleFileBuildResult, *appErrors.Error) {
 	dirName := uuid.New().String()
-	tempExecutionDir := fmt.Sprintf("%s/src/%s", params.StateDir, dirName)
+	tempExecutionDir := fmt.Sprintf("%s/%s", params.StateDir, dirName)
 	fileName := fmt.Sprintf("%s.%s", dirName, params.Extension)
 
 	if err := os.MkdirAll(tempExecutionDir, os.ModePerm); err != nil {
@@ -45,7 +45,7 @@ func GoSingleFileBuild(params GoSingleFileBuildParams) (GoSingleFileBuildResult,
 	}
 
 	return GoSingleFileBuildResult{
-		ContainerDirectory: fmt.Sprintf("/app/src/%s", dirName),
+		ContainerDirectory: fmt.Sprintf("/app/%s", dirName),
 		ExecutionDirectory: tempExecutionDir,
 		FileName:           fileName,
 	}, nil

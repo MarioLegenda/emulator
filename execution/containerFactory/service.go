@@ -49,7 +49,7 @@ func (d *service) Containers() map[string]container {
 }
 
 func (d *service) CreateContainers(tag string, workerNum int) bool {
-	fmt.Println(fmt.Sprintf("Creating %d workers for %s", workerNum, tag))
+	fmt.Println(fmt.Sprintf("Creating %d containers for %s", workerNum, tag))
 	for i := 0; i < workerNum; i++ {
 		name := uuid.New().String()
 
@@ -164,14 +164,13 @@ func createContainer(c container) {
 			"-d",
 			"-t",
 			"--network=none",
-			"--read-only",
-			"--rm",
 			"-v",
 			fmt.Sprintf("%s:/app:rw", getVolumeDirectory(c.Name)),
 			"--name",
 			c.Name,
 			"--init",
 			c.Tag,
+			"/bin/sh",
 		}
 
 		cmd := exec.Command("docker", args...)

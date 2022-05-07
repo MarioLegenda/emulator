@@ -119,7 +119,31 @@ func (s Service) RunPublicSingleFile(model *PublicSingleFileRunRequest) (runner.
 			ExecutionType:     "single_file",
 			EmulatorName:      string(model.codeBlock.Emulator.Name),
 			EmulatorExtension: model.codeBlock.Emulator.Extension,
+			EmulatorTag:       string(model.codeBlock.Emulator.Tag),
 			EmulatorText:      model.Text,
+		})
+
+		result := res.Result
+
+		if result == "" && res.Error != nil && appErrors.TimeoutError == res.Error.Code {
+			result = "timeout"
+		}
+
+		return runner.SingleFileRunResult{
+			Success: res.Success,
+			Result:  result,
+			Timeout: 5,
+		}, nil
+	}
+
+	if model.codeBlock.Emulator.Name == "go" {
+		res := execution.PackageService.RunJob(execution.Job{
+			BuilderType:       "single_file",
+			ExecutionType:     "single_file",
+			EmulatorName:      string(model.codeBlock.Emulator.Name),
+			EmulatorTag:       string(model.codeBlock.Emulator.Tag),
+			EmulatorExtension: model.codeBlock.Emulator.Extension,
+			EmulatorText:      model.codeBlock.Text,
 		})
 
 		result := res.Result
