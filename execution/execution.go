@@ -149,6 +149,10 @@ func (e *execution) init(workerNum int, containerNum int) *appErrors.Error {
 			workerNum: containerNum,
 			tag:       string(runner.Python2.Tag),
 		},
+		{
+			workerNum: containerNum,
+			tag:       string(runner.Python3.Tag),
+		},
 	}
 
 	for _, blueprint := range blueprints {

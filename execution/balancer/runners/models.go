@@ -41,3 +41,7 @@ var php = language{
 var python2 = language{
 	name: "python2",
 }
+
+var python3 = language{
+	name: "python3",
+}
