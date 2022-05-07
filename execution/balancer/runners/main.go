@@ -87,5 +87,28 @@ func Run(params Params) Result {
 		})
 	}
 
+	if params.EmulatorName == string(php.name) && params.BuilderType == "single_file" && params.ExecutionType == "single_file" {
+		build, err := builders.PhpSingleFileBuild(builders.InitPhpParams(
+			params.EmulatorExtension,
+			params.EmulatorText,
+			fmt.Sprintf("%s/%s", os.Getenv("SINGLE_FILE_STATE_DIR"), params.ContainerName),
+		))
+
+		if err != nil {
+			return Result{
+				Result:  "",
+				Success: false,
+				Error:   err,
+			}
+		}
+
+		return phpRunner(PhpExecParams{
+			ExecutionDirectory: build.ExecutionDirectory,
+			ContainerDirectory: build.ContainerDirectory,
+			ExecutionFile:      build.FileName,
+			ContainerName:      params.ContainerName,
+		})
+	}
+
 	return Result{}
 }

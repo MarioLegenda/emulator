@@ -33,3 +33,7 @@ var goLang = language{
 var ruby = language{
 	name: "ruby",
 }
+
+var php = language{
+	name: "php74",
+}
