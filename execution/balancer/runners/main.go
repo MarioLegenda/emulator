@@ -248,5 +248,28 @@ func Run(params Params) Result {
 		})
 	}
 
+	if params.EmulatorName == string(rust.name) && params.BuilderType == "single_file" && params.ExecutionType == "single_file" {
+		build, err := builders.RustSingleFileBuild(builders.InitRustParams(
+			params.EmulatorExtension,
+			params.EmulatorText,
+			fmt.Sprintf("%s/%s", os.Getenv("SINGLE_FILE_STATE_DIR"), params.ContainerName),
+		))
+
+		if err != nil {
+			return Result{
+				Result:  "",
+				Success: false,
+				Error:   err,
+			}
+		}
+
+		return rustRunner(RustExecParams{
+			ExecutionDirectory: build.ExecutionDirectory,
+			ContainerDirectory: build.ContainerDirectory,
+			ExecutionFile:      build.FileName,
+			ContainerName:      params.ContainerName,
+		})
+	}
+
 	return Result{}
 }

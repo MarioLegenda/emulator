@@ -57,3 +57,7 @@ var cLang = language{
 var cPlus = language{
 	name: "c++",
 }
+
+var rust = language{
+	name: "rust",
+}
