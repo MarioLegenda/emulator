@@ -53,3 +53,7 @@ var haskell = language{
 var cLang = language{
 	name: "c",
 }
+
+var cPlus = language{
+	name: "c++",
+}

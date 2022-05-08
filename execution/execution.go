@@ -165,6 +165,10 @@ func (e *execution) init(workerNum int, containerNum int) *appErrors.Error {
 			workerNum: containerNum,
 			tag:       string(runner.CLang.Tag),
 		},
+		{
+			workerNum: containerNum,
+			tag:       string(runner.CPlus.Tag),
+		},
 	}
 
 	for _, blueprint := range blueprints {

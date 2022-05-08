@@ -234,6 +234,29 @@ func (s Service) RunSingleFile(model *SingleFileRunRequest) (runner.SingleFileRu
 		}, nil
 	}
 
+	if model.codeBlock.Emulator.Name == "c++" {
+		res := execution.PackageService.RunJob(execution.Job{
+			BuilderType:       "single_file",
+			ExecutionType:     "single_file",
+			EmulatorName:      string(model.codeBlock.Emulator.Name),
+			EmulatorTag:       string(model.codeBlock.Emulator.Tag),
+			EmulatorExtension: model.codeBlock.Emulator.Extension,
+			EmulatorText:      model.codeBlock.Text,
+		})
+
+		result := res.Result
+
+		if result == "" && res.Error != nil && appErrors.TimeoutError == res.Error.Code {
+			result = "timeout"
+		}
+
+		return runner.SingleFileRunResult{
+			Success: res.Success,
+			Result:  result,
+			Timeout: 5,
+		}, nil
+	}
+
 	builder := builders.CreateBuilder("single_file").(builders.SingleFileRunFn)
 
 	buildResult, err := builder(model.codeBlock, "single_file")
@@ -413,6 +436,29 @@ func (s Service) RunPublicSingleFile(model *PublicSingleFileRunRequest) (runner.
 	}
 
 	if model.codeBlock.Emulator.Name == "c_sharp_mono" {
+		res := execution.PackageService.RunJob(execution.Job{
+			BuilderType:       "single_file",
+			ExecutionType:     "single_file",
+			EmulatorName:      string(model.codeBlock.Emulator.Name),
+			EmulatorTag:       string(model.codeBlock.Emulator.Tag),
+			EmulatorExtension: model.codeBlock.Emulator.Extension,
+			EmulatorText:      model.codeBlock.Text,
+		})
+
+		result := res.Result
+
+		if result == "" && res.Error != nil && appErrors.TimeoutError == res.Error.Code {
+			result = "timeout"
+		}
+
+		return runner.SingleFileRunResult{
+			Success: res.Success,
+			Result:  result,
+			Timeout: 5,
+		}, nil
+	}
+
+	if model.codeBlock.Emulator.Name == "c++" {
 		res := execution.PackageService.RunJob(execution.Job{
 			BuilderType:       "single_file",
 			ExecutionType:     "single_file",
