@@ -1,16 +1,11 @@
-FROM mhart/alpine-node:14.1.0
+FROM gcc:4.9
 
 ENV APP_DIR /app
-
-RUN apk add build-base
 
 WORKDIR $APP_DIR
 
 RUN adduser -D -h $APP_DIR -s /bin/bash dockeruser
 RUN chown -R dockeruser:dockeruser $APP_DIR
-
-RUN chmod -R g+r $APP_DIR
-RUN chown -R dockeruser:dockeruser /usr/bin/gcc && chown -R dockeruser /usr/lib/gcc && chown -R dockeruser /usr/libexec/gcc
 
 USER dockeruser
 ENV USER=dockeruser HOME=$APP_DIR

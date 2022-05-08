@@ -49,3 +49,7 @@ var csharpMono = language{
 var haskell = language{
 	name: "haskell",
 }
+
+var cLang = language{
+	name: "c",
+}
