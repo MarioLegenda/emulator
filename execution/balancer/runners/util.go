@@ -101,9 +101,9 @@ func getContainerProcessPid(processName string, isSingleCommand bool) ([]int, bo
 	a := strings.Split(string(out), "\n")
 
 	for _, i := range a {
-		p := "(app.*%s)$"
+		p := "(app.*%s)"
 		if isSingleCommand {
-			p = "(%s)$"
+			p = "(%s)"
 		}
 
 		match, _ := regexp.MatchString(fmt.Sprintf(p, processName), i)
