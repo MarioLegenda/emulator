@@ -45,3 +45,7 @@ var python3 = language{
 var csharpMono = language{
 	name: "c_sharp_mono",
 }
+
+var haskell = language{
+	name: "haskell",
+}

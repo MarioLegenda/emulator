@@ -129,33 +129,37 @@ func (e *execution) Close() {
 
 func (e *execution) init(workerNum int, containerNum int) *appErrors.Error {
 	blueprints := []containerBlueprint{
+		/*		{
+					workerNum: containerNum,
+					tag:       string(runner.NodeLts.Tag),
+				},
+				{
+					workerNum: containerNum,
+					tag:       string(runner.GoLang.Tag),
+				},
+				{
+					workerNum: containerNum,
+					tag:       string(runner.Ruby.Tag),
+				},
+				{
+					workerNum: containerNum,
+					tag:       string(runner.Php74.Tag),
+				},
+				{
+					workerNum: containerNum,
+					tag:       string(runner.Python2.Tag),
+				},
+				{
+					workerNum: containerNum,
+					tag:       string(runner.Python3.Tag),
+				},
+				{
+					workerNum: containerNum,
+					tag:       string(runner.CSharpMono.Tag),
+				},*/
 		{
 			workerNum: containerNum,
-			tag:       string(runner.NodeLts.Tag),
-		},
-		{
-			workerNum: containerNum,
-			tag:       string(runner.GoLang.Tag),
-		},
-		{
-			workerNum: containerNum,
-			tag:       string(runner.Ruby.Tag),
-		},
-		{
-			workerNum: containerNum,
-			tag:       string(runner.Php74.Tag),
-		},
-		{
-			workerNum: containerNum,
-			tag:       string(runner.Python2.Tag),
-		},
-		{
-			workerNum: containerNum,
-			tag:       string(runner.Python3.Tag),
-		},
-		{
-			workerNum: containerNum,
-			tag:       string(runner.CSharpMono.Tag),
+			tag:       string(runner.Haskell.Tag),
 		},
 	}
 

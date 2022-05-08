@@ -9,14 +9,14 @@ import (
 	"time"
 )
 
-type NodeExecParams struct {
+type HaskellExecParams struct {
 	ContainerName      string
 	ExecutionDirectory string
 	ContainerDirectory string
 	ExecutionFile      string
 }
 
-func nodeRunner(params NodeExecParams) Result {
+func haskellRunner(params HaskellExecParams) Result {
 	ctx, cancel := context.WithDeadline(context.Background(), time.Now().Add(5*time.Second))
 	defer cancel()
 
@@ -26,11 +26,9 @@ func nodeRunner(params NodeExecParams) Result {
 	tc := make(chan string)
 	pidC := make(chan int, 1)
 
-	process := fmt.Sprintf("%s/%s", params.ContainerDirectory, params.ExecutionFile)
-
 	go func() {
-		cmd := exec.Command("docker", []string{"exec", params.ContainerName, "node", process}...)
-
+		cmd := exec.Command("docker", []string{"exec", params.ContainerName, "/bin/bash", "-c", fmt.Sprintf("cd %s && ghc %s >/dev/null 2>&1 && ./%s", params.ContainerDirectory, params.ExecutionFile, params.ExecutionFile[:len(params.ExecutionFile)-3])}...)
+		fmt.Println(cmd.String())
 		errPipe, err := cmd.StderrPipe()
 
 		if err != nil {
@@ -92,7 +90,7 @@ func nodeRunner(params NodeExecParams) Result {
 				runResult.Error = nil
 			}
 
-			destroyContainerProcess(extractUniqueIdentifier(params.ExecutionFile, true), false)
+			destroyContainerProcess(extractUniqueIdentifier(params.ExecutionFile[:len(params.ExecutionFile)-3], false), true)
 			destroy(params.ExecutionDirectory)
 			return runResult
 		}
@@ -109,7 +107,7 @@ func nodeRunner(params NodeExecParams) Result {
 
 		break
 	case <-ctx.Done():
-		destroyContainerProcess(extractUniqueIdentifier(params.ExecutionFile, true), false)
+		destroyContainerProcess(extractUniqueIdentifier(params.ExecutionFile[:len(params.ExecutionFile)-3], false), true)
 		closeExecSession(<-pidC)
 		destroy(params.ExecutionDirectory)
 		close(pidC)
