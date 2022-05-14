@@ -7,7 +7,6 @@ import (
 	"therebelsource/emulator/execution/balancer"
 	"therebelsource/emulator/execution/balancer/runners"
 	"therebelsource/emulator/execution/containerFactory"
-	"therebelsource/emulator/runner"
 )
 
 var PackageService Execution
@@ -34,19 +33,20 @@ type execution struct {
 	close      bool
 }
 
-type containerBlueprint struct {
-	workerNum int
-	tag       string
+type ContainerBlueprint struct {
+	WorkerNum    int
+	ContainerNum int
+	Tag          string
 }
 
-func Init(workerNum int, containerNum int) *appErrors.Error {
+func Init(blueprints []ContainerBlueprint) *appErrors.Error {
 	containerFactory.InitService()
 	s := &execution{
 		balancers:  make(map[string][]balancer.Balancer),
 		controller: make(map[string][]int32),
 	}
 
-	err := s.init(workerNum, containerNum)
+	err := s.init(blueprints)
 
 	if err != nil {
 		return err
@@ -127,65 +127,22 @@ func (e *execution) Close() {
 	containerFactory.PackageService.Close()
 }
 
-func (e *execution) init(workerNum int, containerNum int) *appErrors.Error {
-	blueprints := []containerBlueprint{
-		/*		{
-					workerNum: containerNum,
-					tag:       string(runner.NodeLts.Tag),
-				},
-				{
-					workerNum: containerNum,
-					tag:       string(runner.GoLang.Tag),
-				},
-				{
-					workerNum: containerNum,
-					tag:       string(runner.Ruby.Tag),
-				},
-				{
-					workerNum: containerNum,
-					tag:       string(runner.Php74.Tag),
-				},
-				{
-					workerNum: containerNum,
-					tag:       string(runner.Python2.Tag),
-				},
-				{
-					workerNum: containerNum,
-					tag:       string(runner.Python3.Tag),
-				},
-				{
-					workerNum: containerNum,
-					tag:       string(runner.CSharpMono.Tag),
-				},
-				{
-					workerNum: containerNum,
-					tag:       string(runner.Haskell.Tag),
-				},
-				{
-					workerNum: containerNum,
-					tag:       string(runner.CLang.Tag),
-				},
-				{
-					workerNum: containerNum,
-					tag:       string(runner.CPlus.Tag),
-				},*/
-		{
-			workerNum: containerNum,
-			tag:       string(runner.Rust.Tag),
-		},
-	}
-
+func (e *execution) init(blueprints []ContainerBlueprint) *appErrors.Error {
+	workers := make(map[string]int)
 	for _, blueprint := range blueprints {
-		success := containerFactory.PackageService.CreateContainers(blueprint.tag, blueprint.workerNum)
+		success := containerFactory.PackageService.CreateContainers(blueprint.Tag, blueprint.ContainerNum)
 
 		if !success {
-			return appErrors.New(appErrors.ServerError, appErrors.ApplicationRuntimeError, fmt.Sprintf("Cannot boot container for tag %s", blueprint.tag))
+			return appErrors.New(appErrors.ServerError, appErrors.ApplicationRuntimeError, fmt.Sprintf("Cannot boot container for tag %s", blueprint.Tag))
 		}
+
+		workers[blueprint.Tag] = blueprint.WorkerNum
 	}
 
 	containers := containerFactory.PackageService.Containers()
 
 	for _, c := range containers {
+		workerNum := workers[c.Tag]
 		fmt.Println(fmt.Sprintf("Creating %d workers for %s", workerNum, c.Tag))
 		b := balancer.NewBalancer(c.Name, workerNum)
 		b.StartWorkers()

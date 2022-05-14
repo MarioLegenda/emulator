@@ -16,6 +16,8 @@ import (
 
 var _ = GinkgoDescribe("Single file public execution tests", func() {
 	GinkgoIt("Should public execute a single file in a node LTS environment", func() {
+		ginkgo.Skip("")
+
 		testPrepare()
 		defer testCleanup()
 
@@ -81,6 +83,8 @@ console.log('mile');
 	})
 
 	GinkgoIt("Should public execute a single file in a node LTS ESM environment", func() {
+		ginkgo.Skip("")
+
 		testPrepare()
 		defer testCleanup()
 
@@ -146,6 +150,8 @@ console.log('mile');
 	})
 
 	GinkgoIt("Should public execute a single file in a C# (Mono) environment", func() {
+		ginkgo.Skip("")
+
 		testPrepare()
 		defer testCleanup()
 
@@ -219,6 +225,8 @@ public class HelloWorld
 	})
 
 	GinkgoIt("Should execute a single file in a node 14.x environment", func() {
+		ginkgo.Skip("")
+
 		testPrepare()
 		defer testCleanup()
 
@@ -284,6 +292,8 @@ console.log('mile');
 	})
 
 	GinkgoIt("Should execute a single file in a PHP environment", func() {
+		ginkgo.Skip("")
+
 		testPrepare()
 		defer testCleanup()
 
@@ -355,6 +365,8 @@ echo "mile";
 	})
 
 	GinkgoIt("Should execute a single file in a Ruby environment", func() {
+		ginkgo.Skip("")
+
 		testPrepare()
 		defer testCleanup()
 
@@ -420,6 +432,8 @@ print "mile"
 	})
 
 	GinkgoIt("Should execute a single file in a Go environment", func() {
+		ginkgo.Skip("")
+
 		testPrepare()
 		defer testCleanup()
 
@@ -499,6 +513,8 @@ func main() {
 	})
 
 	GinkgoIt("Should execute a single file in a Python2 environment", func() {
+		ginkgo.Skip("")
+
 		testPrepare()
 		defer testCleanup()
 
@@ -564,6 +580,8 @@ print("This line will be printed.")
 	})
 
 	GinkgoIt("Should execute a single file in a Python3 environment", func() {
+		ginkgo.Skip("")
+
 		testPrepare()
 		defer testCleanup()
 
@@ -629,6 +647,8 @@ print("This line will be printed.")
 	})
 
 	GinkgoIt("Should execute a single file in a Haskell environment", func() {
+		ginkgo.Skip("")
+
 		testPrepare()
 		defer testCleanup()
 
@@ -694,6 +714,8 @@ main = putStrLn "mile"
 	})
 
 	GinkgoIt("Should execute a single file in a C environment", func() {
+		ginkgo.Skip("")
+
 		testPrepare()
 		defer testCleanup()
 
@@ -769,6 +791,8 @@ int main() {
 	})
 
 	GinkgoIt("Should execute a single file in a C++ environment", func() {
+		ginkgo.Skip("")
+
 		testPrepare()
 		defer testCleanup()
 

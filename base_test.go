@@ -16,15 +16,15 @@ import (
 	"testing"
 	"therebelsource/emulator/appErrors"
 	"therebelsource/emulator/httpClient"
-	"therebelsource/emulator/linkedProjectExecution"
 	"therebelsource/emulator/repository"
 	"therebelsource/emulator/runner"
-	"therebelsource/emulator/singleFileExecution"
 )
 
 var GomegaRegisterFailHandler = gomega.RegisterFailHandler
 var GinkgoFail = ginkgo.Fail
 var GinkgoRunSpecs = ginkgo.RunSpecs
+var GinkgoBeforeEach = ginkgo.BeforeEach
+var GinkgoAfterEach = ginkgo.AfterEach
 var GinkgoBeforeSuite = ginkgo.BeforeSuite
 var GinkgoAfterSuite = ginkgo.AfterSuite
 var GinkgoDescribe = ginkgo.Describe
@@ -41,10 +41,15 @@ func testPrepare() {
 	LoadEnv()
 	InitRequiredDirectories(false)
 
-	singleFileExecution.InitService()
-	linkedProjectExecution.InitService()
+	/*	singleFileExecution.InitService()
+		linkedProjectExecution.InitService()
 
-	runner.StartContainerBalancer()
+		runner.StartContainerBalancer()*/
+}
+
+func testNewPrepare() {
+	LoadEnv()
+	InitRequiredDirectories(false)
 }
 
 func testCreateSecureRequest(rr *httptest.ResponseRecorder, sessionUuid string, method string, path string, body io.Reader) *http.Request {

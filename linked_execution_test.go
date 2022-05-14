@@ -17,6 +17,8 @@ import (
 
 var _ = GinkgoDescribe("Linked project execution tests", func() {
 	GinkgoIt("Should run a linked code block execution as a session in a C environment", func() {
+		ginkgo.Skip("")
+
 		testPrepare()
 		defer testCleanup()
 
@@ -105,6 +107,8 @@ int main() {
 	})
 
 	GinkgoIt("Should run a linked code block execution as a session in a C++ environment", func() {
+		ginkgo.Skip("")
+
 		testPrepare()
 		defer testCleanup()
 
@@ -287,6 +291,8 @@ module Bar.FooBar where
 	})
 
 	GinkgoIt("Should run a linked code block execution as a session in a Go environment", func() {
+		ginkgo.Skip("")
+
 		testPrepare()
 		defer testCleanup()
 
@@ -385,6 +391,8 @@ func ExecuteFn() {
 	})
 
 	GinkgoIt("Should run a linked code block execution as a session in a NodeJS environment", func() {
+		ginkgo.Skip("")
+
 		testPrepare()
 		defer testCleanup()
 
@@ -508,6 +516,8 @@ module.exports = {
 	})
 
 	GinkgoIt("Should run a linked code block execution as a session in a NodeJS ESM environment", func() {
+		ginkgo.Skip("")
+
 		testPrepare()
 		defer testCleanup()
 
@@ -625,6 +635,8 @@ export { subDirDirFileExecute };
 	})
 
 	GinkgoIt("Should run a linked code block execution as a session in a C# (Mono) environment", func() {
+		ginkgo.Skip("")
+
 		testPrepare()
 		defer testCleanup()
 

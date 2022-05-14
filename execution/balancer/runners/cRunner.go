@@ -27,7 +27,7 @@ func cRunner(params CExecParams) Result {
 	pidC := make(chan int, 1)
 
 	process := fmt.Sprintf(
-		"cd %s && gcc -o %s %s >/dev/null 2>&1 && ./%s",
+		"cd %s && gcc -o %s %s > output.txt && ./%s > output.txt",
 		params.ContainerDirectory,
 		params.ContainerDirectory,
 		params.ExecutionFile,

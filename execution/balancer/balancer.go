@@ -39,6 +39,8 @@ type balancer struct {
 }
 
 func NewBalancer(name string, initialWorkers int) Balancer {
+	closing = false
+
 	b := &balancer{
 		workers:    make([]worker, 0),
 		controller: make([]int32, 0),

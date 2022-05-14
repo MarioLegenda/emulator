@@ -28,7 +28,6 @@ func rustRunner(params RustExecParams) Result {
 
 	go func() {
 		cmd := exec.Command("docker", []string{"exec", params.ContainerName, "/bin/bash", "-c", fmt.Sprintf("cd %s && cargo run --quiet | tee output.txt", params.ContainerDirectory)}...)
-		fmt.Println(cmd.String())
 		errPipe, err := cmd.StderrPipe()
 
 		if err != nil {

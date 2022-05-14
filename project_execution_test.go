@@ -17,6 +17,8 @@ import (
 
 var _ = GinkgoDescribe("Project execution tests", func() {
 	GinkgoIt("Should run a project execution as a session in a NodeJS ESM environment", func() {
+		ginkgo.Skip("")
+
 		testPrepare()
 		defer testCleanup()
 
@@ -128,6 +130,8 @@ export {subDirDirFileExecute}
 	})
 
 	GinkgoIt("Should run a project execution as a session in a NodeJS ESM environment with a file in a deeper directory structure", func() {
+		ginkgo.Skip("")
+
 		testPrepare()
 		defer testCleanup()
 
@@ -233,6 +237,8 @@ console.log('subSubDirFile.js is executed');
 	})
 
 	GinkgoIt("Should run a project execution as a session in a NodeJS ESM environment with a file in a deeper directory structure", func() {
+		ginkgo.Skip("")
+
 		testPrepare()
 		defer testCleanup()
 
@@ -323,6 +329,8 @@ public class NewClass {
 	})
 
 	GinkgoIt("Should run a project execution as a session in a Go environment", func() {
+		ginkgo.Skip("")
+
 		testPrepare()
 		defer testCleanup()
 
@@ -395,6 +403,8 @@ public class NewClass {
 	})
 
 	GinkgoIt("Should run a project execution as a session in a Go environment with a package", func() {
+		ginkgo.Skip("")
+
 		testPrepare()
 		defer testCleanup()
 
@@ -487,6 +497,8 @@ func main() {
 	})
 
 	GinkgoIt("Should run a project execution as a session in a Go environment multiple times with the same code project", func() {
+		ginkgo.Skip("")
+
 		testPrepare()
 		defer testCleanup()
 
@@ -561,6 +573,8 @@ func main() {
 	})
 
 	GinkgoIt("Should run a project execution as a session in a Rust environment", func() {
+		ginkgo.Skip("")
+
 		testPrepare()
 		defer testCleanup()
 
@@ -633,6 +647,8 @@ func main() {
 	})
 
 	GinkgoIt("Should run a project execution as a session in a C environment", func() {
+		ginkgo.Skip("")
+
 		testPrepare()
 		defer testCleanup()
 
@@ -706,6 +722,8 @@ func main() {
 	})
 
 	GinkgoIt("Should run a project execution as a session in a C++ environment", func() {
+		ginkgo.Skip("")
+
 		testPrepare()
 		defer testCleanup()
 
@@ -779,6 +797,8 @@ func main() {
 	})
 
 	GinkgoIt("Should run a project execution as a session in a Haskell environment", func() {
+		ginkgo.Skip("")
+
 		testPrepare()
 		defer testCleanup()
 
@@ -864,6 +884,8 @@ module Bar.FooBar where
 	})
 
 	GinkgoIt("Should run a project execution as a session in a Ruby environment", func() {
+		ginkgo.Skip("")
+
 		testPrepare()
 		defer testCleanup()
 
@@ -946,6 +968,8 @@ puts "Hello world!"
 	})
 
 	GinkgoIt("Should run a project execution as a session in a PHP environment", func() {
+		ginkgo.Skip("")
+
 		testPrepare()
 		defer testCleanup()
 
@@ -1025,6 +1049,8 @@ echo "Hello world!";
 	})
 
 	GinkgoIt("Should run a project execution as a session in a Python2 environment", func() {
+		ginkgo.Skip("")
+
 		testPrepare()
 		defer testCleanup()
 
@@ -1107,6 +1133,8 @@ def greeting(name):
 	})
 
 	GinkgoIt("Should run a project execution as a session in a Python3 environment", func() {
+		ginkgo.Skip("")
+
 		testPrepare()
 		defer testCleanup()
 

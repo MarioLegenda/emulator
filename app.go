@@ -10,6 +10,7 @@ import (
 	"therebelsource/emulator/execution"
 	"therebelsource/emulator/projectExecution"
 	"therebelsource/emulator/rateLimiter"
+	"therebelsource/emulator/runner"
 	"therebelsource/emulator/singleFileExecution"
 )
 
@@ -79,7 +80,68 @@ func App() {
 	singleFileExecution.InitService()
 	projectExecution.InitService()
 
-	err := execution.Init(20, 1)
+	err := execution.Init([]execution.ContainerBlueprint{
+		{
+			WorkerNum:    1,
+			ContainerNum: 1,
+			Tag:          string(runner.NodeLts.Tag),
+		},
+		{
+			WorkerNum:    1,
+			ContainerNum: 1,
+			Tag:          string(runner.NodeEsm.Tag),
+		},
+		{
+			WorkerNum:    1,
+			ContainerNum: 1,
+			Tag:          string(runner.Ruby.Tag),
+		},
+		{
+			WorkerNum:    1,
+			ContainerNum: 1,
+			Tag:          string(runner.Rust.Tag),
+		},
+		{
+			WorkerNum:    1,
+			ContainerNum: 1,
+			Tag:          string(runner.CPlus.Tag),
+		},
+		{
+			WorkerNum:    1,
+			ContainerNum: 1,
+			Tag:          string(runner.Haskell.Tag),
+		},
+		{
+			WorkerNum:    1,
+			ContainerNum: 1,
+			Tag:          string(runner.CLang.Tag),
+		},
+		{
+			WorkerNum:    1,
+			ContainerNum: 1,
+			Tag:          string(runner.CSharpMono.Tag),
+		},
+		{
+			WorkerNum:    1,
+			ContainerNum: 1,
+			Tag:          string(runner.Python3.Tag),
+		},
+		{
+			WorkerNum:    1,
+			ContainerNum: 1,
+			Tag:          string(runner.Python2.Tag),
+		},
+		{
+			WorkerNum:    1,
+			ContainerNum: 1,
+			Tag:          string(runner.Php74.Tag),
+		},
+		{
+			WorkerNum:    1,
+			ContainerNum: 1,
+			Tag:          string(runner.GoLang.Tag),
+		},
+	})
 	if err != nil {
 		appErrors.TerminateWithMessage("Cannot boot executioner. Server cannot start!")
 	}

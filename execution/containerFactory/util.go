@@ -41,7 +41,7 @@ func stopDockerContainer(containerName string, pid int) {
 	stopCmd = exec.Command("docker", []string{"container", "stop", containerName}...)
 	stopErr := stopCmd.Run()
 
-	if stopErr != nil {
+	if stopErr == nil {
 		var rmCmd *exec.Cmd
 
 		rmCmd = exec.Command("docker", []string{"rm", "-f", containerName}...)

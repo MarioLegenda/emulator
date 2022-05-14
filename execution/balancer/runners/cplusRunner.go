@@ -27,7 +27,7 @@ func cplusRunner(params CPlusExecParams) Result {
 	pidC := make(chan int, 1)
 
 	process := fmt.Sprintf(
-		"cd %s && g++ -o %s %s >/dev/null 2>&1 && ./%s",
+		"cd %s && g++ -o %s %s > output.txt && ./%s",
 		params.ContainerDirectory,
 		params.ContainerDirectory,
 		params.ExecutionFile,

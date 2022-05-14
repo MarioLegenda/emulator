@@ -26,7 +26,7 @@ func pythonRunner(params PythonExecParams) Result {
 	tc := make(chan string)
 	pidC := make(chan int, 1)
 
-	process := fmt.Sprintf("%s/%s", params.ContainerDirectory, params.ExecutionFile)
+	process := fmt.Sprintf("/app/%s/%s", params.ContainerDirectory, params.ExecutionFile)
 
 	go func() {
 		cmd := exec.Command("docker", []string{"exec", params.ContainerName, "python", process}...)

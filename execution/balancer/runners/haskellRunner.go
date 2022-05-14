@@ -27,7 +27,7 @@ func haskellRunner(params HaskellExecParams) Result {
 	pidC := make(chan int, 1)
 
 	go func() {
-		cmd := exec.Command("docker", []string{"exec", params.ContainerName, "/bin/bash", "-c", fmt.Sprintf("cd %s && ghc %s >/dev/null 2>&1 && ./%s", params.ContainerDirectory, params.ExecutionFile, params.ExecutionFile[:len(params.ExecutionFile)-3])}...)
+		cmd := exec.Command("docker", []string{"exec", params.ContainerName, "/bin/bash", "-c", fmt.Sprintf("cd %s && ghc %s > output.txt && ./%s > output.txt", params.ContainerDirectory, params.ExecutionFile, params.ExecutionFile[:len(params.ExecutionFile)-3])}...)
 		errPipe, err := cmd.StderrPipe()
 
 		if err != nil {
