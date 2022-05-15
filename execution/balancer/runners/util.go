@@ -3,6 +3,7 @@ package runners
 import (
 	"fmt"
 	"io/ioutil"
+	"log"
 	"os"
 	"os/exec"
 	"regexp"
@@ -26,12 +27,14 @@ func destroy(path string) {
 	err := os.RemoveAll(path)
 
 	if err != nil {
-		cmd := exec.Command("rm", []string{"-f", path}...)
+		cmd := exec.Command("rm", []string{"-rf", path}...)
 
 		err := cmd.Run()
 
 		if err != nil {
-			// TODO: SEND SLACK ERROR AND LOG
+			// TODO: slack error notification
+			fmt.Println(err)
+			log.Fatal("")
 		}
 	}
 }

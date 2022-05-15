@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"github.com/onsi/ginkgo"
 	"github.com/onsi/gomega"
-	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
 	"os"
@@ -48,6 +47,8 @@ var _ = GinkgoDescribe("Single file execution tests", func() {
 		gomega.Expect(result.Success).Should(gomega.BeTrue())
 		gomega.Expect(result.Error).Should(gomega.BeNil())
 
+		testExecutionDirEmpty()
+
 		execution.PackageService.Close()
 	})
 
@@ -75,6 +76,8 @@ while(true) {
 		gomega.Expect(result.Result).Should(gomega.Equal(""))
 		gomega.Expect(result.Success).Should(gomega.BeFalse())
 		gomega.Expect(result.Error).ShouldNot(gomega.BeNil())
+
+		testExecutionDirEmpty()
 
 		execution.PackageService.Close()
 	})
@@ -104,6 +107,8 @@ while(true {
 		gomega.Expect(result.Success).Should(gomega.BeTrue())
 		gomega.Expect(result.Error).Should(gomega.BeNil())
 
+		testExecutionDirEmpty()
+
 		execution.PackageService.Close()
 	})
 
@@ -128,6 +133,8 @@ while(true {
 		gomega.Expect(result.Result).Should(gomega.Equal("Hello World\n"))
 		gomega.Expect(result.Success).Should(gomega.BeTrue())
 		gomega.Expect(result.Error).Should(gomega.BeNil())
+
+		testExecutionDirEmpty()
 
 		execution.PackageService.Close()
 	})
@@ -157,6 +164,8 @@ while(true) {
 		gomega.Expect(result.Success).Should(gomega.BeFalse())
 		gomega.Expect(result.Error).ShouldNot(gomega.BeNil())
 
+		testExecutionDirEmpty()
+
 		execution.PackageService.Close()
 	})
 
@@ -185,6 +194,8 @@ while(true {
 		gomega.Expect(result.Success).Should(gomega.BeTrue())
 		gomega.Expect(result.Error).Should(gomega.BeNil())
 
+		testExecutionDirEmpty()
+
 		execution.PackageService.Close()
 	})
 
@@ -210,6 +221,8 @@ while(true {
 		gomega.Expect(result.Success).Should(gomega.BeTrue())
 		gomega.Expect(result.Error).Should(gomega.BeNil())
 
+		testExecutionDirEmpty()
+
 		execution.PackageService.Close()
 	})
 
@@ -234,6 +247,8 @@ while(true {
 		gomega.Expect(result.Result).ShouldNot(gomega.BeEmpty())
 		gomega.Expect(result.Success).Should(gomega.BeTrue())
 		gomega.Expect(result.Error).Should(gomega.BeNil())
+
+		testExecutionDirEmpty()
 
 		execution.PackageService.Close()
 	})
@@ -262,6 +277,8 @@ end
 		gomega.Expect(result.Result).Should(gomega.BeEmpty())
 		gomega.Expect(result.Success).Should(gomega.BeFalse())
 		gomega.Expect(result.Error).ShouldNot(gomega.BeNil())
+
+		testExecutionDirEmpty()
 
 		execution.PackageService.Close()
 	})
@@ -292,6 +309,8 @@ fn main() {
 		gomega.Expect(result.Success).Should(gomega.BeTrue())
 		gomega.Expect(result.Error).Should(gomega.BeNil())
 
+		testExecutionDirEmpty()
+
 		execution.PackageService.Close()
 	})
 
@@ -320,6 +339,8 @@ fn main() {
 		gomega.Expect(result.Result).ShouldNot(gomega.BeEmpty())
 		gomega.Expect(result.Success).Should(gomega.BeTrue())
 		gomega.Expect(result.Error).Should(gomega.BeNil())
+
+		testExecutionDirEmpty()
 
 		execution.PackageService.Close()
 	})
@@ -350,6 +371,8 @@ fn main() {
 		gomega.Expect(result.Result).Should(gomega.BeEmpty())
 		gomega.Expect(result.Success).Should(gomega.BeFalse())
 		gomega.Expect(result.Error).ShouldNot(gomega.BeNil())
+
+		testExecutionDirEmpty()
 
 		execution.PackageService.Close()
 	})
@@ -384,6 +407,8 @@ func main() {
 		gomega.Expect(result.Success).Should(gomega.BeTrue())
 		gomega.Expect(result.Error).Should(gomega.BeNil())
 
+		testExecutionDirEmpty()
+
 		execution.PackageService.Close()
 	})
 
@@ -417,6 +442,8 @@ func main() {
 		gomega.Expect(result.Success).Should(gomega.BeTrue())
 		gomega.Expect(result.Error).Should(gomega.BeNil())
 
+		testExecutionDirEmpty()
+
 		execution.PackageService.Close()
 	})
 
@@ -448,6 +475,8 @@ func main() {
 		gomega.Expect(result.Result).Should(gomega.BeEmpty())
 		gomega.Expect(result.Success).Should(gomega.BeFalse())
 		gomega.Expect(result.Error).ShouldNot(gomega.BeNil())
+
+		testExecutionDirEmpty()
 
 		execution.PackageService.Close()
 	})
@@ -484,6 +513,8 @@ namespace HelloWorld
 		gomega.Expect(result.Success).Should(gomega.BeTrue())
 		gomega.Expect(result.Error).Should(gomega.BeNil())
 
+		testExecutionDirEmpty()
+
 		execution.PackageService.Close()
 	})
 
@@ -518,6 +549,8 @@ namespae HelloWorld
 		gomega.Expect(result.Result).ShouldNot(gomega.BeEmpty())
 		gomega.Expect(result.Success).Should(gomega.BeTrue())
 		gomega.Expect(result.Error).Should(gomega.BeNil())
+
+		testExecutionDirEmpty()
 
 		execution.PackageService.Close()
 	})
@@ -554,6 +587,8 @@ namespace HelloWorld
 		gomega.Expect(result.Success).Should(gomega.BeFalse())
 		gomega.Expect(result.Error).ShouldNot(gomega.BeNil())
 
+		testExecutionDirEmpty()
+
 		execution.PackageService.Close()
 	})
 
@@ -586,6 +621,8 @@ int main() {
 		gomega.Expect(result.Result).Should(gomega.Equal("Hello world"))
 		gomega.Expect(result.Success).Should(gomega.BeTrue())
 		gomega.Expect(result.Error).Should(gomega.BeNil())
+
+		testExecutionDirEmpty()
 
 		execution.PackageService.Close()
 	})
@@ -620,6 +657,8 @@ int man() {
 		gomega.Expect(result.Success).Should(gomega.BeTrue())
 		gomega.Expect(result.Error).Should(gomega.BeNil())
 
+		testExecutionDirEmpty()
+
 		execution.PackageService.Close()
 	})
 
@@ -650,6 +689,8 @@ int main() {
 		gomega.Expect(result.Result).Should(gomega.BeEmpty())
 		gomega.Expect(result.Success).Should(gomega.BeFalse())
 		gomega.Expect(result.Error).ShouldNot(gomega.BeNil())
+
+		testExecutionDirEmpty()
 
 		execution.PackageService.Close()
 	})
@@ -683,6 +724,8 @@ int main() {
 		gomega.Expect(result.Success).Should(gomega.BeTrue())
 		gomega.Expect(result.Error).Should(gomega.BeNil())
 
+		testExecutionDirEmpty()
+
 		execution.PackageService.Close()
 	})
 
@@ -715,6 +758,8 @@ int man() {
 		gomega.Expect(result.Success).Should(gomega.BeTrue())
 		gomega.Expect(result.Error).Should(gomega.BeNil())
 
+		testExecutionDirEmpty()
+
 		execution.PackageService.Close()
 	})
 
@@ -746,6 +791,8 @@ int main() {
 		gomega.Expect(result.Success).Should(gomega.BeFalse())
 		gomega.Expect(result.Error).ShouldNot(gomega.BeNil())
 
+		testExecutionDirEmpty()
+
 		execution.PackageService.Close()
 	})
 
@@ -772,6 +819,8 @@ print("Hello world")
 		gomega.Expect(result.Result).Should(gomega.Equal("Hello world\n"))
 		gomega.Expect(result.Success).Should(gomega.BeTrue())
 		gomega.Expect(result.Error).Should(gomega.BeNil())
+
+		testExecutionDirEmpty()
 
 		execution.PackageService.Close()
 	})
@@ -800,6 +849,8 @@ print("Hello world")
 		gomega.Expect(result.Success).Should(gomega.BeTrue())
 		gomega.Expect(result.Error).Should(gomega.BeNil())
 
+		testExecutionDirEmpty()
+
 		execution.PackageService.Close()
 	})
 
@@ -827,6 +878,8 @@ prit("Hello world")
 		gomega.Expect(result.Success).Should(gomega.BeTrue())
 		gomega.Expect(result.Error).Should(gomega.BeNil())
 
+		testExecutionDirEmpty()
+
 		execution.PackageService.Close()
 	})
 
@@ -853,6 +906,8 @@ prit("Hello world")
 		gomega.Expect(result.Result).ShouldNot(gomega.BeEmpty())
 		gomega.Expect(result.Success).Should(gomega.BeTrue())
 		gomega.Expect(result.Error).Should(gomega.BeNil())
+
+		testExecutionDirEmpty()
 
 		execution.PackageService.Close()
 	})
@@ -882,6 +937,8 @@ while True:
 		gomega.Expect(result.Success).Should(gomega.BeFalse())
 		gomega.Expect(result.Error).ShouldNot(gomega.BeNil())
 
+		testExecutionDirEmpty()
+
 		execution.PackageService.Close()
 	})
 
@@ -909,6 +966,8 @@ while True:
 		gomega.Expect(result.Result).Should(gomega.BeEmpty())
 		gomega.Expect(result.Success).Should(gomega.BeFalse())
 		gomega.Expect(result.Error).ShouldNot(gomega.BeNil())
+
+		testExecutionDirEmpty()
 
 		execution.PackageService.Close()
 	})
@@ -939,6 +998,8 @@ echo "Hello world";
 		gomega.Expect(result.Success).Should(gomega.BeTrue())
 		gomega.Expect(result.Error).Should(gomega.BeNil())
 
+		testExecutionDirEmpty()
+
 		execution.PackageService.Close()
 	})
 
@@ -967,6 +1028,8 @@ ech "Hello world";
 		gomega.Expect(result.Result).ShouldNot(gomega.BeEmpty())
 		gomega.Expect(result.Success).Should(gomega.BeTrue())
 		gomega.Expect(result.Error).Should(gomega.BeNil())
+
+		testExecutionDirEmpty()
 
 		execution.PackageService.Close()
 	})
@@ -998,6 +1061,8 @@ ech "Hello world";
 		gomega.Expect(result.Success).Should(gomega.BeFalse())
 		gomega.Expect(result.Error).ShouldNot(gomega.BeNil())
 
+		testExecutionDirEmpty()
+
 		execution.PackageService.Close()
 	})
 
@@ -1026,6 +1091,8 @@ main = putStrLn "Hello world"
 		gomega.Expect(result.Success).Should(gomega.BeTrue())
 		gomega.Expect(result.Error).Should(gomega.BeNil())
 
+		testExecutionDirEmpty()
+
 		execution.PackageService.Close()
 	})
 
@@ -1053,6 +1120,8 @@ man = putStrLn "Hello world"
 		gomega.Expect(result.Result).ShouldNot(gomega.BeEmpty())
 		gomega.Expect(result.Success).Should(gomega.BeTrue())
 		gomega.Expect(result.Error).Should(gomega.BeNil())
+
+		testExecutionDirEmpty()
 
 		execution.PackageService.Close()
 	})
@@ -1088,14 +1157,19 @@ main =
 		gomega.Expect(result.Success).Should(gomega.BeFalse())
 		gomega.Expect(result.Error).ShouldNot(gomega.BeNil())
 
+		testExecutionDirEmpty()
+
 		execution.PackageService.Close()
 	})
 
-	GinkgoIt("Should execute a single file in a node 14.x environment", func() {
-		ginkgo.Skip("")
-
-		testPrepare()
-		defer testCleanup()
+	GinkgoIt("Should execute a single file in a Node latest environment", func() {
+		gomega.Expect(execution.Init([]execution.ContainerBlueprint{
+			{
+				WorkerNum:    1,
+				ContainerNum: 1,
+				Tag:          string(runner.NodeLts.Tag),
+			},
+		})).Should(gomega.BeNil())
 
 		activeSession := testCreateAccount()
 
@@ -1153,13 +1227,18 @@ main =
 		gomega.Expect(result.Timeout).Should(gomega.Equal(5))
 		gomega.Expect(result.Success).Should(gomega.BeTrue())
 		gomega.Expect(result.Result).Should(gomega.Equal("mile\n"))
+
+		execution.PackageService.Close()
 	})
 
 	GinkgoIt("Should execute a single file in a PHP environment", func() {
-		ginkgo.Skip("")
-
-		testPrepare()
-		defer testCleanup()
+		gomega.Expect(execution.Init([]execution.ContainerBlueprint{
+			{
+				WorkerNum:    1,
+				ContainerNum: 1,
+				Tag:          string(runner.Php74.Tag),
+			},
+		})).Should(gomega.BeNil())
 
 		activeSession := testCreateAccount()
 
@@ -1221,13 +1300,18 @@ echo "mile";
 		gomega.Expect(result.Timeout).Should(gomega.Equal(5))
 		gomega.Expect(result.Success).Should(gomega.BeTrue())
 		gomega.Expect(result.Result).Should(gomega.Equal("\nmile"))
+
+		execution.PackageService.Close()
 	})
 
 	GinkgoIt("Should execute a single file in a Ruby environment", func() {
-		ginkgo.Skip("")
-
-		testPrepare()
-		defer testCleanup()
+		gomega.Expect(execution.Init([]execution.ContainerBlueprint{
+			{
+				WorkerNum:    1,
+				ContainerNum: 1,
+				Tag:          string(runner.Ruby.Tag),
+			},
+		})).Should(gomega.BeNil())
 
 		activeSession := testCreateAccount()
 
@@ -1285,13 +1369,18 @@ echo "mile";
 		gomega.Expect(result.Timeout).Should(gomega.Equal(5))
 		gomega.Expect(result.Success).Should(gomega.BeTrue())
 		gomega.Expect(result.Result).Should(gomega.Equal("mile\n"))
+
+		execution.PackageService.Close()
 	})
 
 	GinkgoIt("Should execute a single file in a Go environment", func() {
-		ginkgo.Skip("")
-
-		testPrepare()
-		defer testCleanup()
+		gomega.Expect(execution.Init([]execution.ContainerBlueprint{
+			{
+				WorkerNum:    1,
+				ContainerNum: 1,
+				Tag:          string(runner.GoLang.Tag),
+			},
+		})).Should(gomega.BeNil())
 
 		activeSession := testCreateAccount()
 
@@ -1357,13 +1446,18 @@ func main() {
 		gomega.Expect(result.Timeout).Should(gomega.Equal(5))
 		gomega.Expect(result.Success).Should(gomega.BeTrue())
 		gomega.Expect(result.Result).Should(gomega.Equal("mile\n"))
+
+		execution.PackageService.Close()
 	})
 
 	GinkgoIt("Should execute a single file in a C# (Mono) environment", func() {
-		ginkgo.Skip("")
-
-		testPrepare()
-		defer testCleanup()
+		gomega.Expect(execution.Init([]execution.ContainerBlueprint{
+			{
+				WorkerNum:    1,
+				ContainerNum: 1,
+				Tag:          string(runner.CSharpMono.Tag),
+			},
+		})).Should(gomega.BeNil())
 
 		activeSession := testCreateAccount()
 
@@ -1431,13 +1525,18 @@ public class HelloWorld
 		gomega.Expect(result.Timeout).Should(gomega.Equal(5))
 		gomega.Expect(result.Success).Should(gomega.BeTrue())
 		gomega.Expect(result.Result).Should(gomega.Equal("mile\n"))
+
+		execution.PackageService.Close()
 	})
 
 	GinkgoIt("Should execute a single file in a Python2 environment", func() {
-		ginkgo.Skip("")
-
-		testPrepare()
-		defer testCleanup()
+		gomega.Expect(execution.Init([]execution.ContainerBlueprint{
+			{
+				WorkerNum:    1,
+				ContainerNum: 1,
+				Tag:          string(runner.Python2.Tag),
+			},
+		})).Should(gomega.BeNil())
 
 		activeSession := testCreateAccount()
 
@@ -1495,19 +1594,24 @@ public class HelloWorld
 		gomega.Expect(result.Timeout).Should(gomega.Equal(5))
 		gomega.Expect(result.Success).Should(gomega.BeTrue())
 		gomega.Expect(result.Result).Should(gomega.Equal("mile\n"))
+
+		execution.PackageService.Close()
 	})
 
 	GinkgoIt("Should execute a single file in a Python3 environment", func() {
-		ginkgo.Skip("")
-
-		testPrepare()
-		defer testCleanup()
+		gomega.Expect(execution.Init([]execution.ContainerBlueprint{
+			{
+				WorkerNum:    1,
+				ContainerNum: 1,
+				Tag:          string(runner.Python3.Tag),
+			},
+		})).Should(gomega.BeNil())
 
 		activeSession := testCreateAccount()
 
 		pg := testCreateEmptyPage(activeSession)
 		cb := testCreateCodeBlock(pg["uuid"].(string), activeSession)
-		testAddEmulatorToCodeBlock(pg["uuid"].(string), cb["uuid"].(string), `print("mile")`, runner.Python2, activeSession)
+		testAddEmulatorToCodeBlock(pg["uuid"].(string), cb["uuid"].(string), `print("mile")`, runner.Python3, activeSession)
 		sessionUuid := testCreateTemporarySession(activeSession, pg["uuid"].(string), cb["uuid"].(string), "single_file")
 
 		bm := map[string]interface{}{
@@ -1559,13 +1663,18 @@ public class HelloWorld
 		gomega.Expect(result.Timeout).Should(gomega.Equal(5))
 		gomega.Expect(result.Success).Should(gomega.BeTrue())
 		gomega.Expect(result.Result).Should(gomega.Equal("mile\n"))
+
+		execution.PackageService.Close()
 	})
 
 	GinkgoIt("Should execute a single file in a Haskell environment", func() {
-		ginkgo.Skip("")
-
-		testPrepare()
-		defer testCleanup()
+		gomega.Expect(execution.Init([]execution.ContainerBlueprint{
+			{
+				WorkerNum:    1,
+				ContainerNum: 1,
+				Tag:          string(runner.Haskell.Tag),
+			},
+		})).Should(gomega.BeNil())
 
 		activeSession := testCreateAccount()
 
@@ -1622,14 +1731,19 @@ public class HelloWorld
 
 		gomega.Expect(result.Timeout).Should(gomega.Equal(5))
 		gomega.Expect(result.Success).Should(gomega.BeTrue())
-		gomega.Expect(result.Result).Should(gomega.Equal("\nmile\n"))
+		gomega.Expect(result.Result).Should(gomega.Equal("mile\n"))
+
+		execution.PackageService.Close()
 	})
 
 	GinkgoIt("Should execute a single file in a C environment", func() {
-		ginkgo.Skip("")
-
-		testPrepare()
-		defer testCleanup()
+		gomega.Expect(execution.Init([]execution.ContainerBlueprint{
+			{
+				WorkerNum:    1,
+				ContainerNum: 1,
+				Tag:          string(runner.CLang.Tag),
+			},
+		})).Should(gomega.BeNil())
 
 		activeSession := testCreateAccount()
 
@@ -1693,13 +1807,18 @@ int main() {
 		gomega.Expect(result.Timeout).Should(gomega.Equal(5))
 		gomega.Expect(result.Success).Should(gomega.BeTrue())
 		gomega.Expect(result.Result).Should(gomega.Equal("mile"))
+
+		execution.PackageService.Close()
 	})
 
 	GinkgoIt("Should execute a single file in a C++ environment", func() {
-		ginkgo.Skip("")
-
-		testPrepare()
-		defer testCleanup()
+		gomega.Expect(execution.Init([]execution.ContainerBlueprint{
+			{
+				WorkerNum:    1,
+				ContainerNum: 1,
+				Tag:          string(runner.CPlus.Tag),
+			},
+		})).Should(gomega.BeNil())
 
 		activeSession := testCreateAccount()
 
@@ -1765,84 +1884,17 @@ int main() {
 		gomega.Expect(result.Success).Should(gomega.BeTrue())
 		gomega.Expect(result.Result).Should(gomega.Equal("mile"))
 
-		if _, err := os.Stat("/var/www/execution/singleFile"); os.IsNotExist(err) {
-			ginkgo.Fail("/var/www/execution/singleFile directory does not exist but should")
-		}
-
-		files, err := ioutil.ReadDir("/var/www/execution/singleFile")
-
-		gomega.Expect(err).Should(gomega.BeNil())
-		gomega.Expect(files).Should(gomega.HaveLen(0))
-	})
-
-	GinkgoIt("Should gracefully fail because of a timeout", func() {
-		ginkgo.Skip("")
-
-		testPrepare()
-		defer testCleanup()
-
-		activeSession := testCreateAccount()
-
-		pg := testCreateEmptyPage(activeSession)
-		cb := testCreateCodeBlock(pg["uuid"].(string), activeSession)
-		testAddEmulatorToCodeBlock(pg["uuid"].(string), cb["uuid"].(string), `while(true) {}`, runner.NodeLts, activeSession)
-		sessionUuid := testCreateTemporarySession(activeSession, pg["uuid"].(string), cb["uuid"].(string), "single_file")
-
-		bm := map[string]interface{}{
-			"uuid": sessionUuid,
-		}
-
-		body, err := json.Marshal(bm)
-
-		gomega.Expect(err).To(gomega.BeNil())
-
-		req, err := http.NewRequest("POST", "/api/environment-emulator/execute/single-file", bytes.NewReader(body))
-
-		if err != nil {
-			ginkgo.Fail(err.Error())
-
-			return
-		}
-
-		rr := httptest.NewRecorder()
-		handler := http.HandlerFunc(executeSingleCodeBlockHandler)
-
-		handler.ServeHTTP(rr, req)
-
-		b := rr.Body.Bytes()
-
-		var apiResponse httpUtil.ApiResponse
-		err = json.Unmarshal(b, &apiResponse)
-
-		gomega.Expect(err).To(gomega.BeNil())
-
-		gomega.Expect(rr.Code).To(gomega.Equal(http.StatusOK))
-		gomega.Expect(rr.Body).To(gomega.Not(gomega.BeNil()))
-
-		gomega.Expect(apiResponse.Method).To(gomega.Equal("POST"))
-		gomega.Expect(apiResponse.Type).To(gomega.Equal(staticTypes.RESPONSE_RESOURCE))
-		gomega.Expect(apiResponse.Message).To(gomega.Equal("Emulator run result"))
-		gomega.Expect(apiResponse.MasterCode).To(gomega.Equal(0))
-		gomega.Expect(apiResponse.Code).To(gomega.Equal(0))
-		gomega.Expect(apiResponse.Status).To(gomega.Equal(http.StatusOK))
-		gomega.Expect(apiResponse.Pagination).To(gomega.BeNil())
-
-		b, err = json.Marshal(apiResponse.Data)
-
-		gomega.Expect(err).To(gomega.BeNil())
-
-		var result runner.SingleFileRunResult
-		gomega.Expect(json.Unmarshal(b, &result)).To(gomega.BeNil())
-
-		gomega.Expect(result.Success).Should(gomega.BeFalse())
-		gomega.Expect(result.Timeout).Should(gomega.Equal(5))
+		execution.PackageService.Close()
 	})
 
 	GinkgoIt("Should gracefully fail multiple concurrent requests and stop containers", func() {
-		ginkgo.Skip("")
-
-		testPrepare()
-		defer testCleanup()
+		gomega.Expect(execution.Init([]execution.ContainerBlueprint{
+			{
+				WorkerNum:    10,
+				ContainerNum: 1,
+				Tag:          string(runner.NodeLts.Tag),
+			},
+		})).Should(gomega.BeNil())
 
 		activeSession := testCreateAccount()
 
@@ -1908,5 +1960,7 @@ int main() {
 		}
 
 		wg.Wait()
+
+		execution.PackageService.Close()
 	})
 })

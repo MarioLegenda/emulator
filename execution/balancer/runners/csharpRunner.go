@@ -91,7 +91,7 @@ func csharpRunner(params CsharpExecParams) Result {
 			}
 
 			destroyContainerProcess(extractUniqueIdentifier(params.ContainerDirectory, false), true)
-			//destroy(params.ExecutionDirectory)
+			destroy(params.ExecutionDirectory)
 			return runResult
 		}
 
@@ -103,13 +103,13 @@ func csharpRunner(params CsharpExecParams) Result {
 		}
 
 		closeExecSession(<-pidC)
-		//destroy(params.ExecutionDirectory)
+		destroy(params.ExecutionDirectory)
 
 		break
 	case <-ctx.Done():
 		destroyContainerProcess(extractUniqueIdentifier(params.ContainerDirectory, false), true)
 		closeExecSession(<-pidC)
-		//destroy(params.ExecutionDirectory)
+		destroy(params.ExecutionDirectory)
 		close(pidC)
 		return Result{
 			Result:  "",

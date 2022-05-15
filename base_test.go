@@ -9,8 +9,10 @@ import (
 	"github.com/onsi/ginkgo"
 	"github.com/onsi/gomega"
 	"io"
+	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
+	"os"
 	"os/exec"
 	"strings"
 	"testing"
@@ -45,6 +47,25 @@ func testPrepare() {
 		linkedProjectExecution.InitService()
 
 		runner.StartContainerBalancer()*/
+}
+
+func testExecutionDirEmpty() {
+	containerDir, err := ioutil.ReadDir(os.Getenv("SINGLE_FILE_STATE_DIR"))
+
+	gomega.Expect(err).Should(gomega.BeNil())
+	gomega.Expect(len(containerDir)).Should(gomega.Equal(1))
+
+	executionDir, err := ioutil.ReadDir(fmt.Sprintf("%s/%s", os.Getenv("SINGLE_FILE_STATE_DIR"), containerDir[0].Name()))
+	if len(executionDir) != 0 && executionDir[0].Name() == ".cache" {
+		return
+	}
+
+	if len(executionDir) != 0 {
+		fmt.Println(executionDir[0].Name())
+	}
+
+	gomega.Expect(err).Should(gomega.BeNil())
+	gomega.Expect(len(executionDir)).Should(gomega.Equal(0))
 }
 
 func testNewPrepare() {
