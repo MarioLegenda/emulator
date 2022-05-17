@@ -6,8 +6,6 @@ import (
 	"therebelsource/emulator/execution/balancer/runners"
 )
 
-var closing bool
-
 type Balancer interface {
 	StartWorkers()
 	AddJob(Job)
@@ -36,11 +34,10 @@ type balancer struct {
 	name       string
 	controller []int32
 	lock       sync.Mutex
+	closing    bool
 }
 
 func NewBalancer(name string, initialWorkers int) Balancer {
-	closing = false
-
 	b := &balancer{
 		workers:    make([]worker, 0),
 		controller: make([]int32, 0),
@@ -69,7 +66,7 @@ func (b *balancer) StartWorkers() {
 			for {
 				job := <-worker.input
 
-				if closing {
+				if b.closing {
 					job.Output <- runners.Result{
 						Result:  "",
 						Success: false,
@@ -134,7 +131,7 @@ func (b *balancer) AddJob(j Job) {
 
 func (b *balancer) Close() {
 	b.lock.Lock()
-	closing = true
+	b.closing = true
 	b.lock.Unlock()
 
 	l := len(b.controller)

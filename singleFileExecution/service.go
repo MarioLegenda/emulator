@@ -4,6 +4,7 @@ import (
 	"therebelsource/emulator/appErrors"
 	"therebelsource/emulator/execution"
 	"therebelsource/emulator/runner"
+	_var "therebelsource/emulator/var"
 )
 
 var SingleFileExecutionService Service
@@ -17,7 +18,7 @@ func InitService() {
 func (s Service) RunSingleFile(model *SingleFileRunRequest) (runner.SingleFileRunResult, *appErrors.Error) {
 	model.Sanitize()
 
-	res := execution.PackageService.RunJob(execution.Job{
+	res := execution.Service(_var.SINGLE_FILE_EXECUTION).RunJob(execution.Job{
 		BuilderType:       "single_file",
 		ExecutionType:     "single_file",
 		EmulatorName:      string(model.codeBlock.Emulator.Name),
@@ -42,7 +43,7 @@ func (s Service) RunSingleFile(model *SingleFileRunRequest) (runner.SingleFileRu
 func (s Service) RunPublicSingleFile(model *PublicSingleFileRunRequest) (runner.SingleFileRunResult, *appErrors.Error) {
 	model.Sanitize()
 
-	res := execution.PackageService.RunJob(execution.Job{
+	res := execution.Service(_var.SINGLE_FILE_EXECUTION).RunJob(execution.Job{
 		BuilderType:       "single_file",
 		ExecutionType:     "single_file",
 		EmulatorName:      string(model.codeBlock.Emulator.Name),

@@ -12,6 +12,7 @@ import (
 	"therebelsource/emulator/rateLimiter"
 	"therebelsource/emulator/runner"
 	"therebelsource/emulator/singleFileExecution"
+	"therebelsource/emulator/var"
 )
 
 func LoadEnv() {
@@ -80,7 +81,7 @@ func App() {
 	singleFileExecution.InitService()
 	projectExecution.InitService()
 
-	err := execution.Init([]execution.ContainerBlueprint{
+	err := execution.Init(_var.SINGLE_FILE_EXECUTION, []execution.ContainerBlueprint{
 		{
 			WorkerNum:    1,
 			ContainerNum: 1,

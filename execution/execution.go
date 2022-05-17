@@ -9,7 +9,7 @@ import (
 	"therebelsource/emulator/execution/containerFactory"
 )
 
-var PackageService Execution
+var services map[string]Execution
 
 type Job struct {
 	BuilderType   string
@@ -39,7 +39,9 @@ type ContainerBlueprint struct {
 	Tag          string
 }
 
-func Init(blueprints []ContainerBlueprint) *appErrors.Error {
+func Init(name string, blueprints []ContainerBlueprint) *appErrors.Error {
+	services = make(map[string]Execution)
+	
 	containerFactory.InitService()
 	s := &execution{
 		balancers:  make(map[string][]balancer.Balancer),
@@ -52,9 +54,13 @@ func Init(blueprints []ContainerBlueprint) *appErrors.Error {
 		return err
 	}
 
-	PackageService = s
+	services[name] = s
 
 	return nil
+}
+
+func Service(name string) Execution {
+	return services[name]
 }
 
 func (e *execution) RunJob(j Job) runners.Result {
