@@ -18,8 +18,8 @@ import (
 
 var _ = GinkgoDescribe("Single file execution tests", func() {
 	GinkgoBeforeEach(func() {
-		LoadEnv()
-		InitRequiredDirectories(false)
+		loadEnv()
+		initRequiredDirectories(false)
 	})
 
 	GinkgoAfterEach(func() {

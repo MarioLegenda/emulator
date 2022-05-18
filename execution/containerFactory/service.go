@@ -7,17 +7,18 @@ import (
 	"github.com/google/uuid"
 	"os"
 	"os/exec"
-	errorHandler "therebelsource/emulator/appErrors"
+	"sync"
+	"therebelsource/emulator/appErrors"
 	"time"
 )
 
-type Service interface {
-	CreateContainers(string, int) bool
+var services map[string]Container
+
+type Container interface {
+	CreateContainers(string, int) []*appErrors.Error
 	Close()
 	Containers() map[string]container
 }
-
-var PackageService Service
 
 type service struct {
 	containers map[string]container
@@ -38,68 +39,88 @@ type container struct {
 	WorkerNum int
 }
 
-func InitService() {
+func Init(name string) {
+	if services == nil {
+		services = make(map[string]Container)
+	}
+
 	s := &service{containers: make(map[string]container)}
 
-	PackageService = s
+	services[name] = s
+}
+
+func Service(name string) Container {
+	return services[name]
 }
 
 func (d *service) Containers() map[string]container {
 	return d.containers
 }
 
-func (d *service) CreateContainers(tag string, workerNum int) bool {
+func (d *service) CreateContainers(tag string, workerNum int) []*appErrors.Error {
 	fmt.Println(fmt.Sprintf("Creating %d container(s) for %s", workerNum, tag))
+
+	errs := make([]*appErrors.Error, 0)
+	wg := sync.WaitGroup{}
 	for i := 0; i < workerNum; i++ {
-		name := uuid.New().String()
+		wg.Add(1)
+		go func(wg *sync.WaitGroup) {
+			name := uuid.New().String()
 
-		containerDir := fmt.Sprintf("%s/%s", os.Getenv("SINGLE_FILE_STATE_DIR"), name)
-		fsErr := os.Mkdir(containerDir, os.ModePerm)
+			containerDir := fmt.Sprintf("%s/%s", os.Getenv("SINGLE_FILE_STATE_DIR"), name)
+			fsErr := os.Mkdir(containerDir, os.ModePerm)
 
-		if fsErr != nil {
-			d.Close()
+			if fsErr != nil {
+				errs = append(errs, appErrors.New(appErrors.ApplicationError, appErrors.ApplicationRuntimeError, fmt.Sprintf("Could not start container: %s", fsErr.Error())))
 
-			errorHandler.TerminateWithMessage(fmt.Sprintf("Cannot create %s directory", containerDir))
-		}
+				wg.Done()
 
-		container := container{
-			output: make(chan message),
-			pid:    make(chan int),
-			dir:    containerDir,
-
-			Tag:       tag,
-			Name:      name,
-			WorkerNum: workerNum,
-		}
-
-		createContainer(container)
-
-		select {
-		case <-time.After(1 * time.Second):
-			if !isContainerRunning(name) {
-				d.Close()
-
-				return false
+				return
 			}
 
-			close(container.output)
-			d.containers[name] = container
+			container := container{
+				output: make(chan message),
+				pid:    make(chan int),
+				dir:    containerDir,
 
-			fmt.Println(fmt.Sprintf("Container for %s with name %s started!", container.Tag, container.Name))
-		case msg := <-container.output:
-			if msg.messageType == "error" {
-				err := msg.data.(error)
-
-				fmt.Println(fmt.Sprintf("Container with name %s could not start: %s; Cannot continue, stopping all container!", name, err.Error()))
-
-				d.Close()
-
-				return false
+				Tag:       tag,
+				Name:      name,
+				WorkerNum: workerNum,
 			}
-		}
+
+			createContainer(container)
+
+			select {
+			case <-time.After(5 * time.Second):
+				if !isContainerRunning(name) {
+					errs = append(errs, appErrors.New(appErrors.ApplicationError, appErrors.ApplicationRuntimeError, "Container startup timeout"))
+
+					wg.Done()
+
+					return
+				}
+
+				close(container.output)
+				d.containers[name] = container
+
+				fmt.Println(fmt.Sprintf("Container for %s with name %s started!", container.Tag, container.Name))
+
+				wg.Done()
+			case msg := <-container.output:
+				if msg.messageType == "error" {
+					err := msg.data.(error)
+
+					errs = append(errs, appErrors.New(appErrors.ApplicationError, appErrors.ApplicationRuntimeError, fmt.Sprintf("Could not start container: %s", err.Error())))
+
+					wg.Done()
+				}
+			}
+		}(&wg)
 	}
 
-	return true
+	wg.Wait()
+
+	return errs
 }
 
 func (d service) Close() {

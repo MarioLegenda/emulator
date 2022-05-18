@@ -31,6 +31,7 @@ type execution struct {
 	balancers  map[string][]balancer.Balancer
 	lock       sync.Mutex
 	close      bool
+	name       string
 }
 
 type ContainerBlueprint struct {
@@ -40,15 +41,18 @@ type ContainerBlueprint struct {
 }
 
 func Init(name string, blueprints []ContainerBlueprint) *appErrors.Error {
-	services = make(map[string]Execution)
-	
-	containerFactory.InitService()
+	if services == nil {
+		services = make(map[string]Execution)
+	}
+
+	containerFactory.Init(name)
 	s := &execution{
 		balancers:  make(map[string][]balancer.Balancer),
 		controller: make(map[string][]int32),
+		name:       name,
 	}
 
-	err := s.init(blueprints)
+	err := s.init(name, blueprints)
 
 	if err != nil {
 		return err
@@ -116,6 +120,7 @@ func (e *execution) RunJob(j Job) runners.Result {
 func (e *execution) Close() {
 	defer func() {
 		if err := recover(); err != nil {
+			panic(err)
 			// send to slack/log
 		}
 	}()
@@ -130,22 +135,26 @@ func (e *execution) Close() {
 		}
 	}
 
-	containerFactory.PackageService.Close()
+	containerFactory.Service(e.name).Close()
 }
 
-func (e *execution) init(blueprints []ContainerBlueprint) *appErrors.Error {
+func (e *execution) init(name string, blueprints []ContainerBlueprint) *appErrors.Error {
 	workers := make(map[string]int)
 	for _, blueprint := range blueprints {
-		success := containerFactory.PackageService.CreateContainers(blueprint.Tag, blueprint.ContainerNum)
+		errs := containerFactory.Service(name).CreateContainers(blueprint.Tag, blueprint.ContainerNum)
 
-		if !success {
+		if len(errs) != 0 {
+			containerFactory.Service(name).Close()
+
+			// TODO: Slack service notification and sve to log
+
 			return appErrors.New(appErrors.ServerError, appErrors.ApplicationRuntimeError, fmt.Sprintf("Cannot boot container for tag %s", blueprint.Tag))
 		}
 
 		workers[blueprint.Tag] = blueprint.WorkerNum
 	}
 
-	containers := containerFactory.PackageService.Containers()
+	containers := containerFactory.Service(name).Containers()
 
 	for _, c := range containers {
 		workerNum := workers[c.Tag]

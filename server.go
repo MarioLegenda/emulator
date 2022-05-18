@@ -12,9 +12,7 @@ import (
 	"os/signal"
 	"syscall"
 	errorHandler "therebelsource/emulator/appErrors"
-	"therebelsource/emulator/execution"
 	"therebelsource/emulator/runner"
-	_var "therebelsource/emulator/var"
 	"time"
 )
 
@@ -78,7 +76,7 @@ func WatchServerShutdown(srv *http.Server) {
 	fmt.Println("Container balancer stopped!")
 
 	fmt.Println("Stopping emulator workers...")
-	execution.Service(_var.SINGLE_FILE_EXECUTION).Close()
+	closeExecutioners()
 	fmt.Println("Emulator workers stopped")
 
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)

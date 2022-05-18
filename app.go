@@ -5,6 +5,7 @@ import (
 	"github.com/joho/godotenv"
 	"log"
 	"os"
+	"sync"
 	"therebelsource/emulator/appErrors"
 	errorHandler "therebelsource/emulator/appErrors"
 	"therebelsource/emulator/execution"
@@ -12,10 +13,10 @@ import (
 	"therebelsource/emulator/rateLimiter"
 	"therebelsource/emulator/runner"
 	"therebelsource/emulator/singleFileExecution"
-	"therebelsource/emulator/var"
+	_var "therebelsource/emulator/var"
 )
 
-func LoadEnv() {
+func loadEnv() {
 	err := godotenv.Load(".env")
 
 	if err != nil {
@@ -23,7 +24,7 @@ func LoadEnv() {
 	}
 }
 
-func InitRequiredDirectories(output bool) {
+func initRequiredDirectories(output bool) {
 	projectsDir := os.Getenv("PROJECTS_DIR")
 	directoriesExist := true
 	if _, err := os.Stat(projectsDir); os.IsNotExist(err) {
@@ -72,15 +73,7 @@ func InitRequiredDirectories(output bool) {
 	}
 }
 
-func App() {
-	LoadEnv()
-	InitRequiredDirectories(true)
-
-	rateLimiter.InitRateLimiter()
-
-	singleFileExecution.InitService()
-	projectExecution.InitService()
-
+func initExecutioners() {
 	err := execution.Init(_var.SINGLE_FILE_EXECUTION, []execution.ContainerBlueprint{
 		{
 			WorkerNum:    1,
@@ -143,9 +136,104 @@ func App() {
 			Tag:          string(runner.GoLang.Tag),
 		},
 	})
+
 	if err != nil {
 		appErrors.TerminateWithMessage("Cannot boot executioner. Server cannot start!")
 	}
+
+	err = execution.Init(_var.PROJECT_EXECUTION, []execution.ContainerBlueprint{
+		{
+			WorkerNum:    1,
+			ContainerNum: 1,
+			Tag:          string(runner.NodeLts.Tag),
+		},
+		{
+			WorkerNum:    1,
+			ContainerNum: 1,
+			Tag:          string(runner.NodeEsm.Tag),
+		},
+		{
+			WorkerNum:    1,
+			ContainerNum: 1,
+			Tag:          string(runner.Ruby.Tag),
+		},
+		{
+			WorkerNum:    1,
+			ContainerNum: 1,
+			Tag:          string(runner.Rust.Tag),
+		},
+		{
+			WorkerNum:    1,
+			ContainerNum: 1,
+			Tag:          string(runner.CPlus.Tag),
+		},
+		{
+			WorkerNum:    1,
+			ContainerNum: 1,
+			Tag:          string(runner.Haskell.Tag),
+		},
+		{
+			WorkerNum:    1,
+			ContainerNum: 1,
+			Tag:          string(runner.CLang.Tag),
+		},
+		{
+			WorkerNum:    1,
+			ContainerNum: 1,
+			Tag:          string(runner.CSharpMono.Tag),
+		},
+		{
+			WorkerNum:    1,
+			ContainerNum: 1,
+			Tag:          string(runner.Python3.Tag),
+		},
+		{
+			WorkerNum:    1,
+			ContainerNum: 1,
+			Tag:          string(runner.Python2.Tag),
+		},
+		{
+			WorkerNum:    1,
+			ContainerNum: 1,
+			Tag:          string(runner.Php74.Tag),
+		},
+		{
+			WorkerNum:    1,
+			ContainerNum: 1,
+			Tag:          string(runner.GoLang.Tag),
+		},
+	})
+
+	if err != nil {
+		execution.Service(_var.SINGLE_FILE_EXECUTION).Close()
+
+		appErrors.TerminateWithMessage("Cannot boot executioner. Server cannot start!")
+	}
+}
+
+func closeExecutioners() {
+	wg := sync.WaitGroup{}
+	for _, e := range []string{_var.SINGLE_FILE_EXECUTION, _var.PROJECT_EXECUTION} {
+		wg.Add(1)
+
+		go func(name string, wg *sync.WaitGroup) {
+			execution.Service(name).Close()
+			wg.Done()
+		}(e, &wg)
+	}
+	wg.Wait()
+}
+
+func App() {
+	loadEnv()
+	initRequiredDirectories(true)
+
+	rateLimiter.InitRateLimiter()
+
+	singleFileExecution.InitService()
+	projectExecution.InitService()
+
+	initExecutioners()
 
 	WatchServerShutdown(InitServer(RegisterRoutes()))
 }

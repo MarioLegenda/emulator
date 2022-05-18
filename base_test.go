@@ -40,8 +40,8 @@ func TestApi(t *testing.T) {
 }
 
 func testPrepare() {
-	LoadEnv()
-	InitRequiredDirectories(false)
+	loadEnv()
+	initRequiredDirectories(false)
 
 	/*	singleFileExecution.InitService()
 		linkedProjectExecution.InitService()
@@ -69,8 +69,8 @@ func testExecutionDirEmpty() {
 }
 
 func testNewPrepare() {
-	LoadEnv()
-	InitRequiredDirectories(false)
+	loadEnv()
+	initRequiredDirectories(false)
 }
 
 func testCreateSecureRequest(rr *httptest.ResponseRecorder, sessionUuid string, method string, path string, body io.Reader) *http.Request {
