@@ -1,4 +1,4 @@
-package builders
+package single
 
 import (
 	"fmt"
@@ -7,46 +7,44 @@ import (
 	"therebelsource/emulator/appErrors"
 )
 
-type CSingleFileBuildResult struct {
+type PhpSingleFileBuildResult struct {
 	ContainerDirectory string
 	ExecutionDirectory string
 	FileName           string
 }
 
-type CSingleFileBuildParams struct {
+type PhpSingleFileBuildParams struct {
 	Extension string
 	Text      string
 	StateDir  string
 }
 
-var outb, errb string
-
-func InitCParams(ext string, text string, stateDir string) CSingleFileBuildParams {
-	return CSingleFileBuildParams{
+func InitPhpParams(ext string, text string, stateDir string) PhpSingleFileBuildParams {
+	return PhpSingleFileBuildParams{
 		Extension: ext,
 		Text:      text,
 		StateDir:  stateDir,
 	}
 }
 
-func CSingleFileBuild(params CSingleFileBuildParams) (CSingleFileBuildResult, *appErrors.Error) {
+func PhpSingleFileBuild(params PhpSingleFileBuildParams) (PhpSingleFileBuildResult, *appErrors.Error) {
 	dirName := uuid.New().String()
 	tempExecutionDir := fmt.Sprintf("%s/%s", params.StateDir, dirName)
 	fileName := fmt.Sprintf("%s.%s", dirName, params.Extension)
 
 	if err := os.MkdirAll(tempExecutionDir, os.ModePerm); err != nil {
-		return CSingleFileBuildResult{}, appErrors.New(appErrors.ApplicationError, appErrors.FilesystemError, fmt.Sprintf("Cannot create execution dir: %s", err.Error()))
+		return PhpSingleFileBuildResult{}, appErrors.New(appErrors.ApplicationError, appErrors.FilesystemError, fmt.Sprintf("Cannot create execution dir: %s", err.Error()))
 	}
 
 	if err := writeContent(fileName, tempExecutionDir, params.Text); err != nil {
-		return CSingleFileBuildResult{}, err
+		return PhpSingleFileBuildResult{}, err
 	}
 
 	if err := writeContent("output.txt", tempExecutionDir, ""); err != nil {
-		return CSingleFileBuildResult{}, err
+		return PhpSingleFileBuildResult{}, err
 	}
 
-	return CSingleFileBuildResult{
+	return PhpSingleFileBuildResult{
 		ContainerDirectory: dirName,
 		ExecutionDirectory: tempExecutionDir,
 		FileName:           fileName,

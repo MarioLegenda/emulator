@@ -3,7 +3,9 @@ package runners
 import (
 	"fmt"
 	"os"
-	"therebelsource/emulator/execution/balancer/builders"
+	"therebelsource/emulator/execution/balancer/builders/project"
+	"therebelsource/emulator/execution/balancer/builders/single"
+	"therebelsource/emulator/repository"
 )
 
 type Params struct {
@@ -15,14 +17,18 @@ type Params struct {
 	EmulatorName      string
 	EmulatorExtension string
 	EmulatorText      string
+
+	CodeProject   *repository.CodeProject
+	Contents      []*repository.FileContent
+	ExecutingFile *repository.File
 }
 
 func Run(params Params) Result {
 	if params.EmulatorName == string(nodeLts.name) && params.BuilderType == "single_file" && params.ExecutionType == "single_file" {
-		build, err := builders.NodeSingleFileBuild(builders.InitNodeParams(
+		build, err := single.NodeSingleFileBuild(single.InitNodeParams(
 			params.EmulatorExtension,
 			params.EmulatorText,
-			fmt.Sprintf("%s/%s", os.Getenv("SINGLE_FILE_STATE_DIR"), params.ContainerName),
+			fmt.Sprintf("%s/%s", os.Getenv("EXECUTION_DIR"), params.ContainerName),
 		))
 
 		if err != nil {
@@ -42,10 +48,10 @@ func Run(params Params) Result {
 	}
 
 	if params.EmulatorName == string(nodeEsm.name) && params.BuilderType == "single_file" && params.ExecutionType == "single_file" {
-		build, err := builders.NodeSingleFileBuild(builders.InitNodeParams(
+		build, err := single.NodeSingleFileBuild(single.InitNodeParams(
 			params.EmulatorExtension,
 			params.EmulatorText,
-			fmt.Sprintf("%s/%s", os.Getenv("SINGLE_FILE_STATE_DIR"), params.ContainerName),
+			fmt.Sprintf("%s/%s", os.Getenv("EXECUTION_DIR"), params.ContainerName),
 		))
 
 		if err != nil {
@@ -65,10 +71,10 @@ func Run(params Params) Result {
 	}
 
 	if params.EmulatorName == string(goLang.name) && params.BuilderType == "single_file" && params.ExecutionType == "single_file" {
-		build, err := builders.GoSingleFileBuild(builders.InitGoParams(
+		build, err := single.GoSingleFileBuild(single.InitGoParams(
 			params.EmulatorExtension,
 			params.EmulatorText,
-			fmt.Sprintf("%s/%s", os.Getenv("SINGLE_FILE_STATE_DIR"), params.ContainerName),
+			fmt.Sprintf("%s/%s", os.Getenv("EXECUTION_DIR"), params.ContainerName),
 		))
 
 		if err != nil {
@@ -88,10 +94,10 @@ func Run(params Params) Result {
 	}
 
 	if params.EmulatorName == string(ruby.name) && params.BuilderType == "single_file" && params.ExecutionType == "single_file" {
-		build, err := builders.RubySingleFileBuild(builders.InitRubyParams(
+		build, err := single.RubySingleFileBuild(single.InitRubyParams(
 			params.EmulatorExtension,
 			params.EmulatorText,
-			fmt.Sprintf("%s/%s", os.Getenv("SINGLE_FILE_STATE_DIR"), params.ContainerName),
+			fmt.Sprintf("%s/%s", os.Getenv("EXECUTION_DIR"), params.ContainerName),
 		))
 
 		if err != nil {
@@ -111,10 +117,10 @@ func Run(params Params) Result {
 	}
 
 	if params.EmulatorName == string(php.name) && params.BuilderType == "single_file" && params.ExecutionType == "single_file" {
-		build, err := builders.PhpSingleFileBuild(builders.InitPhpParams(
+		build, err := single.PhpSingleFileBuild(single.InitPhpParams(
 			params.EmulatorExtension,
 			params.EmulatorText,
-			fmt.Sprintf("%s/%s", os.Getenv("SINGLE_FILE_STATE_DIR"), params.ContainerName),
+			fmt.Sprintf("%s/%s", os.Getenv("EXECUTION_DIR"), params.ContainerName),
 		))
 
 		if err != nil {
@@ -134,10 +140,10 @@ func Run(params Params) Result {
 	}
 
 	if params.EmulatorName == string(python2.name) && params.BuilderType == "single_file" && params.ExecutionType == "single_file" {
-		build, err := builders.PythonSingleFileBuild(builders.InitPythonParams(
+		build, err := single.PythonSingleFileBuild(single.InitPythonParams(
 			params.EmulatorExtension,
 			params.EmulatorText,
-			fmt.Sprintf("%s/%s", os.Getenv("SINGLE_FILE_STATE_DIR"), params.ContainerName),
+			fmt.Sprintf("%s/%s", os.Getenv("EXECUTION_DIR"), params.ContainerName),
 		))
 
 		if err != nil {
@@ -157,10 +163,10 @@ func Run(params Params) Result {
 	}
 
 	if params.EmulatorName == string(python3.name) && params.BuilderType == "single_file" && params.ExecutionType == "single_file" {
-		build, err := builders.PythonSingleFileBuild(builders.InitPythonParams(
+		build, err := single.PythonSingleFileBuild(single.InitPythonParams(
 			params.EmulatorExtension,
 			params.EmulatorText,
-			fmt.Sprintf("%s/%s", os.Getenv("SINGLE_FILE_STATE_DIR"), params.ContainerName),
+			fmt.Sprintf("%s/%s", os.Getenv("EXECUTION_DIR"), params.ContainerName),
 		))
 
 		if err != nil {
@@ -180,10 +186,10 @@ func Run(params Params) Result {
 	}
 
 	if params.EmulatorName == string(csharpMono.name) && params.BuilderType == "single_file" && params.ExecutionType == "single_file" {
-		build, err := builders.CsharpSingleFileBuild(builders.InitCsharpParams(
+		build, err := single.CsharpSingleFileBuild(single.InitCsharpParams(
 			params.EmulatorExtension,
 			params.EmulatorText,
-			fmt.Sprintf("%s/%s", os.Getenv("SINGLE_FILE_STATE_DIR"), params.ContainerName),
+			fmt.Sprintf("%s/%s", os.Getenv("EXECUTION_DIR"), params.ContainerName),
 		))
 
 		if err != nil {
@@ -203,10 +209,10 @@ func Run(params Params) Result {
 	}
 
 	if params.EmulatorName == string(haskell.name) && params.BuilderType == "single_file" && params.ExecutionType == "single_file" {
-		build, err := builders.HaskellSingleFileBuild(builders.InitHaskellParams(
+		build, err := single.HaskellSingleFileBuild(single.InitHaskellParams(
 			params.EmulatorExtension,
 			params.EmulatorText,
-			fmt.Sprintf("%s/%s", os.Getenv("SINGLE_FILE_STATE_DIR"), params.ContainerName),
+			fmt.Sprintf("%s/%s", os.Getenv("EXECUTION_DIR"), params.ContainerName),
 		))
 
 		if err != nil {
@@ -226,10 +232,10 @@ func Run(params Params) Result {
 	}
 
 	if params.EmulatorName == string(cLang.name) && params.BuilderType == "single_file" && params.ExecutionType == "single_file" {
-		build, err := builders.CSingleFileBuild(builders.InitCParams(
+		build, err := single.CSingleFileBuild(single.InitCParams(
 			params.EmulatorExtension,
 			params.EmulatorText,
-			fmt.Sprintf("%s/%s", os.Getenv("SINGLE_FILE_STATE_DIR"), params.ContainerName),
+			fmt.Sprintf("%s/%s", os.Getenv("EXECUTION_DIR"), params.ContainerName),
 		))
 
 		if err != nil {
@@ -249,10 +255,10 @@ func Run(params Params) Result {
 	}
 
 	if params.EmulatorName == string(cPlus.name) && params.BuilderType == "single_file" && params.ExecutionType == "single_file" {
-		build, err := builders.CPlusSingleFileBuild(builders.InitCPlusParams(
+		build, err := single.CPlusSingleFileBuild(single.InitCPlusParams(
 			params.EmulatorExtension,
 			params.EmulatorText,
-			fmt.Sprintf("%s/%s", os.Getenv("SINGLE_FILE_STATE_DIR"), params.ContainerName),
+			fmt.Sprintf("%s/%s", os.Getenv("EXECUTION_DIR"), params.ContainerName),
 		))
 
 		if err != nil {
@@ -272,10 +278,10 @@ func Run(params Params) Result {
 	}
 
 	if params.EmulatorName == string(rust.name) && params.BuilderType == "single_file" && params.ExecutionType == "single_file" {
-		build, err := builders.RustSingleFileBuild(builders.InitRustParams(
+		build, err := single.RustSingleFileBuild(single.InitRustParams(
 			params.EmulatorExtension,
 			params.EmulatorText,
-			fmt.Sprintf("%s/%s", os.Getenv("SINGLE_FILE_STATE_DIR"), params.ContainerName),
+			fmt.Sprintf("%s/%s", os.Getenv("EXECUTION_DIR"), params.ContainerName),
 		))
 
 		if err != nil {
@@ -287,6 +293,54 @@ func Run(params Params) Result {
 		}
 
 		return rustRunner(RustExecParams{
+			ExecutionDirectory: build.ExecutionDirectory,
+			ContainerDirectory: build.ContainerDirectory,
+			ExecutionFile:      build.FileName,
+			ContainerName:      params.ContainerName,
+		})
+	}
+
+	if params.EmulatorName == string(nodeLts.name) && params.BuilderType == "project" && params.ExecutionType == "project" {
+		build, err := project.NodeProjectBuild(project.InitNodeParams(
+			params.CodeProject,
+			params.Contents,
+			fmt.Sprintf("%s/%s", os.Getenv("EXECUTION_DIR"), params.ContainerName),
+			params.ExecutingFile,
+		))
+
+		if err != nil {
+			return Result{
+				Result:  "",
+				Success: false,
+				Error:   err,
+			}
+		}
+
+		return nodeRunner(NodeExecParams{
+			ExecutionDirectory: build.ExecutionDirectory,
+			ContainerDirectory: build.ContainerDirectory,
+			ExecutionFile:      build.FileName,
+			ContainerName:      params.ContainerName,
+		})
+	}
+
+	if params.EmulatorName == string(nodeEsm.name) && params.BuilderType == "project" && params.ExecutionType == "project" {
+		build, err := project.NodeProjectBuild(project.InitNodeParams(
+			params.CodeProject,
+			params.Contents,
+			fmt.Sprintf("%s/%s", os.Getenv("EXECUTION_DIR"), params.ContainerName),
+			params.ExecutingFile,
+		))
+
+		if err != nil {
+			return Result{
+				Result:  "",
+				Success: false,
+				Error:   err,
+			}
+		}
+
+		return nodeRunner(NodeExecParams{
 			ExecutionDirectory: build.ExecutionDirectory,
 			ContainerDirectory: build.ContainerDirectory,
 			ExecutionFile:      build.FileName,

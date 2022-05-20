@@ -4,6 +4,7 @@ import (
 	"sync"
 	"therebelsource/emulator/appErrors"
 	"therebelsource/emulator/execution/balancer/runners"
+	"therebelsource/emulator/repository"
 )
 
 type Balancer interface {
@@ -19,6 +20,10 @@ type Job struct {
 	EmulatorName      string
 	EmulatorExtension string
 	EmulatorText      string
+
+	CodeProject   *repository.CodeProject
+	Contents      []*repository.FileContent
+	ExecutingFile *repository.File
 
 	Output chan runners.Result
 }
@@ -83,6 +88,10 @@ func (b *balancer) StartWorkers() {
 					EmulatorName:      job.EmulatorName,
 					EmulatorExtension: job.EmulatorExtension,
 					EmulatorText:      job.EmulatorText,
+
+					CodeProject:   job.CodeProject,
+					ExecutingFile: job.ExecutingFile,
+					Contents:      job.Contents,
 				})
 
 				if res.Error != nil {

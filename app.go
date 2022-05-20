@@ -25,7 +25,7 @@ func loadEnv() {
 }
 
 func initRequiredDirectories(output bool) {
-	projectsDir := os.Getenv("PROJECTS_DIR")
+	projectsDir := os.Getenv("EXECUTION_DIR")
 	directoriesExist := true
 	if _, err := os.Stat(projectsDir); os.IsNotExist(err) {
 		directoriesExist = false
@@ -43,9 +43,7 @@ func initRequiredDirectories(output bool) {
 
 	if !directoriesExist {
 		rest := []string{
-			os.Getenv("CODE_PROJECT_STATE_DIR"),
-			os.Getenv("SINGLE_FILE_STATE_DIR"),
-			os.Getenv("PACKAGES_DIR"),
+			os.Getenv("EXECUTION_DIR"),
 		}
 
 		for _, dir := range rest {

@@ -50,12 +50,12 @@ func testPrepare() {
 }
 
 func testExecutionDirEmpty() {
-	containerDir, err := ioutil.ReadDir(os.Getenv("SINGLE_FILE_STATE_DIR"))
+	containerDir, err := ioutil.ReadDir(os.Getenv("EXECUTION_DIR"))
 
 	gomega.Expect(err).Should(gomega.BeNil())
 	gomega.Expect(len(containerDir)).Should(gomega.Equal(1))
 
-	executionDir, err := ioutil.ReadDir(fmt.Sprintf("%s/%s", os.Getenv("SINGLE_FILE_STATE_DIR"), containerDir[0].Name()))
+	executionDir, err := ioutil.ReadDir(fmt.Sprintf("%s/%s", os.Getenv("EXECUTION_DIR"), containerDir[0].Name()))
 	if len(executionDir) != 0 && executionDir[0].Name() == ".cache" {
 		return
 	}

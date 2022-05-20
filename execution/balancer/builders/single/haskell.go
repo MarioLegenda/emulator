@@ -1,4 +1,4 @@
-package builders
+package single
 
 import (
 	"fmt"
@@ -7,44 +7,44 @@ import (
 	"therebelsource/emulator/appErrors"
 )
 
-type CPlusSingleFileBuildResult struct {
+type HaskellSingleFileBuildResult struct {
 	ContainerDirectory string
 	ExecutionDirectory string
 	FileName           string
 }
 
-type CPlusSingleFileBuildParams struct {
+type HaskellSingleFileBuildParams struct {
 	Extension string
 	Text      string
 	StateDir  string
 }
 
-func InitCPlusParams(ext string, text string, stateDir string) CPlusSingleFileBuildParams {
-	return CPlusSingleFileBuildParams{
+func InitHaskellParams(ext string, text string, stateDir string) HaskellSingleFileBuildParams {
+	return HaskellSingleFileBuildParams{
 		Extension: ext,
 		Text:      text,
 		StateDir:  stateDir,
 	}
 }
 
-func CPlusSingleFileBuild(params CPlusSingleFileBuildParams) (CPlusSingleFileBuildResult, *appErrors.Error) {
+func HaskellSingleFileBuild(params HaskellSingleFileBuildParams) (HaskellSingleFileBuildResult, *appErrors.Error) {
 	dirName := uuid.New().String()
 	tempExecutionDir := fmt.Sprintf("%s/%s", params.StateDir, dirName)
 	fileName := fmt.Sprintf("%s.%s", dirName, params.Extension)
 
 	if err := os.MkdirAll(tempExecutionDir, os.ModePerm); err != nil {
-		return CPlusSingleFileBuildResult{}, appErrors.New(appErrors.ApplicationError, appErrors.FilesystemError, fmt.Sprintf("Cannot create execution dir: %s", err.Error()))
+		return HaskellSingleFileBuildResult{}, appErrors.New(appErrors.ApplicationError, appErrors.FilesystemError, fmt.Sprintf("Cannot create execution dir: %s", err.Error()))
 	}
 
 	if err := writeContent(fileName, tempExecutionDir, params.Text); err != nil {
-		return CPlusSingleFileBuildResult{}, err
+		return HaskellSingleFileBuildResult{}, err
 	}
 
 	if err := writeContent("output.txt", tempExecutionDir, ""); err != nil {
-		return CPlusSingleFileBuildResult{}, err
+		return HaskellSingleFileBuildResult{}, err
 	}
 
-	return CPlusSingleFileBuildResult{
+	return HaskellSingleFileBuildResult{
 		ContainerDirectory: dirName,
 		ExecutionDirectory: tempExecutionDir,
 		FileName:           fileName,

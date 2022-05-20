@@ -67,7 +67,7 @@ func (d *service) CreateContainers(tag string, workerNum int) []*appErrors.Error
 		go func(wg *sync.WaitGroup) {
 			name := uuid.New().String()
 
-			containerDir := fmt.Sprintf("%s/%s", os.Getenv("SINGLE_FILE_STATE_DIR"), name)
+			containerDir := fmt.Sprintf("%s/%s", os.Getenv("EXECUTION_DIR"), name)
 			fsErr := os.Mkdir(containerDir, os.ModePerm)
 
 			if fsErr != nil {
@@ -91,7 +91,7 @@ func (d *service) CreateContainers(tag string, workerNum int) []*appErrors.Error
 			createContainer(container)
 
 			select {
-			case <-time.After(5 * time.Second):
+			case <-time.After(1 * time.Second):
 				if !isContainerRunning(name) {
 					errs = append(errs, appErrors.New(appErrors.ApplicationError, appErrors.ApplicationRuntimeError, "Container startup timeout"))
 

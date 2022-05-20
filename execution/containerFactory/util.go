@@ -10,7 +10,7 @@ import (
 )
 
 func getVolumeDirectory(volume string) string {
-	return fmt.Sprintf("%s/%s", os.Getenv("SINGLE_FILE_STATE_DIR"), volume)
+	return fmt.Sprintf("%s/%s", os.Getenv("EXECUTION_DIR"), volume)
 }
 
 func isContainerRunning(name string) bool {

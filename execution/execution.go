@@ -7,6 +7,7 @@ import (
 	"therebelsource/emulator/execution/balancer"
 	"therebelsource/emulator/execution/balancer/runners"
 	"therebelsource/emulator/execution/containerFactory"
+	"therebelsource/emulator/repository"
 )
 
 var services map[string]Execution
@@ -19,6 +20,10 @@ type Job struct {
 	EmulatorExtension string
 	EmulatorTag       string
 	EmulatorText      string
+
+	CodeProject   *repository.CodeProject
+	Contents      []*repository.FileContent
+	ExecutingFile *repository.File
 }
 
 type Execution interface {
@@ -104,7 +109,12 @@ func (e *execution) RunJob(j Job) runners.Result {
 		EmulatorName:      j.EmulatorName,
 		EmulatorExtension: j.EmulatorExtension,
 		EmulatorText:      j.EmulatorText,
-		Output:            output,
+
+		CodeProject:   j.CodeProject,
+		ExecutingFile: j.ExecutingFile,
+		Contents:      j.Contents,
+
+		Output: output,
 	})
 
 	out := <-output

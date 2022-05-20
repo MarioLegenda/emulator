@@ -4,7 +4,9 @@ import (
 	"github.com/google/uuid"
 	"therebelsource/emulator/appErrors"
 	"therebelsource/emulator/builders"
+	"therebelsource/emulator/execution"
 	"therebelsource/emulator/runner"
+	_var "therebelsource/emulator/var"
 )
 
 var ProjectExecutionService Service
@@ -63,6 +65,54 @@ func createCommand(params interface{}, lang *runner.Language, containerName stri
 }
 
 func (s Service) RunProject(model *ProjectRunRequest) (runner.ProjectRunResult, *appErrors.Error) {
+	if model.sessionData.CodeProject.Environment.Name == "node_latest" {
+		res := execution.Service(_var.PROJECT_EXECUTION).RunJob(execution.Job{
+			BuilderType:   "project",
+			ExecutionType: "project",
+			EmulatorTag:   string(model.sessionData.CodeProject.Environment.Tag),
+			EmulatorName:  string(model.sessionData.CodeProject.Environment.Name),
+			CodeProject:   model.sessionData.CodeProject,
+			ExecutingFile: model.sessionData.ExecutingFile,
+			Contents:      model.sessionData.Content,
+		})
+
+		result := res.Result
+
+		if result == "" && res.Error != nil && appErrors.TimeoutError == res.Error.Code {
+			result = "timeout"
+		}
+
+		return runner.ProjectRunResult{
+			Success: res.Success,
+			Result:  result,
+			Timeout: 5,
+		}, nil
+	}
+
+	if model.sessionData.CodeProject.Environment.Name == "node_latest_esm" {
+		res := execution.Service(_var.PROJECT_EXECUTION).RunJob(execution.Job{
+			BuilderType:   "project",
+			ExecutionType: "project",
+			EmulatorTag:   string(model.sessionData.CodeProject.Environment.Tag),
+			EmulatorName:  string(model.sessionData.CodeProject.Environment.Name),
+			CodeProject:   model.sessionData.CodeProject,
+			ExecutingFile: model.sessionData.ExecutingFile,
+			Contents:      model.sessionData.Content,
+		})
+
+		result := res.Result
+
+		if result == "" && res.Error != nil && appErrors.TimeoutError == res.Error.Code {
+			result = "timeout"
+		}
+
+		return runner.ProjectRunResult{
+			Success: res.Success,
+			Result:  result,
+			Timeout: 5,
+		}, nil
+	}
+
 	if model.sessionData.CodeProject.Environment.Name == "c" {
 		projectBuilder := builders.CreateBuilder("c_project").(builders.CProjectBuildFn)
 

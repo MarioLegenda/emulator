@@ -23,10 +23,12 @@ var _ = GinkgoDescribe("Single file execution tests", func() {
 	})
 
 	GinkgoAfterEach(func() {
-		gomega.Expect(os.RemoveAll(os.Getenv("PROJECTS_DIR"))).Should(gomega.BeNil())
+		gomega.Expect(os.RemoveAll(os.Getenv("EXECUTION_DIR"))).Should(gomega.BeNil())
 	})
 
 	GinkgoIt("Should execute a single file in a node LTS environment with imports", func() {
+		ginkgo.Skip("")
+
 		gomega.Expect(execution.Init(_var.SINGLE_FILE_EXECUTION, []execution.ContainerBlueprint{
 			{
 				WorkerNum:    1,
@@ -54,6 +56,8 @@ var _ = GinkgoDescribe("Single file execution tests", func() {
 	})
 
 	GinkgoIt("Should execute a single file in a node LTS environment if an infinite loop with a timeout with imports", func() {
+		ginkgo.Skip("")
+
 		gomega.Expect(execution.Init(_var.SINGLE_FILE_EXECUTION, []execution.ContainerBlueprint{
 			{
 				WorkerNum:    1,
@@ -84,6 +88,8 @@ while(true) {
 	})
 
 	GinkgoIt("Should gracefully fail to execute a single file in a node LTS environment because of a syntax error with imports", func() {
+		ginkgo.Skip("")
+
 		gomega.Expect(execution.Init(_var.SINGLE_FILE_EXECUTION, []execution.ContainerBlueprint{
 			{
 				WorkerNum:    1,
@@ -114,6 +120,8 @@ while(true {
 	})
 
 	GinkgoIt("Should execute a single file in a node LTS environment", func() {
+		ginkgo.Skip("")
+
 		gomega.Expect(execution.Init(_var.SINGLE_FILE_EXECUTION, []execution.ContainerBlueprint{
 			{
 				WorkerNum:    1,
@@ -141,6 +149,8 @@ while(true {
 	})
 
 	GinkgoIt("Should execute a single file in a node LTS environment if an infinite loop with a timeout", func() {
+		ginkgo.Skip("")
+
 		gomega.Expect(execution.Init(_var.SINGLE_FILE_EXECUTION, []execution.ContainerBlueprint{
 			{
 				WorkerNum:    1,
@@ -171,6 +181,8 @@ while(true) {
 	})
 
 	GinkgoIt("Should gracefully fail to execute a single file in a node LTS environment because of a syntax error", func() {
+		ginkgo.Skip("")
+
 		gomega.Expect(execution.Init(_var.SINGLE_FILE_EXECUTION, []execution.ContainerBlueprint{
 			{
 				WorkerNum:    1,
@@ -201,6 +213,8 @@ while(true {
 	})
 
 	GinkgoIt("Should execute code in Ruby environment", func() {
+		ginkgo.Skip("")
+
 		gomega.Expect(execution.Init(_var.SINGLE_FILE_EXECUTION, []execution.ContainerBlueprint{
 			{
 				WorkerNum:    1,
@@ -228,6 +242,8 @@ while(true {
 	})
 
 	GinkgoIt("Should execute code in Ruby environment that has a syntax error", func() {
+		ginkgo.Skip("")
+
 		gomega.Expect(execution.Init(_var.SINGLE_FILE_EXECUTION, []execution.ContainerBlueprint{
 			{
 				WorkerNum:    1,
@@ -255,6 +271,8 @@ while(true {
 	})
 
 	GinkgoIt("Should execute code in Ruby environment with an infinite loop", func() {
+		ginkgo.Skip("")
+
 		gomega.Expect(execution.Init(_var.SINGLE_FILE_EXECUTION, []execution.ContainerBlueprint{
 			{
 				WorkerNum:    1,
@@ -285,6 +303,8 @@ end
 	})
 
 	GinkgoIt("Should execute code in Rust environment", func() {
+		ginkgo.Skip("")
+
 		gomega.Expect(execution.Init(_var.SINGLE_FILE_EXECUTION, []execution.ContainerBlueprint{
 			{
 				WorkerNum:    1,
@@ -316,6 +336,8 @@ fn main() {
 	})
 
 	GinkgoIt("Should execute code in Rust environment with a syntax error", func() {
+		ginkgo.Skip("")
+
 		gomega.Expect(execution.Init(_var.SINGLE_FILE_EXECUTION, []execution.ContainerBlueprint{
 			{
 				WorkerNum:    1,
@@ -347,6 +369,8 @@ fn main() {
 	})
 
 	GinkgoIt("Should execute code in Rust environment with a syntax error", func() {
+		ginkgo.Skip("")
+
 		gomega.Expect(execution.Init(_var.SINGLE_FILE_EXECUTION, []execution.ContainerBlueprint{
 			{
 				WorkerNum:    1,
@@ -379,6 +403,8 @@ fn main() {
 	})
 
 	GinkgoIt("Should execute code in Golang environment", func() {
+		ginkgo.Skip("")
+
 		gomega.Expect(execution.Init(_var.SINGLE_FILE_EXECUTION, []execution.ContainerBlueprint{
 			{
 				WorkerNum:    1,
@@ -414,6 +440,8 @@ func main() {
 	})
 
 	GinkgoIt("Should execute code in Golang environment with syntax error", func() {
+		ginkgo.Skip("")
+
 		gomega.Expect(execution.Init(_var.SINGLE_FILE_EXECUTION, []execution.ContainerBlueprint{
 			{
 				WorkerNum:    1,
@@ -449,6 +477,8 @@ func main() {
 	})
 
 	GinkgoIt("Should execute code in Golang environment with timeout", func() {
+		ginkgo.Skip("")
+
 		gomega.Expect(execution.Init(_var.SINGLE_FILE_EXECUTION, []execution.ContainerBlueprint{
 			{
 				WorkerNum:    1,
@@ -483,6 +513,8 @@ func main() {
 	})
 
 	GinkgoIt("Should execute code in Mono environment", func() {
+		ginkgo.Skip("")
+
 		gomega.Expect(execution.Init(_var.SINGLE_FILE_EXECUTION, []execution.ContainerBlueprint{
 			{
 				WorkerNum:    1,
@@ -520,6 +552,8 @@ namespace HelloWorld
 	})
 
 	GinkgoIt("Should execute code in Mono environment with syntax error", func() {
+		ginkgo.Skip("")
+
 		gomega.Expect(execution.Init(_var.SINGLE_FILE_EXECUTION, []execution.ContainerBlueprint{
 			{
 				WorkerNum:    1,
@@ -557,6 +591,8 @@ namespae HelloWorld
 	})
 
 	GinkgoIt("Should execute code in Mono environment with infinite loop", func() {
+		ginkgo.Skip("")
+
 		gomega.Expect(execution.Init(_var.SINGLE_FILE_EXECUTION, []execution.ContainerBlueprint{
 			{
 				WorkerNum:    1,
@@ -594,6 +630,8 @@ namespace HelloWorld
 	})
 
 	GinkgoIt("Should execute code in C environment", func() {
+		ginkgo.Skip("")
+
 		gomega.Expect(execution.Init(_var.SINGLE_FILE_EXECUTION, []execution.ContainerBlueprint{
 			{
 				WorkerNum:    1,
@@ -629,6 +667,8 @@ int main() {
 	})
 
 	GinkgoIt("Should execute code in C environment with syntax error", func() {
+		ginkgo.Skip("")
+
 		gomega.Expect(execution.Init(_var.SINGLE_FILE_EXECUTION, []execution.ContainerBlueprint{
 			{
 				WorkerNum:    1,
@@ -664,6 +704,8 @@ int man() {
 	})
 
 	GinkgoIt("Should execute code in C environment with infinite loop", func() {
+		ginkgo.Skip("")
+
 		gomega.Expect(execution.Init(_var.SINGLE_FILE_EXECUTION, []execution.ContainerBlueprint{
 			{
 				WorkerNum:    1,
@@ -697,6 +739,8 @@ int main() {
 	})
 
 	GinkgoIt("Should execute code in C++ environment", func() {
+		ginkgo.Skip("")
+
 		gomega.Expect(execution.Init(_var.SINGLE_FILE_EXECUTION, []execution.ContainerBlueprint{
 			{
 				WorkerNum:    1,
@@ -731,6 +775,8 @@ int main() {
 	})
 
 	GinkgoIt("Should execute code in C++ environment with syntax error", func() {
+		ginkgo.Skip("")
+
 		gomega.Expect(execution.Init(_var.SINGLE_FILE_EXECUTION, []execution.ContainerBlueprint{
 			{
 				WorkerNum:    1,
@@ -765,6 +811,8 @@ int man() {
 	})
 
 	GinkgoIt("Should execute code in C++ environment with infinite loop", func() {
+		ginkgo.Skip("")
+
 		gomega.Expect(execution.Init(_var.SINGLE_FILE_EXECUTION, []execution.ContainerBlueprint{
 			{
 				WorkerNum:    1,
@@ -798,6 +846,8 @@ int main() {
 	})
 
 	GinkgoIt("Should execute code in Python2 environment", func() {
+		ginkgo.Skip("")
+
 		gomega.Expect(execution.Init(_var.SINGLE_FILE_EXECUTION, []execution.ContainerBlueprint{
 			{
 				WorkerNum:    1,
@@ -827,6 +877,8 @@ print("Hello world")
 	})
 
 	GinkgoIt("Should execute code in Python3 environment", func() {
+		ginkgo.Skip("")
+
 		gomega.Expect(execution.Init(_var.SINGLE_FILE_EXECUTION, []execution.ContainerBlueprint{
 			{
 				WorkerNum:    1,
@@ -856,6 +908,8 @@ print("Hello world")
 	})
 
 	GinkgoIt("Should execute code in Python2 environment with syntax error", func() {
+		ginkgo.Skip("")
+
 		gomega.Expect(execution.Init(_var.SINGLE_FILE_EXECUTION, []execution.ContainerBlueprint{
 			{
 				WorkerNum:    1,
@@ -885,6 +939,8 @@ prit("Hello world")
 	})
 
 	GinkgoIt("Should execute code in Python3 environment with syntax error", func() {
+		ginkgo.Skip("")
+
 		gomega.Expect(execution.Init(_var.SINGLE_FILE_EXECUTION, []execution.ContainerBlueprint{
 			{
 				WorkerNum:    1,
@@ -914,6 +970,8 @@ prit("Hello world")
 	})
 
 	GinkgoIt("Should execute code in Python2 environment with na infinite loop", func() {
+		ginkgo.Skip("")
+
 		gomega.Expect(execution.Init(_var.SINGLE_FILE_EXECUTION, []execution.ContainerBlueprint{
 			{
 				WorkerNum:    1,
@@ -944,6 +1002,8 @@ while True:
 	})
 
 	GinkgoIt("Should execute code in Python3 environment with na infinite loop", func() {
+		ginkgo.Skip("")
+
 		gomega.Expect(execution.Init(_var.SINGLE_FILE_EXECUTION, []execution.ContainerBlueprint{
 			{
 				WorkerNum:    1,
@@ -974,6 +1034,8 @@ while True:
 	})
 
 	GinkgoIt("Should execute code in PHP environment", func() {
+		ginkgo.Skip("")
+
 		gomega.Expect(execution.Init(_var.SINGLE_FILE_EXECUTION, []execution.ContainerBlueprint{
 			{
 				WorkerNum:    1,
@@ -1005,6 +1067,8 @@ echo "Hello world";
 	})
 
 	GinkgoIt("Should execute code in PHP environment with syntax error", func() {
+		ginkgo.Skip("")
+
 		gomega.Expect(execution.Init(_var.SINGLE_FILE_EXECUTION, []execution.ContainerBlueprint{
 			{
 				WorkerNum:    1,
@@ -1036,6 +1100,8 @@ ech "Hello world";
 	})
 
 	GinkgoIt("Should execute code in PHP environment with infinite loop", func() {
+		ginkgo.Skip("")
+
 		gomega.Expect(execution.Init(_var.SINGLE_FILE_EXECUTION, []execution.ContainerBlueprint{
 			{
 				WorkerNum:    1,
@@ -1068,6 +1134,8 @@ ech "Hello world";
 	})
 
 	GinkgoIt("Should execute code in Haskell environment", func() {
+		ginkgo.Skip("")
+
 		gomega.Expect(execution.Init(_var.SINGLE_FILE_EXECUTION, []execution.ContainerBlueprint{
 			{
 				WorkerNum:    1,
@@ -1098,6 +1166,8 @@ main = putStrLn "Hello world"
 	})
 
 	GinkgoIt("Should execute code in Haskell environment with syntax error", func() {
+		ginkgo.Skip("")
+
 		gomega.Expect(execution.Init(_var.SINGLE_FILE_EXECUTION, []execution.ContainerBlueprint{
 			{
 				WorkerNum:    1,
@@ -1128,6 +1198,8 @@ man = putStrLn "Hello world"
 	})
 
 	GinkgoIt("Should execute code in Haskell environment with infinite loop", func() {
+		ginkgo.Skip("")
+
 		gomega.Expect(execution.Init(_var.SINGLE_FILE_EXECUTION, []execution.ContainerBlueprint{
 			{
 				WorkerNum:    1,
@@ -1164,6 +1236,8 @@ main =
 	})
 
 	GinkgoIt("Should execute a single file in a Node latest environment", func() {
+		ginkgo.Skip("")
+
 		gomega.Expect(execution.Init(_var.SINGLE_FILE_EXECUTION, []execution.ContainerBlueprint{
 			{
 				WorkerNum:    1,
@@ -1233,6 +1307,8 @@ main =
 	})
 
 	GinkgoIt("Should execute a single file in a PHP environment", func() {
+		ginkgo.Skip("")
+
 		gomega.Expect(execution.Init(_var.SINGLE_FILE_EXECUTION, []execution.ContainerBlueprint{
 			{
 				WorkerNum:    1,
@@ -1306,6 +1382,8 @@ echo "mile";
 	})
 
 	GinkgoIt("Should execute a single file in a Ruby environment", func() {
+		ginkgo.Skip("")
+
 		gomega.Expect(execution.Init(_var.SINGLE_FILE_EXECUTION, []execution.ContainerBlueprint{
 			{
 				WorkerNum:    1,
@@ -1375,6 +1453,8 @@ echo "mile";
 	})
 
 	GinkgoIt("Should execute a single file in a Go environment", func() {
+		ginkgo.Skip("")
+
 		gomega.Expect(execution.Init(_var.SINGLE_FILE_EXECUTION, []execution.ContainerBlueprint{
 			{
 				WorkerNum:    1,
@@ -1452,6 +1532,8 @@ func main() {
 	})
 
 	GinkgoIt("Should execute a single file in a C# (Mono) environment", func() {
+		ginkgo.Skip("")
+
 		gomega.Expect(execution.Init(_var.SINGLE_FILE_EXECUTION, []execution.ContainerBlueprint{
 			{
 				WorkerNum:    1,
@@ -1531,6 +1613,8 @@ public class HelloWorld
 	})
 
 	GinkgoIt("Should execute a single file in a Python2 environment", func() {
+		ginkgo.Skip("")
+
 		gomega.Expect(execution.Init(_var.SINGLE_FILE_EXECUTION, []execution.ContainerBlueprint{
 			{
 				WorkerNum:    1,
@@ -1600,6 +1684,8 @@ public class HelloWorld
 	})
 
 	GinkgoIt("Should execute a single file in a Python3 environment", func() {
+		ginkgo.Skip("")
+
 		gomega.Expect(execution.Init(_var.SINGLE_FILE_EXECUTION, []execution.ContainerBlueprint{
 			{
 				WorkerNum:    1,
@@ -1669,6 +1755,8 @@ public class HelloWorld
 	})
 
 	GinkgoIt("Should execute a single file in a Haskell environment", func() {
+		ginkgo.Skip("")
+
 		gomega.Expect(execution.Init(_var.SINGLE_FILE_EXECUTION, []execution.ContainerBlueprint{
 			{
 				WorkerNum:    1,
@@ -1738,6 +1826,8 @@ public class HelloWorld
 	})
 
 	GinkgoIt("Should execute a single file in a C environment", func() {
+		ginkgo.Skip("")
+
 		gomega.Expect(execution.Init(_var.SINGLE_FILE_EXECUTION, []execution.ContainerBlueprint{
 			{
 				WorkerNum:    1,
@@ -1813,6 +1903,8 @@ int main() {
 	})
 
 	GinkgoIt("Should execute a single file in a C++ environment", func() {
+		ginkgo.Skip("")
+
 		gomega.Expect(execution.Init(_var.SINGLE_FILE_EXECUTION, []execution.ContainerBlueprint{
 			{
 				WorkerNum:    1,
@@ -1889,6 +1981,8 @@ int main() {
 	})
 
 	GinkgoIt("Should gracefully fail multiple concurrent requests and stop containers", func() {
+		ginkgo.Skip("")
+
 		gomega.Expect(execution.Init(_var.SINGLE_FILE_EXECUTION, []execution.ContainerBlueprint{
 			{
 				WorkerNum:    10,

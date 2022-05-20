@@ -1,4 +1,4 @@
-package builders
+package single
 
 import (
 	"fmt"
@@ -7,45 +7,45 @@ import (
 	"therebelsource/emulator/appErrors"
 )
 
-type NodeSingleFileBuildResult struct {
+type CsharpSingleFileBuildResult struct {
 	ContainerDirectory string
 	ExecutionDirectory string
 	FileName           string
 }
 
-type NodeSingleFileBuildParams struct {
+type CsharpSingleFileBuildParams struct {
 	Extension string
 	Text      string
 	StateDir  string
 }
 
-func InitNodeParams(ext string, text string, stateDir string) NodeSingleFileBuildParams {
-	return NodeSingleFileBuildParams{
+func InitCsharpParams(ext string, text string, stateDir string) CsharpSingleFileBuildParams {
+	return CsharpSingleFileBuildParams{
 		Extension: ext,
 		Text:      text,
 		StateDir:  stateDir,
 	}
 }
 
-func NodeSingleFileBuild(params NodeSingleFileBuildParams) (NodeSingleFileBuildResult, *appErrors.Error) {
+func CsharpSingleFileBuild(params CsharpSingleFileBuildParams) (CsharpSingleFileBuildResult, *appErrors.Error) {
 	dirName := uuid.New().String()
 	tempExecutionDir := fmt.Sprintf("%s/%s", params.StateDir, dirName)
 	fileName := fmt.Sprintf("%s.%s", dirName, params.Extension)
 
 	if err := os.MkdirAll(tempExecutionDir, os.ModePerm); err != nil {
-		return NodeSingleFileBuildResult{}, appErrors.New(appErrors.ApplicationError, appErrors.FilesystemError, fmt.Sprintf("Cannot create execution dir: %s", err.Error()))
+		return CsharpSingleFileBuildResult{}, appErrors.New(appErrors.ApplicationError, appErrors.FilesystemError, fmt.Sprintf("Cannot create execution dir: %s", err.Error()))
 	}
 
 	if err := writeContent(fileName, tempExecutionDir, params.Text); err != nil {
-		return NodeSingleFileBuildResult{}, err
+		return CsharpSingleFileBuildResult{}, err
 	}
 
 	if err := writeContent("output.txt", tempExecutionDir, ""); err != nil {
-		return NodeSingleFileBuildResult{}, err
+		return CsharpSingleFileBuildResult{}, err
 	}
 
-	return NodeSingleFileBuildResult{
-		ContainerDirectory: fmt.Sprintf("/app/%s", dirName),
+	return CsharpSingleFileBuildResult{
+		ContainerDirectory: dirName,
 		ExecutionDirectory: tempExecutionDir,
 		FileName:           fileName,
 	}, nil

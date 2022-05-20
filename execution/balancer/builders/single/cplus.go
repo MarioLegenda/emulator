@@ -1,4 +1,4 @@
-package builders
+package single
 
 import (
 	"fmt"
@@ -7,44 +7,44 @@ import (
 	"therebelsource/emulator/appErrors"
 )
 
-type GoSingleFileBuildResult struct {
+type CPlusSingleFileBuildResult struct {
 	ContainerDirectory string
 	ExecutionDirectory string
 	FileName           string
 }
 
-type GoSingleFileBuildParams struct {
+type CPlusSingleFileBuildParams struct {
 	Extension string
 	Text      string
 	StateDir  string
 }
 
-func InitGoParams(ext string, text string, stateDir string) GoSingleFileBuildParams {
-	return GoSingleFileBuildParams{
+func InitCPlusParams(ext string, text string, stateDir string) CPlusSingleFileBuildParams {
+	return CPlusSingleFileBuildParams{
 		Extension: ext,
 		Text:      text,
 		StateDir:  stateDir,
 	}
 }
 
-func GoSingleFileBuild(params GoSingleFileBuildParams) (GoSingleFileBuildResult, *appErrors.Error) {
+func CPlusSingleFileBuild(params CPlusSingleFileBuildParams) (CPlusSingleFileBuildResult, *appErrors.Error) {
 	dirName := uuid.New().String()
 	tempExecutionDir := fmt.Sprintf("%s/%s", params.StateDir, dirName)
 	fileName := fmt.Sprintf("%s.%s", dirName, params.Extension)
 
 	if err := os.MkdirAll(tempExecutionDir, os.ModePerm); err != nil {
-		return GoSingleFileBuildResult{}, appErrors.New(appErrors.ApplicationError, appErrors.FilesystemError, fmt.Sprintf("Cannot create execution dir: %s", err.Error()))
+		return CPlusSingleFileBuildResult{}, appErrors.New(appErrors.ApplicationError, appErrors.FilesystemError, fmt.Sprintf("Cannot create execution dir: %s", err.Error()))
 	}
 
 	if err := writeContent(fileName, tempExecutionDir, params.Text); err != nil {
-		return GoSingleFileBuildResult{}, err
+		return CPlusSingleFileBuildResult{}, err
 	}
 
 	if err := writeContent("output.txt", tempExecutionDir, ""); err != nil {
-		return GoSingleFileBuildResult{}, err
+		return CPlusSingleFileBuildResult{}, err
 	}
 
-	return GoSingleFileBuildResult{
+	return CPlusSingleFileBuildResult{
 		ContainerDirectory: dirName,
 		ExecutionDirectory: tempExecutionDir,
 		FileName:           fileName,
