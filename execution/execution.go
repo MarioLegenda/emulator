@@ -20,6 +20,7 @@ type Job struct {
 	EmulatorExtension string
 	EmulatorTag       string
 	EmulatorText      string
+	PackageName       string
 
 	CodeProject   *repository.CodeProject
 	Contents      []*repository.FileContent
@@ -113,6 +114,7 @@ func (e *execution) RunJob(j Job) runners.Result {
 		CodeProject:   j.CodeProject,
 		ExecutingFile: j.ExecutingFile,
 		Contents:      j.Contents,
+		PackageName:   j.PackageName,
 
 		Output: output,
 	})

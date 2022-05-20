@@ -24,6 +24,7 @@ type Job struct {
 	CodeProject   *repository.CodeProject
 	Contents      []*repository.FileContent
 	ExecutingFile *repository.File
+	PackageName   string
 
 	Output chan runners.Result
 }
@@ -92,6 +93,7 @@ func (b *balancer) StartWorkers() {
 					CodeProject:   job.CodeProject,
 					ExecutingFile: job.ExecutingFile,
 					Contents:      job.Contents,
+					PackageName:   job.PackageName,
 				})
 
 				if res.Error != nil {

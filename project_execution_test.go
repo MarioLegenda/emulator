@@ -9,24 +9,14 @@ import (
 	"github.com/onsi/gomega"
 	"net/http"
 	"net/http/httptest"
-	"therebelsource/emulator/execution"
 	"therebelsource/emulator/httpUtil"
 	"therebelsource/emulator/repository"
 	"therebelsource/emulator/runner"
 	"therebelsource/emulator/staticTypes"
-	_var "therebelsource/emulator/var"
 )
 
 var _ = GinkgoDescribe("Project execution tests", func() {
 	GinkgoIt("Should run a project execution as a session in a NodeJS ESM environment", func() {
-		gomega.Expect(execution.Init(_var.PROJECT_EXECUTION, []execution.ContainerBlueprint{
-			{
-				WorkerNum:    1,
-				ContainerNum: 1,
-				Tag:          string(runner.NodeEsm.Tag),
-			},
-		})).Should(gomega.BeNil())
-
 		activeSession := testCreateAccount()
 
 		cp := testCreateCodeProject(activeSession, uuid.New().String(), runner.NodeEsm)

@@ -21,6 +21,7 @@ type Params struct {
 	CodeProject   *repository.CodeProject
 	Contents      []*repository.FileContent
 	ExecutingFile *repository.File
+	PackageName   string
 }
 
 func Run(params Params) Result {
@@ -343,6 +344,31 @@ func Run(params Params) Result {
 		return nodeRunner(NodeExecParams{
 			ExecutionDirectory: build.ExecutionDirectory,
 			ContainerDirectory: build.ContainerDirectory,
+			ExecutionFile:      build.FileName,
+			ContainerName:      params.ContainerName,
+		})
+	}
+
+	if params.EmulatorName == string(goLang.name) && params.BuilderType == "project" && params.ExecutionType == "project" {
+		build, err := project.GoProjectBuild(project.InitGoParams(
+			params.CodeProject,
+			params.Contents,
+			fmt.Sprintf("%s/%s", os.Getenv("EXECUTION_DIR"), params.ContainerName),
+			params.ExecutingFile,
+			params.PackageName,
+		))
+
+		if err != nil {
+			return Result{
+				Result:  "",
+				Success: false,
+				Error:   err,
+			}
+		}
+
+		return goProjectRunner(GoProjectExecParams{
+			ExecutionDirectory: build.ExecutionDirectory,
+			ContainerDirectory: params.PackageName,
 			ExecutionFile:      build.FileName,
 			ContainerName:      params.ContainerName,
 		})
