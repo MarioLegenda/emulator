@@ -9,37 +9,73 @@ import (
 	"github.com/onsi/gomega"
 	"net/http"
 	"net/http/httptest"
+	"os"
+	"therebelsource/emulator/execution"
 	"therebelsource/emulator/httpUtil"
 	"therebelsource/emulator/repository"
 	"therebelsource/emulator/runner"
 	"therebelsource/emulator/staticTypes"
+	_var "therebelsource/emulator/var"
 )
 
 var _ = GinkgoDescribe("Project execution tests", func() {
-	GinkgoIt("Should run a project execution as a session in a NodeJS ESM environment", func() {
-		activeSession := testCreateAccount()
+	GinkgoBeforeEach(func() {
+		loadEnv()
+		initRequiredDirectories(false)
+	})
 
-		cp := testCreateCodeProject(activeSession, uuid.New().String(), runner.NodeEsm)
+	GinkgoAfterEach(func() {
+		gomega.Expect(os.RemoveAll(os.Getenv("EXECUTION_DIR"))).Should(gomega.BeNil())
+	})
 
-		cpUuid := cp["uuid"].(string)
+	GinkgoIt("Should run a project execution in NodeJS ESM environment", func() {
+		gomega.Expect(execution.Init(_var.PROJECT_EXECUTION, []execution.ContainerBlueprint{
+			{
+				WorkerNum:    1,
+				ContainerNum: 1,
+				Tag:          string(runner.NodeEsm.Tag),
+			},
+		})).Should(gomega.BeNil())
 
-		var rootDirectory map[string]interface{}
-		s, err := json.Marshal(cp["rootDirectory"])
-		gomega.Expect(err).Should(gomega.BeNil())
-		gomega.Expect(json.Unmarshal(s, &rootDirectory)).Should(gomega.BeNil())
+		projectName := "project name node esm"
+		root := testCreateFileStub(projectName, true, 1, false, nil, []string{})
 
-		rootDirectoryFile1 := testCreateFile(activeSession, true, rootDirectory["uuid"].(string), cpUuid, "rootDirectoryFile1.mjs")
-		testUpdateFileContent(activeSession, cpUuid, rootDirectoryFile1["uuid"].(string), fmt.Sprintf(`
+		rootFile1 := testCreateFileStub("rootDirectoryFile1.mjs", false, 1, true, &root.Uuid, []string{})
+		rootFile2 := testCreateFileStub("rootDirectoryFile2.mjs", false, 1, true, &root.Uuid, []string{})
+
+		subDir := testCreateFileStub("subDir", false, 2, false, &root.Uuid, []string{})
+		subDirFile1 := testCreateFileStub("subDirFile.mjs", false, 2, true, &subDir.Uuid, []string{})
+		subSubDir := testCreateFileStub("subSubDir", false, 3, false, &subDir.Uuid, []string{})
+
+		subSubDirFile := testCreateFileStub("subSubDirFile.mjs", false, 3, true, &subSubDir.Uuid, []string{})
+
+		root.Children = append(root.Children, subDir.Uuid)
+		root.Children = append(root.Children, rootFile1.Uuid)
+		root.Children = append(root.Children, rootFile2.Uuid)
+		subDir.Children = append(subDir.Children, subDirFile1.Uuid)
+		subDir.Children = append(subDir.Children, subSubDir.Uuid)
+		subSubDir.Children = append(subSubDir.Children, subSubDirFile.Uuid)
+
+		environment := runner.NodeEsm
+		codeProject := testCreateCodeProjectStub(projectName, "", []*repository.File{
+			&root,
+			&rootFile1,
+			&rootFile2,
+			&subDir,
+			&subDirFile1,
+			&subSubDir,
+			&subSubDirFile,
+		}, &root, &environment)
+
+		content1 := testCreateFileContent(codeProject.Uuid, rootFile1.Uuid, `
 import {execute} from './rootDirectoryFile2.mjs';
 import {subDirDirFileExecute} from './subDir/subSubDir/subSubDirFile.mjs';
 
 execute();
 
 console.log('rootDirectoryFile1');
-`))
-
-		rootDirectoryFile2 := testCreateFile(activeSession, true, rootDirectory["uuid"].(string), cpUuid, "rootDirectoryFile2.mjs")
-		testUpdateFileContent(activeSession, cpUuid, rootDirectoryFile2["uuid"].(string), `
+`)
+		content2 := testCreateFileContent(codeProject.Uuid, rootFile2.Uuid, `
 import {subDirFileExecute} from './subDir/subDirFile.mjs';
 
 function execute() {
@@ -50,20 +86,14 @@ function execute() {
 
 export { execute };
 `)
-
-		rootDirectorySubDir := testCreateFile(activeSession, false, rootDirectory["uuid"].(string), cpUuid, "subDir")
-		subDirFile := testCreateFile(activeSession, true, rootDirectorySubDir["uuid"].(string), cpUuid, "subDirFile.mjs")
-		testUpdateFileContent(activeSession, cpUuid, subDirFile["uuid"].(string), `
+		content3 := testCreateFileContent(codeProject.Uuid, subDirFile1.Uuid, `
 function subDirFileExecute() {
     console.log('subDirFile');
 }
 
 export {subDirFileExecute};
 `)
-
-		subDir := testCreateFile(activeSession, false, rootDirectorySubDir["uuid"].(string), cpUuid, "subSubDir")
-		subDirSubFile := testCreateFile(activeSession, true, subDir["uuid"].(string), cpUuid, "subSubDirFile.mjs")
-		testUpdateFileContent(activeSession, cpUuid, subDirSubFile["uuid"].(string), `
+		content4 := testCreateFileContent(codeProject.Uuid, subSubDirFile.Uuid, `
 function subDirDirFileExecute() {
     console.log('subSubDirFile');
 }
@@ -71,167 +101,48 @@ function subDirDirFileExecute() {
 export {subDirDirFileExecute}
 `)
 
-		sessionUuid := testCreateProjectTemporarySession(repository.ActiveSession{}, cp["uuid"].(string), rootDirectoryFile1["uuid"].(string))
+		result := execution.Service(_var.PROJECT_EXECUTION).RunJob(execution.Job{
+			BuilderType:       "project",
+			ExecutionType:     "project",
+			EmulatorName:      string(environment.Name),
+			EmulatorExtension: string(environment.Extension),
+			EmulatorTag:       string(environment.Tag),
+			EmulatorText:      "",
+			PackageName:       "",
+			CodeProject:       &codeProject,
+			Contents: []*repository.FileContent{
+				&content1,
+				&content2,
+				&content3,
+				&content4,
+			},
+			ExecutingFile: &rootFile1,
+		})
 
-		bm := map[string]interface{}{
-			"uuid": sessionUuid,
-		}
-
-		body, err := json.Marshal(bm)
-
-		gomega.Expect(err).To(gomega.BeNil())
-
-		req, err := http.NewRequest("POST", "/api/environment-emulator/execute/project", bytes.NewReader(body))
-
-		if err != nil {
-			ginkgo.Fail(err.Error())
-
-			return
-		}
-
-		rr := httptest.NewRecorder()
-		handler := http.HandlerFunc(executeProjectHandler)
-
-		handler.ServeHTTP(rr, req)
-
-		b := rr.Body.Bytes()
-
-		var apiResponse httpUtil.ApiResponse
-		err = json.Unmarshal(b, &apiResponse)
-
-		gomega.Expect(err).To(gomega.BeNil())
-
-		gomega.Expect(rr.Code).To(gomega.Equal(http.StatusOK))
-		gomega.Expect(rr.Body).To(gomega.Not(gomega.BeNil()))
-
-		gomega.Expect(apiResponse.Method).To(gomega.Equal("POST"))
-		gomega.Expect(apiResponse.Type).To(gomega.Equal(staticTypes.RESPONSE_RESOURCE))
-		gomega.Expect(apiResponse.Message).To(gomega.Equal("Emulator run result"))
-		gomega.Expect(apiResponse.MasterCode).To(gomega.Equal(0))
-		gomega.Expect(apiResponse.Code).To(gomega.Equal(0))
-		gomega.Expect(apiResponse.Status).To(gomega.Equal(http.StatusOK))
-		gomega.Expect(apiResponse.Pagination).To(gomega.BeNil())
-
-		b, err = json.Marshal(apiResponse.Data)
-
-		gomega.Expect(err).To(gomega.BeNil())
-
-		var result runner.ProjectRunResult
-		gomega.Expect(json.Unmarshal(b, &result)).To(gomega.BeNil())
-
-		gomega.Expect(result.Timeout).Should(gomega.Equal(5))
 		gomega.Expect(result.Success).Should(gomega.BeTrue())
 		gomega.Expect(result.Result).Should(gomega.Equal("rootDirectoryFile2\nsubDirFile\nrootDirectoryFile1\n"))
+
+		execution.Service(_var.PROJECT_EXECUTION).Close()
 	})
+	/*
+		GinkgoIt("Should run a project execution in C# Mono environment with a file in a deeper directory structure", func() {
+			gomega.Expect(execution.Init(_var.PROJECT_EXECUTION, []execution.ContainerBlueprint{
+				{
+					WorkerNum:    1,
+					ContainerNum: 1,
+					Tag:          string(runner.CSharpMono.Tag),
+				},
+			})).Should(gomega.BeNil())
 
-	GinkgoIt("Should run a project execution as a session in a NodeJS ESM environment with a file in a deeper directory structure", func() {
-		ginkgo.Skip("")
+			projectName := "project name node esm"
+			root := testCreateFileStub(projectName, true, 1, false, nil, []string{})
 
-		testPrepare()
-		defer testCleanup()
+			rootFile1 := testCreateFileStub("rootDirectoryFile1.cs", false, 1, true, &root.Uuid, []string{})
+			subDir := testCreateFileStub("subDir", false, 2, false, &root.Uuid, []string{})
+			subDirFile := testCreateFileStub("subDirFile.cs", false, 2, true, &root.Uuid, []string{})
+		})*/
 
-		activeSession := testCreateAccount()
-		cp := testCreateCodeProject(activeSession, uuid.New().String(), runner.NodeEsm)
-		cpUuid := cp["uuid"].(string)
-
-		var rootDirectory map[string]interface{}
-		s, err := json.Marshal(cp["rootDirectory"])
-		gomega.Expect(err).Should(gomega.BeNil())
-		gomega.Expect(json.Unmarshal(s, &rootDirectory)).Should(gomega.BeNil())
-
-		rootDirectoryFile1 := testCreateFile(activeSession, true, rootDirectory["uuid"].(string), cpUuid, "rootDirectoryFile1.mjs")
-		testUpdateFileContent(activeSession, cpUuid, rootDirectoryFile1["uuid"].(string), fmt.Sprintf(`
-import {execute} from './rootDirectoryFile2.mjs';
-import './subDir/subSubDir/subSubDirFile.mjs';
-
-execute();
-
-console.log('rootDirectoryFile1');
-`))
-
-		rootDirectoryFile2 := testCreateFile(activeSession, true, rootDirectory["uuid"].(string), cpUuid, "rootDirectoryFile2.mjs")
-		testUpdateFileContent(activeSession, cpUuid, rootDirectoryFile2["uuid"].(string), `
-import {subDirFileExecute} from './subDir/subDirFile.mjs';
-
-function execute() {
-    console.log('rootDirectoryFile2');
-
-    subDirFileExecute();
-}
-
-export { execute };
-`)
-
-		rootDirectorySubDir := testCreateFile(activeSession, false, rootDirectory["uuid"].(string), cpUuid, "subDir")
-		subDirFile := testCreateFile(activeSession, true, rootDirectorySubDir["uuid"].(string), cpUuid, "subDirFile.mjs")
-		testUpdateFileContent(activeSession, cpUuid, subDirFile["uuid"].(string), `
-function subDirFileExecute() {
-    console.log('subDirFile');
-}
-
-export { subDirFileExecute }
-`)
-
-		subDir := testCreateFile(activeSession, false, rootDirectorySubDir["uuid"].(string), cpUuid, "subSubDir")
-		subDirSubFile := testCreateFile(activeSession, true, subDir["uuid"].(string), cpUuid, "subSubDirFile.mjs")
-		testUpdateFileContent(activeSession, cpUuid, subDirSubFile["uuid"].(string), `
-console.log('subSubDirFile.js is executed');
-`)
-
-		sessionUuid := testCreateProjectTemporarySession(repository.ActiveSession{}, cp["uuid"].(string), rootDirectoryFile1["uuid"].(string))
-		bm := map[string]interface{}{
-			"uuid":     sessionUuid,
-			"fileUuid": subDirSubFile["uuid"].(string),
-		}
-
-		body, err := json.Marshal(bm)
-
-		gomega.Expect(err).To(gomega.BeNil())
-
-		req, err := http.NewRequest("POST", "/api/environment-emulator/execute/project", bytes.NewReader(body))
-
-		if err != nil {
-			ginkgo.Fail(err.Error())
-
-			return
-		}
-
-		rr := httptest.NewRecorder()
-		handler := http.HandlerFunc(executeProjectHandler)
-
-		handler.ServeHTTP(rr, req)
-
-		b := rr.Body.Bytes()
-
-		var apiResponse httpUtil.ApiResponse
-		err = json.Unmarshal(b, &apiResponse)
-
-		gomega.Expect(err).To(gomega.BeNil())
-
-		gomega.Expect(rr.Code).To(gomega.Equal(http.StatusOK))
-		gomega.Expect(rr.Body).To(gomega.Not(gomega.BeNil()))
-
-		gomega.Expect(apiResponse.Method).To(gomega.Equal("POST"))
-		gomega.Expect(apiResponse.Type).To(gomega.Equal(staticTypes.RESPONSE_RESOURCE))
-		gomega.Expect(apiResponse.Message).To(gomega.Equal("Emulator run result"))
-		gomega.Expect(apiResponse.MasterCode).To(gomega.Equal(0))
-		gomega.Expect(apiResponse.Code).To(gomega.Equal(0))
-		gomega.Expect(apiResponse.Status).To(gomega.Equal(http.StatusOK))
-		gomega.Expect(apiResponse.Pagination).To(gomega.BeNil())
-
-		b, err = json.Marshal(apiResponse.Data)
-
-		gomega.Expect(err).To(gomega.BeNil())
-
-		var result runner.ProjectRunResult
-		gomega.Expect(json.Unmarshal(b, &result)).To(gomega.BeNil())
-
-		gomega.Expect(result.Timeout).Should(gomega.Equal(5))
-		gomega.Expect(result.Success).Should(gomega.BeTrue())
-		gomega.Expect(result.Result).Should(gomega.Equal("subSubDirFile.js is executed\nrootDirectoryFile2\nsubDirFile\nrootDirectoryFile1\n"))
-	})
-
-	GinkgoIt("Should run a project execution as a session in a NodeJS ESM environment with a file in a deeper directory structure", func() {
+	GinkgoIt("Should run a project execution as a session in a C# Mono environment with a file in a deeper directory structure", func() {
 		ginkgo.Skip("")
 
 		testPrepare()

@@ -20,6 +20,7 @@ import (
 	"therebelsource/emulator/httpClient"
 	"therebelsource/emulator/repository"
 	"therebelsource/emulator/runner"
+	"time"
 )
 
 var GomegaRegisterFailHandler = gomega.RegisterFailHandler
@@ -848,4 +849,48 @@ func testUpdateFileContent(activeSession repository.ActiveSession, cpUuid string
 	gomega.Expect(json.Unmarshal(b, &data)).Should(gomega.BeNil())
 
 	return data
+}
+
+func testCreateCodeProjectStub(
+	name string,
+	packageName string,
+	structure []*repository.File,
+	rootDirectory *repository.File,
+	environment *runner.Language,
+) repository.CodeProject {
+	return repository.CodeProject{
+		Uuid:           uuid.New().String(),
+		ShortId:        uuid.New().String(),
+		Name:           name,
+		Description:    "Some not important description",
+		Environment:    environment,
+		Structure:      structure,
+		StructureCount: len(structure),
+		PackageName:    packageName,
+		RootDirectory:  rootDirectory,
+		CreatedAt:      time.Now().Unix(),
+		UpdatedAt:      nil,
+	}
+}
+
+func testCreateFileStub(name string, isRoot bool, depth int, isFile bool, parent *string, children []string) repository.File {
+	return repository.File{
+		Name:      name,
+		IsRoot:    isRoot,
+		Depth:     depth,
+		IsFile:    isFile,
+		Uuid:      uuid.New().String(),
+		Parent:    parent,
+		Children:  children,
+		CreatedAt: time.Now().Unix(),
+		UpdatedAt: nil,
+	}
+}
+
+func testCreateFileContent(codeProjectUuid string, fileUuid string, content string) repository.FileContent {
+	return repository.FileContent{
+		CodeProjectUuid: codeProjectUuid,
+		Uuid:            fileUuid,
+		Content:         content,
+	}
 }

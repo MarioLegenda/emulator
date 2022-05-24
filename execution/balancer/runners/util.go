@@ -3,7 +3,6 @@ package runners
 import (
 	"fmt"
 	"io/ioutil"
-	"log"
 	"os"
 	"os/exec"
 	"regexp"
@@ -34,7 +33,6 @@ func destroy(path string) {
 		if err != nil {
 			// TODO: slack error notification
 			fmt.Println(err)
-			log.Fatal("")
 		}
 	}
 }

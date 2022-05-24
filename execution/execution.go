@@ -85,7 +85,7 @@ func (e *execution) RunJob(j Job) runners.Result {
 		return runners.Result{
 			Result:  "",
 			Success: false,
-			Error:   appErrors.New(appErrors.ApplicationError, appErrors.TimeoutError, "Code execution timeout!"),
+			Error:   appErrors.New(appErrors.ApplicationError, appErrors.TimeoutError, "Closing executioner"),
 		}
 	}
 

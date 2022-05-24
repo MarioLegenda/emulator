@@ -4,7 +4,7 @@ ENV APP_DIR /app
 
 WORKDIR $APP_DIR
 
-RUN adduser -D -h $APP_DIR -s /bin/bash dockeruser
+RUN useradd -M -d $APP_DIR --shell /bin/bash dockeruser
 RUN chown -R dockeruser:dockeruser $APP_DIR
 
 USER dockeruser

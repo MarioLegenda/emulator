@@ -68,7 +68,7 @@ var Python3 = Language{
 
 var Ruby = Language{
 	Name:          "ruby",
-	Text:          "Ruby 2.5.1",
+	Text:          "Ruby",
 	Tag:           "ruby:ruby",
 	InDevelopment: false,
 	InMaintenance: false,
