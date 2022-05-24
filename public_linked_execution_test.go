@@ -27,7 +27,7 @@ var _ = GinkgoDescribe("Linked project execution tests", func() {
 		pageUuid := link["page"].(map[string]interface{})["uuid"].(string)
 		blogUuid := link["blog"].(map[string]interface{})["uuid"].(string)
 
-		cp := testCreateCodeProject(activeSession, uuid.New().String(), runner.CLang)
+		cp := testCreateCodeProject(activeSession, uuid.New().String(), repository.CLang)
 
 		cpUuid := cp["uuid"].(string)
 		cb := testCreateCodeBlock(pageUuid, activeSession)
@@ -124,7 +124,7 @@ int main() {
 		pageUuid := link["page"].(map[string]interface{})["uuid"].(string)
 		blogUuid := link["blog"].(map[string]interface{})["uuid"].(string)
 
-		cp := testCreateCodeProject(activeSession, uuid.New().String(), runner.CPlus)
+		cp := testCreateCodeProject(activeSession, uuid.New().String(), repository.CPlus)
 		cpUuid := cp["uuid"].(string)
 		cb := testCreateCodeBlock(pageUuid, activeSession)
 		testUpdateCodeBlock(activeSession, pageUuid, cb["uuid"].(string), `
@@ -222,7 +222,7 @@ int main() {
 		pageUuid := link["page"].(map[string]interface{})["uuid"].(string)
 		blogUuid := link["blog"].(map[string]interface{})["uuid"].(string)
 
-		cp := testCreateCodeProject(activeSession, "my_cool_name", runner.GoLang)
+		cp := testCreateCodeProject(activeSession, "my_cool_name", repository.GoLang)
 		cpUuid := cp["uuid"].(string)
 		cb := testCreateCodeBlock(pageUuid, activeSession)
 		testUpdateCodeBlock(activeSession, pageUuid, cb["uuid"].(string), fmt.Sprintf(`
@@ -333,7 +333,7 @@ func main() {
 		pageUuid := link["page"].(map[string]interface{})["uuid"].(string)
 		blogUuid := link["blog"].(map[string]interface{})["uuid"].(string)
 
-		cp := testCreateCodeProject(activeSession, uuid.New().String(), runner.NodeLts)
+		cp := testCreateCodeProject(activeSession, uuid.New().String(), repository.NodeLts)
 		cpUuid := cp["uuid"].(string)
 		cb := testCreateCodeBlock(pageUuid, activeSession)
 		testUpdateCodeBlock(activeSession, pageUuid, cb["uuid"].(string), `
@@ -461,7 +461,7 @@ console.log('shit');
 		pageUuid := link["page"].(map[string]interface{})["uuid"].(string)
 		blogUuid := link["blog"].(map[string]interface{})["uuid"].(string)
 
-		cp := testCreateCodeProject(activeSession, uuid.New().String(), runner.NodeEsm)
+		cp := testCreateCodeProject(activeSession, uuid.New().String(), repository.NodeEsm)
 		cpUuid := cp["uuid"].(string)
 		cb := testCreateCodeBlock(pageUuid, activeSession)
 		testUpdateCodeBlock(activeSession, pageUuid, cb["uuid"].(string), `
@@ -583,7 +583,7 @@ console.log('shit');
 		pageUuid := link["page"].(map[string]interface{})["uuid"].(string)
 		blogUuid := link["blog"].(map[string]interface{})["uuid"].(string)
 
-		cp := testCreateCodeProject(activeSession, uuid.New().String(), runner.CSharpMono)
+		cp := testCreateCodeProject(activeSession, uuid.New().String(), repository.CSharpMono)
 		cpUuid := cp["uuid"].(string)
 		cb := testCreateCodeBlock(pageUuid, activeSession)
 		testUpdateCodeBlock(activeSession, pageUuid, cb["uuid"].(string), `

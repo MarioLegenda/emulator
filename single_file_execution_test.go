@@ -11,6 +11,7 @@ import (
 	"sync"
 	"therebelsource/emulator/execution"
 	"therebelsource/emulator/httpUtil"
+	"therebelsource/emulator/repository"
 	"therebelsource/emulator/runner"
 	"therebelsource/emulator/staticTypes"
 	"therebelsource/emulator/var"
@@ -33,16 +34,16 @@ var _ = GinkgoDescribe("Single file execution tests", func() {
 			{
 				WorkerNum:    1,
 				ContainerNum: 1,
-				Tag:          string(runner.NodeEsm.Tag),
+				Tag:          string(repository.NodeEsm.Tag),
 			},
 		})).Should(gomega.BeNil())
 
 		result := execution.Service(_var.SINGLE_FILE_EXECUTION).RunJob(execution.Job{
 			BuilderType:       "single_file",
 			ExecutionType:     "single_file",
-			EmulatorName:      string(runner.NodeEsm.Name),
-			EmulatorExtension: runner.NodeEsm.Extension,
-			EmulatorTag:       string(runner.NodeEsm.Tag),
+			EmulatorName:      string(repository.NodeEsm.Name),
+			EmulatorExtension: repository.NodeEsm.Extension,
+			EmulatorTag:       string(repository.NodeEsm.Tag),
 			EmulatorText:      "console.log('Hello World')",
 		})
 
@@ -62,16 +63,16 @@ var _ = GinkgoDescribe("Single file execution tests", func() {
 			{
 				WorkerNum:    1,
 				ContainerNum: 1,
-				Tag:          string(runner.NodeEsm.Tag),
+				Tag:          string(repository.NodeEsm.Tag),
 			},
 		})).Should(gomega.BeNil())
 
 		result := execution.Service(_var.SINGLE_FILE_EXECUTION).RunJob(execution.Job{
 			BuilderType:       "single_file",
 			ExecutionType:     "single_file",
-			EmulatorName:      string(runner.NodeEsm.Name),
-			EmulatorExtension: runner.NodeEsm.Extension,
-			EmulatorTag:       string(runner.NodeEsm.Tag),
+			EmulatorName:      string(repository.NodeEsm.Name),
+			EmulatorExtension: repository.NodeEsm.Extension,
+			EmulatorTag:       string(repository.NodeEsm.Tag),
 			EmulatorText: `
 while(true) {
 }
@@ -94,16 +95,16 @@ while(true) {
 			{
 				WorkerNum:    1,
 				ContainerNum: 1,
-				Tag:          string(runner.NodeEsm.Tag),
+				Tag:          string(repository.NodeEsm.Tag),
 			},
 		})).Should(gomega.BeNil())
 
 		result := execution.Service(_var.SINGLE_FILE_EXECUTION).RunJob(execution.Job{
 			BuilderType:       "single_file",
 			ExecutionType:     "single_file",
-			EmulatorName:      string(runner.NodeEsm.Name),
-			EmulatorExtension: runner.NodeEsm.Extension,
-			EmulatorTag:       string(runner.NodeEsm.Tag),
+			EmulatorName:      string(repository.NodeEsm.Name),
+			EmulatorExtension: repository.NodeEsm.Extension,
+			EmulatorTag:       string(repository.NodeEsm.Tag),
 			EmulatorText: `
 while(true {
 }
@@ -126,16 +127,16 @@ while(true {
 			{
 				WorkerNum:    1,
 				ContainerNum: 1,
-				Tag:          string(runner.NodeLts.Tag),
+				Tag:          string(repository.NodeLts.Tag),
 			},
 		})).Should(gomega.BeNil())
 
 		result := execution.Service(_var.SINGLE_FILE_EXECUTION).RunJob(execution.Job{
 			BuilderType:       "single_file",
 			ExecutionType:     "single_file",
-			EmulatorName:      string(runner.NodeLts.Name),
-			EmulatorExtension: runner.NodeLts.Extension,
-			EmulatorTag:       string(runner.NodeLts.Tag),
+			EmulatorName:      string(repository.NodeLts.Name),
+			EmulatorExtension: repository.NodeLts.Extension,
+			EmulatorTag:       string(repository.NodeLts.Tag),
 			EmulatorText:      "console.log('Hello World')",
 		})
 
@@ -155,16 +156,16 @@ while(true {
 			{
 				WorkerNum:    1,
 				ContainerNum: 1,
-				Tag:          string(runner.NodeLts.Tag),
+				Tag:          string(repository.NodeLts.Tag),
 			},
 		})).Should(gomega.BeNil())
 
 		result := execution.Service(_var.SINGLE_FILE_EXECUTION).RunJob(execution.Job{
 			BuilderType:       "single_file",
 			ExecutionType:     "single_file",
-			EmulatorName:      string(runner.NodeLts.Name),
-			EmulatorExtension: runner.NodeLts.Extension,
-			EmulatorTag:       string(runner.NodeLts.Tag),
+			EmulatorName:      string(repository.NodeLts.Name),
+			EmulatorExtension: repository.NodeLts.Extension,
+			EmulatorTag:       string(repository.NodeLts.Tag),
 			EmulatorText: `
 while(true) {
 }
@@ -187,16 +188,16 @@ while(true) {
 			{
 				WorkerNum:    1,
 				ContainerNum: 1,
-				Tag:          string(runner.NodeLts.Tag),
+				Tag:          string(repository.NodeLts.Tag),
 			},
 		})).Should(gomega.BeNil())
 
 		result := execution.Service(_var.SINGLE_FILE_EXECUTION).RunJob(execution.Job{
 			BuilderType:       "single_file",
 			ExecutionType:     "single_file",
-			EmulatorName:      string(runner.NodeLts.Name),
-			EmulatorExtension: runner.NodeLts.Extension,
-			EmulatorTag:       string(runner.NodeLts.Tag),
+			EmulatorName:      string(repository.NodeLts.Name),
+			EmulatorExtension: repository.NodeLts.Extension,
+			EmulatorTag:       string(repository.NodeLts.Tag),
 			EmulatorText: `
 while(true {
 }
@@ -219,16 +220,16 @@ while(true {
 			{
 				WorkerNum:    1,
 				ContainerNum: 1,
-				Tag:          string(runner.Ruby.Tag),
+				Tag:          string(repository.Ruby.Tag),
 			},
 		})).Should(gomega.BeNil())
 
 		result := execution.Service(_var.SINGLE_FILE_EXECUTION).RunJob(execution.Job{
 			BuilderType:       "single_file",
 			ExecutionType:     "single_file",
-			EmulatorName:      string(runner.Ruby.Name),
-			EmulatorExtension: runner.Ruby.Extension,
-			EmulatorTag:       string(runner.Ruby.Tag),
+			EmulatorName:      string(repository.Ruby.Name),
+			EmulatorExtension: repository.Ruby.Extension,
+			EmulatorTag:       string(repository.Ruby.Tag),
 			EmulatorText:      `print "Hello World"`,
 		})
 
@@ -248,16 +249,16 @@ while(true {
 			{
 				WorkerNum:    1,
 				ContainerNum: 1,
-				Tag:          string(runner.Ruby.Tag),
+				Tag:          string(repository.Ruby.Tag),
 			},
 		})).Should(gomega.BeNil())
 
 		result := execution.Service(_var.SINGLE_FILE_EXECUTION).RunJob(execution.Job{
 			BuilderType:       "single_file",
 			ExecutionType:     "single_file",
-			EmulatorName:      string(runner.Ruby.Name),
-			EmulatorExtension: runner.Ruby.Extension,
-			EmulatorTag:       string(runner.Ruby.Tag),
+			EmulatorName:      string(repository.Ruby.Name),
+			EmulatorExtension: repository.Ruby.Extension,
+			EmulatorTag:       string(repository.Ruby.Tag),
 			EmulatorText:      `prit "Hello World"`,
 		})
 
@@ -277,16 +278,16 @@ while(true {
 			{
 				WorkerNum:    1,
 				ContainerNum: 1,
-				Tag:          string(runner.Ruby.Tag),
+				Tag:          string(repository.Ruby.Tag),
 			},
 		})).Should(gomega.BeNil())
 
 		result := execution.Service(_var.SINGLE_FILE_EXECUTION).RunJob(execution.Job{
 			BuilderType:       "single_file",
 			ExecutionType:     "single_file",
-			EmulatorName:      string(runner.Ruby.Name),
-			EmulatorExtension: runner.Ruby.Extension,
-			EmulatorTag:       string(runner.Ruby.Tag),
+			EmulatorName:      string(repository.Ruby.Name),
+			EmulatorExtension: repository.Ruby.Extension,
+			EmulatorTag:       string(repository.Ruby.Tag),
 			EmulatorText: `
 loop do
 end
@@ -309,16 +310,16 @@ end
 			{
 				WorkerNum:    1,
 				ContainerNum: 1,
-				Tag:          string(runner.Rust.Tag),
+				Tag:          string(repository.Rust.Tag),
 			},
 		})).Should(gomega.BeNil())
 
 		result := execution.Service(_var.SINGLE_FILE_EXECUTION).RunJob(execution.Job{
 			BuilderType:       "single_file",
 			ExecutionType:     "single_file",
-			EmulatorName:      string(runner.Rust.Name),
-			EmulatorExtension: runner.Rust.Extension,
-			EmulatorTag:       string(runner.Rust.Tag),
+			EmulatorName:      string(repository.Rust.Name),
+			EmulatorExtension: repository.Rust.Extension,
+			EmulatorTag:       string(repository.Rust.Tag),
 			EmulatorText: `
 fn main() {
     println!("Hello World!");
@@ -342,16 +343,16 @@ fn main() {
 			{
 				WorkerNum:    1,
 				ContainerNum: 1,
-				Tag:          string(runner.Rust.Tag),
+				Tag:          string(repository.Rust.Tag),
 			},
 		})).Should(gomega.BeNil())
 
 		result := execution.Service(_var.SINGLE_FILE_EXECUTION).RunJob(execution.Job{
 			BuilderType:       "single_file",
 			ExecutionType:     "single_file",
-			EmulatorName:      string(runner.Rust.Name),
-			EmulatorExtension: runner.Rust.Extension,
-			EmulatorTag:       string(runner.Rust.Tag),
+			EmulatorName:      string(repository.Rust.Name),
+			EmulatorExtension: repository.Rust.Extension,
+			EmulatorTag:       string(repository.Rust.Tag),
 			EmulatorText: `
 fn main() {
     printn!("Hello World!");
@@ -375,16 +376,16 @@ fn main() {
 			{
 				WorkerNum:    1,
 				ContainerNum: 1,
-				Tag:          string(runner.Rust.Tag),
+				Tag:          string(repository.Rust.Tag),
 			},
 		})).Should(gomega.BeNil())
 
 		result := execution.Service(_var.SINGLE_FILE_EXECUTION).RunJob(execution.Job{
 			BuilderType:       "single_file",
 			ExecutionType:     "single_file",
-			EmulatorName:      string(runner.Rust.Name),
-			EmulatorExtension: runner.Rust.Extension,
-			EmulatorTag:       string(runner.Rust.Tag),
+			EmulatorName:      string(repository.Rust.Name),
+			EmulatorExtension: repository.Rust.Extension,
+			EmulatorTag:       string(repository.Rust.Tag),
 			EmulatorText: `
 fn main() {
 	loop {
@@ -409,16 +410,16 @@ fn main() {
 			{
 				WorkerNum:    1,
 				ContainerNum: 1,
-				Tag:          string(runner.GoLang.Tag),
+				Tag:          string(repository.GoLang.Tag),
 			},
 		})).Should(gomega.BeNil())
 
 		result := execution.Service(_var.SINGLE_FILE_EXECUTION).RunJob(execution.Job{
 			BuilderType:       "single_file",
 			ExecutionType:     "single_file",
-			EmulatorName:      string(runner.GoLang.Name),
-			EmulatorExtension: runner.GoLang.Extension,
-			EmulatorTag:       string(runner.GoLang.Tag),
+			EmulatorName:      string(repository.GoLang.Name),
+			EmulatorExtension: repository.GoLang.Extension,
+			EmulatorTag:       string(repository.GoLang.Tag),
 			EmulatorText: `
 package main
 
@@ -446,16 +447,16 @@ func main() {
 			{
 				WorkerNum:    1,
 				ContainerNum: 1,
-				Tag:          string(runner.GoLang.Tag),
+				Tag:          string(repository.GoLang.Tag),
 			},
 		})).Should(gomega.BeNil())
 
 		result := execution.Service(_var.SINGLE_FILE_EXECUTION).RunJob(execution.Job{
 			BuilderType:       "single_file",
 			ExecutionType:     "single_file",
-			EmulatorName:      string(runner.GoLang.Name),
-			EmulatorExtension: runner.GoLang.Extension,
-			EmulatorTag:       string(runner.GoLang.Tag),
+			EmulatorName:      string(repository.GoLang.Name),
+			EmulatorExtension: repository.GoLang.Extension,
+			EmulatorTag:       string(repository.GoLang.Tag),
 			EmulatorText: `
 package main
 
@@ -483,16 +484,16 @@ func main() {
 			{
 				WorkerNum:    1,
 				ContainerNum: 1,
-				Tag:          string(runner.GoLang.Tag),
+				Tag:          string(repository.GoLang.Tag),
 			},
 		})).Should(gomega.BeNil())
 
 		result := execution.Service(_var.SINGLE_FILE_EXECUTION).RunJob(execution.Job{
 			BuilderType:       "single_file",
 			ExecutionType:     "single_file",
-			EmulatorName:      string(runner.GoLang.Name),
-			EmulatorExtension: runner.GoLang.Extension,
-			EmulatorTag:       string(runner.GoLang.Tag),
+			EmulatorName:      string(repository.GoLang.Name),
+			EmulatorExtension: repository.GoLang.Extension,
+			EmulatorTag:       string(repository.GoLang.Tag),
 			EmulatorText: `
 package main
 
@@ -519,16 +520,16 @@ func main() {
 			{
 				WorkerNum:    1,
 				ContainerNum: 1,
-				Tag:          string(runner.CSharpMono.Tag),
+				Tag:          string(repository.CSharpMono.Tag),
 			},
 		})).Should(gomega.BeNil())
 
 		result := execution.Service(_var.SINGLE_FILE_EXECUTION).RunJob(execution.Job{
 			BuilderType:       "single_file",
 			ExecutionType:     "single_file",
-			EmulatorName:      string(runner.CSharpMono.Name),
-			EmulatorExtension: runner.CSharpMono.Extension,
-			EmulatorTag:       string(runner.CSharpMono.Tag),
+			EmulatorName:      string(repository.CSharpMono.Name),
+			EmulatorExtension: repository.CSharpMono.Extension,
+			EmulatorTag:       string(repository.CSharpMono.Tag),
 			EmulatorText: `
 namespace HelloWorld
 {
@@ -558,16 +559,16 @@ namespace HelloWorld
 			{
 				WorkerNum:    1,
 				ContainerNum: 1,
-				Tag:          string(runner.CSharpMono.Tag),
+				Tag:          string(repository.CSharpMono.Tag),
 			},
 		})).Should(gomega.BeNil())
 
 		result := execution.Service(_var.SINGLE_FILE_EXECUTION).RunJob(execution.Job{
 			BuilderType:       "single_file",
 			ExecutionType:     "single_file",
-			EmulatorName:      string(runner.CSharpMono.Name),
-			EmulatorExtension: runner.CSharpMono.Extension,
-			EmulatorTag:       string(runner.CSharpMono.Tag),
+			EmulatorName:      string(repository.CSharpMono.Name),
+			EmulatorExtension: repository.CSharpMono.Extension,
+			EmulatorTag:       string(repository.CSharpMono.Tag),
 			EmulatorText: `
 namespae HelloWorld
 {
@@ -597,16 +598,16 @@ namespae HelloWorld
 			{
 				WorkerNum:    1,
 				ContainerNum: 1,
-				Tag:          string(runner.CSharpMono.Tag),
+				Tag:          string(repository.CSharpMono.Tag),
 			},
 		})).Should(gomega.BeNil())
 
 		result := execution.Service(_var.SINGLE_FILE_EXECUTION).RunJob(execution.Job{
 			BuilderType:       "single_file",
 			ExecutionType:     "single_file",
-			EmulatorName:      string(runner.CSharpMono.Name),
-			EmulatorExtension: runner.CSharpMono.Extension,
-			EmulatorTag:       string(runner.CSharpMono.Tag),
+			EmulatorName:      string(repository.CSharpMono.Name),
+			EmulatorExtension: repository.CSharpMono.Extension,
+			EmulatorTag:       string(repository.CSharpMono.Tag),
 			EmulatorText: `
 namespace HelloWorld
 {
@@ -636,16 +637,16 @@ namespace HelloWorld
 			{
 				WorkerNum:    1,
 				ContainerNum: 1,
-				Tag:          string(runner.CLang.Tag),
+				Tag:          string(repository.CLang.Tag),
 			},
 		})).Should(gomega.BeNil())
 
 		result := execution.Service(_var.SINGLE_FILE_EXECUTION).RunJob(execution.Job{
 			BuilderType:       "single_file",
 			ExecutionType:     "single_file",
-			EmulatorName:      string(runner.CLang.Name),
-			EmulatorExtension: runner.CLang.Extension,
-			EmulatorTag:       string(runner.CLang.Tag),
+			EmulatorName:      string(repository.CLang.Name),
+			EmulatorExtension: repository.CLang.Extension,
+			EmulatorTag:       string(repository.CLang.Tag),
 			EmulatorText: `
 #include <stdio.h>
 int main() {
@@ -673,16 +674,16 @@ int main() {
 			{
 				WorkerNum:    1,
 				ContainerNum: 1,
-				Tag:          string(runner.CLang.Tag),
+				Tag:          string(repository.CLang.Tag),
 			},
 		})).Should(gomega.BeNil())
 
 		result := execution.Service(_var.SINGLE_FILE_EXECUTION).RunJob(execution.Job{
 			BuilderType:       "single_file",
 			ExecutionType:     "single_file",
-			EmulatorName:      string(runner.CLang.Name),
-			EmulatorExtension: runner.CLang.Extension,
-			EmulatorTag:       string(runner.CLang.Tag),
+			EmulatorName:      string(repository.CLang.Name),
+			EmulatorExtension: repository.CLang.Extension,
+			EmulatorTag:       string(repository.CLang.Tag),
 			EmulatorText: `
 #include <stdio.h>
 int man() {
@@ -710,16 +711,16 @@ int man() {
 			{
 				WorkerNum:    1,
 				ContainerNum: 1,
-				Tag:          string(runner.CLang.Tag),
+				Tag:          string(repository.CLang.Tag),
 			},
 		})).Should(gomega.BeNil())
 
 		result := execution.Service(_var.SINGLE_FILE_EXECUTION).RunJob(execution.Job{
 			BuilderType:       "single_file",
 			ExecutionType:     "single_file",
-			EmulatorName:      string(runner.CLang.Name),
-			EmulatorExtension: runner.CLang.Extension,
-			EmulatorTag:       string(runner.CLang.Tag),
+			EmulatorName:      string(repository.CLang.Name),
+			EmulatorExtension: repository.CLang.Extension,
+			EmulatorTag:       string(repository.CLang.Tag),
 			EmulatorText: `
 #include <stdio.h>
 int main() {
@@ -745,16 +746,16 @@ int main() {
 			{
 				WorkerNum:    1,
 				ContainerNum: 1,
-				Tag:          string(runner.CPlus.Tag),
+				Tag:          string(repository.CPlus.Tag),
 			},
 		})).Should(gomega.BeNil())
 
 		result := execution.Service(_var.SINGLE_FILE_EXECUTION).RunJob(execution.Job{
 			BuilderType:       "single_file",
 			ExecutionType:     "single_file",
-			EmulatorName:      string(runner.CPlus.Name),
-			EmulatorExtension: runner.CPlus.Extension,
-			EmulatorTag:       string(runner.CPlus.Tag),
+			EmulatorName:      string(repository.CPlus.Name),
+			EmulatorExtension: repository.CPlus.Extension,
+			EmulatorTag:       string(repository.CPlus.Tag),
 			EmulatorText: `
 #include <iostream>
 
@@ -781,16 +782,16 @@ int main() {
 			{
 				WorkerNum:    1,
 				ContainerNum: 1,
-				Tag:          string(runner.CPlus.Tag),
+				Tag:          string(repository.CPlus.Tag),
 			},
 		})).Should(gomega.BeNil())
 
 		result := execution.Service(_var.SINGLE_FILE_EXECUTION).RunJob(execution.Job{
 			BuilderType:       "single_file",
 			ExecutionType:     "single_file",
-			EmulatorName:      string(runner.CPlus.Name),
-			EmulatorExtension: runner.CPlus.Extension,
-			EmulatorTag:       string(runner.CPlus.Tag),
+			EmulatorName:      string(repository.CPlus.Name),
+			EmulatorExtension: repository.CPlus.Extension,
+			EmulatorTag:       string(repository.CPlus.Tag),
 			EmulatorText: `
 #include <iostream>
 
@@ -817,16 +818,16 @@ int man() {
 			{
 				WorkerNum:    1,
 				ContainerNum: 1,
-				Tag:          string(runner.CPlus.Tag),
+				Tag:          string(repository.CPlus.Tag),
 			},
 		})).Should(gomega.BeNil())
 
 		result := execution.Service(_var.SINGLE_FILE_EXECUTION).RunJob(execution.Job{
 			BuilderType:       "single_file",
 			ExecutionType:     "single_file",
-			EmulatorName:      string(runner.CPlus.Name),
-			EmulatorExtension: runner.CPlus.Extension,
-			EmulatorTag:       string(runner.CPlus.Tag),
+			EmulatorName:      string(repository.CPlus.Name),
+			EmulatorExtension: repository.CPlus.Extension,
+			EmulatorTag:       string(repository.CPlus.Tag),
 			EmulatorText: `
 #include <iostream>
 
@@ -852,16 +853,16 @@ int main() {
 			{
 				WorkerNum:    1,
 				ContainerNum: 1,
-				Tag:          string(runner.Python2.Tag),
+				Tag:          string(repository.Python2.Tag),
 			},
 		})).Should(gomega.BeNil())
 
 		result := execution.Service(_var.SINGLE_FILE_EXECUTION).RunJob(execution.Job{
 			BuilderType:       "single_file",
 			ExecutionType:     "single_file",
-			EmulatorName:      string(runner.Python2.Name),
-			EmulatorExtension: runner.Python2.Extension,
-			EmulatorTag:       string(runner.Python2.Tag),
+			EmulatorName:      string(repository.Python2.Name),
+			EmulatorExtension: repository.Python2.Extension,
+			EmulatorTag:       string(repository.Python2.Tag),
 			EmulatorText: `
 print("Hello world")
 `,
@@ -883,16 +884,16 @@ print("Hello world")
 			{
 				WorkerNum:    1,
 				ContainerNum: 1,
-				Tag:          string(runner.Python3.Tag),
+				Tag:          string(repository.Python3.Tag),
 			},
 		})).Should(gomega.BeNil())
 
 		result := execution.Service(_var.SINGLE_FILE_EXECUTION).RunJob(execution.Job{
 			BuilderType:       "single_file",
 			ExecutionType:     "single_file",
-			EmulatorName:      string(runner.Python3.Name),
-			EmulatorExtension: runner.Python3.Extension,
-			EmulatorTag:       string(runner.Python3.Tag),
+			EmulatorName:      string(repository.Python3.Name),
+			EmulatorExtension: repository.Python3.Extension,
+			EmulatorTag:       string(repository.Python3.Tag),
 			EmulatorText: `
 print("Hello world")
 `,
@@ -914,16 +915,16 @@ print("Hello world")
 			{
 				WorkerNum:    1,
 				ContainerNum: 1,
-				Tag:          string(runner.Python2.Tag),
+				Tag:          string(repository.Python2.Tag),
 			},
 		})).Should(gomega.BeNil())
 
 		result := execution.Service(_var.SINGLE_FILE_EXECUTION).RunJob(execution.Job{
 			BuilderType:       "single_file",
 			ExecutionType:     "single_file",
-			EmulatorName:      string(runner.Python2.Name),
-			EmulatorExtension: runner.Python2.Extension,
-			EmulatorTag:       string(runner.Python2.Tag),
+			EmulatorName:      string(repository.Python2.Name),
+			EmulatorExtension: repository.Python2.Extension,
+			EmulatorTag:       string(repository.Python2.Tag),
 			EmulatorText: `
 prit("Hello world")
 `,
@@ -945,16 +946,16 @@ prit("Hello world")
 			{
 				WorkerNum:    1,
 				ContainerNum: 1,
-				Tag:          string(runner.Python3.Tag),
+				Tag:          string(repository.Python3.Tag),
 			},
 		})).Should(gomega.BeNil())
 
 		result := execution.Service(_var.SINGLE_FILE_EXECUTION).RunJob(execution.Job{
 			BuilderType:       "single_file",
 			ExecutionType:     "single_file",
-			EmulatorName:      string(runner.Python3.Name),
-			EmulatorExtension: runner.Python3.Extension,
-			EmulatorTag:       string(runner.Python3.Tag),
+			EmulatorName:      string(repository.Python3.Name),
+			EmulatorExtension: repository.Python3.Extension,
+			EmulatorTag:       string(repository.Python3.Tag),
 			EmulatorText: `
 prit("Hello world")
 `,
@@ -976,16 +977,16 @@ prit("Hello world")
 			{
 				WorkerNum:    1,
 				ContainerNum: 1,
-				Tag:          string(runner.Python2.Tag),
+				Tag:          string(repository.Python2.Tag),
 			},
 		})).Should(gomega.BeNil())
 
 		result := execution.Service(_var.SINGLE_FILE_EXECUTION).RunJob(execution.Job{
 			BuilderType:       "single_file",
 			ExecutionType:     "single_file",
-			EmulatorName:      string(runner.Python2.Name),
-			EmulatorExtension: runner.Python2.Extension,
-			EmulatorTag:       string(runner.Python2.Tag),
+			EmulatorName:      string(repository.Python2.Name),
+			EmulatorExtension: repository.Python2.Extension,
+			EmulatorTag:       string(repository.Python2.Tag),
 			EmulatorText: `
 while True:
     print("hello")
@@ -1008,16 +1009,16 @@ while True:
 			{
 				WorkerNum:    1,
 				ContainerNum: 1,
-				Tag:          string(runner.Python3.Tag),
+				Tag:          string(repository.Python3.Tag),
 			},
 		})).Should(gomega.BeNil())
 
 		result := execution.Service(_var.SINGLE_FILE_EXECUTION).RunJob(execution.Job{
 			BuilderType:       "single_file",
 			ExecutionType:     "single_file",
-			EmulatorName:      string(runner.Python3.Name),
-			EmulatorExtension: runner.Python3.Extension,
-			EmulatorTag:       string(runner.Python3.Tag),
+			EmulatorName:      string(repository.Python3.Name),
+			EmulatorExtension: repository.Python3.Extension,
+			EmulatorTag:       string(repository.Python3.Tag),
 			EmulatorText: `
 while True:
     print("hello")
@@ -1040,16 +1041,16 @@ while True:
 			{
 				WorkerNum:    1,
 				ContainerNum: 1,
-				Tag:          string(runner.Php74.Tag),
+				Tag:          string(repository.Php74.Tag),
 			},
 		})).Should(gomega.BeNil())
 
 		result := execution.Service(_var.SINGLE_FILE_EXECUTION).RunJob(execution.Job{
 			BuilderType:       "single_file",
 			ExecutionType:     "single_file",
-			EmulatorName:      string(runner.Php74.Name),
-			EmulatorExtension: runner.Php74.Extension,
-			EmulatorTag:       string(runner.Php74.Tag),
+			EmulatorName:      string(repository.Php74.Name),
+			EmulatorExtension: repository.Php74.Extension,
+			EmulatorTag:       string(repository.Php74.Tag),
 			EmulatorText: `
 <?php
 
@@ -1073,16 +1074,16 @@ echo "Hello world";
 			{
 				WorkerNum:    1,
 				ContainerNum: 1,
-				Tag:          string(runner.Php74.Tag),
+				Tag:          string(repository.Php74.Tag),
 			},
 		})).Should(gomega.BeNil())
 
 		result := execution.Service(_var.SINGLE_FILE_EXECUTION).RunJob(execution.Job{
 			BuilderType:       "single_file",
 			ExecutionType:     "single_file",
-			EmulatorName:      string(runner.Php74.Name),
-			EmulatorExtension: runner.Php74.Extension,
-			EmulatorTag:       string(runner.Php74.Tag),
+			EmulatorName:      string(repository.Php74.Name),
+			EmulatorExtension: repository.Php74.Extension,
+			EmulatorTag:       string(repository.Php74.Tag),
 			EmulatorText: `
 <?php
 
@@ -1106,16 +1107,16 @@ ech "Hello world";
 			{
 				WorkerNum:    1,
 				ContainerNum: 1,
-				Tag:          string(runner.Php74.Tag),
+				Tag:          string(repository.Php74.Tag),
 			},
 		})).Should(gomega.BeNil())
 
 		result := execution.Service(_var.SINGLE_FILE_EXECUTION).RunJob(execution.Job{
 			BuilderType:       "single_file",
 			ExecutionType:     "single_file",
-			EmulatorName:      string(runner.Php74.Name),
-			EmulatorExtension: runner.Php74.Extension,
-			EmulatorTag:       string(runner.Php74.Tag),
+			EmulatorName:      string(repository.Php74.Name),
+			EmulatorExtension: repository.Php74.Extension,
+			EmulatorTag:       string(repository.Php74.Tag),
 			EmulatorText: `
 <?php
 
@@ -1140,16 +1141,16 @@ ech "Hello world";
 			{
 				WorkerNum:    1,
 				ContainerNum: 1,
-				Tag:          string(runner.Haskell.Tag),
+				Tag:          string(repository.Haskell.Tag),
 			},
 		})).Should(gomega.BeNil())
 
 		result := execution.Service(_var.SINGLE_FILE_EXECUTION).RunJob(execution.Job{
 			BuilderType:       "single_file",
 			ExecutionType:     "single_file",
-			EmulatorName:      string(runner.Haskell.Name),
-			EmulatorExtension: runner.Haskell.Extension,
-			EmulatorTag:       string(runner.Haskell.Tag),
+			EmulatorName:      string(repository.Haskell.Name),
+			EmulatorExtension: repository.Haskell.Extension,
+			EmulatorTag:       string(repository.Haskell.Tag),
 			EmulatorText: `
 main :: IO ()
 main = putStrLn "Hello world"
@@ -1172,16 +1173,16 @@ main = putStrLn "Hello world"
 			{
 				WorkerNum:    1,
 				ContainerNum: 1,
-				Tag:          string(runner.Haskell.Tag),
+				Tag:          string(repository.Haskell.Tag),
 			},
 		})).Should(gomega.BeNil())
 
 		result := execution.Service(_var.SINGLE_FILE_EXECUTION).RunJob(execution.Job{
 			BuilderType:       "single_file",
 			ExecutionType:     "single_file",
-			EmulatorName:      string(runner.Haskell.Name),
-			EmulatorExtension: runner.Haskell.Extension,
-			EmulatorTag:       string(runner.Haskell.Tag),
+			EmulatorName:      string(repository.Haskell.Name),
+			EmulatorExtension: repository.Haskell.Extension,
+			EmulatorTag:       string(repository.Haskell.Tag),
 			EmulatorText: `
 main :: IO ()
 man = putStrLn "Hello world"
@@ -1204,16 +1205,16 @@ man = putStrLn "Hello world"
 			{
 				WorkerNum:    1,
 				ContainerNum: 1,
-				Tag:          string(runner.Haskell.Tag),
+				Tag:          string(repository.Haskell.Tag),
 			},
 		})).Should(gomega.BeNil())
 
 		result := execution.Service(_var.SINGLE_FILE_EXECUTION).RunJob(execution.Job{
 			BuilderType:       "single_file",
 			ExecutionType:     "single_file",
-			EmulatorName:      string(runner.Haskell.Name),
-			EmulatorExtension: runner.Haskell.Extension,
-			EmulatorTag:       string(runner.Haskell.Tag),
+			EmulatorName:      string(repository.Haskell.Name),
+			EmulatorExtension: repository.Haskell.Extension,
+			EmulatorTag:       string(repository.Haskell.Tag),
 			EmulatorText: `
 infi = 
   do
@@ -1242,7 +1243,7 @@ main =
 			{
 				WorkerNum:    1,
 				ContainerNum: 1,
-				Tag:          string(runner.NodeLts.Tag),
+				Tag:          string(repository.NodeLts.Tag),
 			},
 		})).Should(gomega.BeNil())
 
@@ -1250,7 +1251,7 @@ main =
 
 		pg := testCreateEmptyPage(activeSession)
 		cb := testCreateCodeBlock(pg["uuid"].(string), activeSession)
-		testAddEmulatorToCodeBlock(pg["uuid"].(string), cb["uuid"].(string), `console.log("mile")`, runner.NodeLts, activeSession)
+		testAddEmulatorToCodeBlock(pg["uuid"].(string), cb["uuid"].(string), `console.log("mile")`, repository.NodeLts, activeSession)
 		sessionUuid := testCreateTemporarySession(activeSession, pg["uuid"].(string), cb["uuid"].(string), "single_file")
 
 		bm := map[string]interface{}{
@@ -1313,7 +1314,7 @@ main =
 			{
 				WorkerNum:    1,
 				ContainerNum: 1,
-				Tag:          string(runner.Php74.Tag),
+				Tag:          string(repository.Php74.Tag),
 			},
 		})).Should(gomega.BeNil())
 
@@ -1325,7 +1326,7 @@ main =
 <?php
 
 echo "mile";
-`, runner.Php74, activeSession)
+`, repository.Php74, activeSession)
 		sessionUuid := testCreateTemporarySession(activeSession, pg["uuid"].(string), cb["uuid"].(string), "single_file")
 
 		bm := map[string]interface{}{
@@ -1388,7 +1389,7 @@ echo "mile";
 			{
 				WorkerNum:    1,
 				ContainerNum: 1,
-				Tag:          string(runner.Ruby.Tag),
+				Tag:          string(repository.Ruby.Tag),
 			},
 		})).Should(gomega.BeNil())
 
@@ -1396,7 +1397,7 @@ echo "mile";
 
 		pg := testCreateEmptyPage(activeSession)
 		cb := testCreateCodeBlock(pg["uuid"].(string), activeSession)
-		testAddEmulatorToCodeBlock(pg["uuid"].(string), cb["uuid"].(string), `puts "mile"`, runner.Ruby, activeSession)
+		testAddEmulatorToCodeBlock(pg["uuid"].(string), cb["uuid"].(string), `puts "mile"`, repository.Ruby, activeSession)
 		sessionUuid := testCreateTemporarySession(activeSession, pg["uuid"].(string), cb["uuid"].(string), "single_file")
 
 		bm := map[string]interface{}{
@@ -1459,7 +1460,7 @@ echo "mile";
 			{
 				WorkerNum:    1,
 				ContainerNum: 1,
-				Tag:          string(runner.GoLang.Tag),
+				Tag:          string(repository.GoLang.Tag),
 			},
 		})).Should(gomega.BeNil())
 
@@ -1475,7 +1476,7 @@ import "fmt"
 func main() {
 	fmt.Println("mile")
 }
-`, runner.GoLang, activeSession)
+`, repository.GoLang, activeSession)
 		sessionUuid := testCreateTemporarySession(activeSession, pg["uuid"].(string), cb["uuid"].(string), "single_file")
 
 		bm := map[string]interface{}{
@@ -1538,7 +1539,7 @@ func main() {
 			{
 				WorkerNum:    1,
 				ContainerNum: 1,
-				Tag:          string(runner.CSharpMono.Tag),
+				Tag:          string(repository.CSharpMono.Tag),
 			},
 		})).Should(gomega.BeNil())
 
@@ -1556,7 +1557,7 @@ public class HelloWorld
         Console.WriteLine ("mile");
     }
 }
-`, runner.CSharpMono, activeSession)
+`, repository.CSharpMono, activeSession)
 		sessionUuid := testCreateTemporarySession(activeSession, pg["uuid"].(string), cb["uuid"].(string), "single_file")
 
 		bm := map[string]interface{}{
@@ -1619,7 +1620,7 @@ public class HelloWorld
 			{
 				WorkerNum:    1,
 				ContainerNum: 1,
-				Tag:          string(runner.Python2.Tag),
+				Tag:          string(repository.Python2.Tag),
 			},
 		})).Should(gomega.BeNil())
 
@@ -1627,7 +1628,7 @@ public class HelloWorld
 
 		pg := testCreateEmptyPage(activeSession)
 		cb := testCreateCodeBlock(pg["uuid"].(string), activeSession)
-		testAddEmulatorToCodeBlock(pg["uuid"].(string), cb["uuid"].(string), `print("mile")`, runner.Python2, activeSession)
+		testAddEmulatorToCodeBlock(pg["uuid"].(string), cb["uuid"].(string), `print("mile")`, repository.Python2, activeSession)
 		sessionUuid := testCreateTemporarySession(activeSession, pg["uuid"].(string), cb["uuid"].(string), "single_file")
 
 		bm := map[string]interface{}{
@@ -1690,7 +1691,7 @@ public class HelloWorld
 			{
 				WorkerNum:    1,
 				ContainerNum: 1,
-				Tag:          string(runner.Python3.Tag),
+				Tag:          string(repository.Python3.Tag),
 			},
 		})).Should(gomega.BeNil())
 
@@ -1698,7 +1699,7 @@ public class HelloWorld
 
 		pg := testCreateEmptyPage(activeSession)
 		cb := testCreateCodeBlock(pg["uuid"].(string), activeSession)
-		testAddEmulatorToCodeBlock(pg["uuid"].(string), cb["uuid"].(string), `print("mile")`, runner.Python3, activeSession)
+		testAddEmulatorToCodeBlock(pg["uuid"].(string), cb["uuid"].(string), `print("mile")`, repository.Python3, activeSession)
 		sessionUuid := testCreateTemporarySession(activeSession, pg["uuid"].(string), cb["uuid"].(string), "single_file")
 
 		bm := map[string]interface{}{
@@ -1761,7 +1762,7 @@ public class HelloWorld
 			{
 				WorkerNum:    1,
 				ContainerNum: 1,
-				Tag:          string(runner.Haskell.Tag),
+				Tag:          string(repository.Haskell.Tag),
 			},
 		})).Should(gomega.BeNil())
 
@@ -1769,7 +1770,7 @@ public class HelloWorld
 
 		pg := testCreateEmptyPage(activeSession)
 		cb := testCreateCodeBlock(pg["uuid"].(string), activeSession)
-		testAddEmulatorToCodeBlock(pg["uuid"].(string), cb["uuid"].(string), `main = putStrLn "mile"`, runner.Haskell, activeSession)
+		testAddEmulatorToCodeBlock(pg["uuid"].(string), cb["uuid"].(string), `main = putStrLn "mile"`, repository.Haskell, activeSession)
 		sessionUuid := testCreateTemporarySession(activeSession, pg["uuid"].(string), cb["uuid"].(string), "single_file")
 
 		bm := map[string]interface{}{
@@ -1832,7 +1833,7 @@ public class HelloWorld
 			{
 				WorkerNum:    1,
 				ContainerNum: 1,
-				Tag:          string(runner.CLang.Tag),
+				Tag:          string(repository.CLang.Tag),
 			},
 		})).Should(gomega.BeNil())
 
@@ -1846,7 +1847,7 @@ int main() {
    printf("mile");
    return 0;
 }
-`, runner.CLang, activeSession)
+`, repository.CLang, activeSession)
 		sessionUuid := testCreateTemporarySession(activeSession, pg["uuid"].(string), cb["uuid"].(string), "single_file")
 
 		bm := map[string]interface{}{
@@ -1909,7 +1910,7 @@ int main() {
 			{
 				WorkerNum:    1,
 				ContainerNum: 1,
-				Tag:          string(runner.CPlus.Tag),
+				Tag:          string(repository.CPlus.Tag),
 			},
 		})).Should(gomega.BeNil())
 
@@ -1924,7 +1925,7 @@ int main() {
     std::cout << "mile";
     return 0;
 }
-`, runner.CPlus, activeSession)
+`, repository.CPlus, activeSession)
 		sessionUuid := testCreateTemporarySession(activeSession, pg["uuid"].(string), cb["uuid"].(string), "single_file")
 
 		bm := map[string]interface{}{
@@ -1987,7 +1988,7 @@ int main() {
 			{
 				WorkerNum:    10,
 				ContainerNum: 1,
-				Tag:          string(runner.NodeLts.Tag),
+				Tag:          string(repository.NodeLts.Tag),
 			},
 		})).Should(gomega.BeNil())
 
@@ -1999,7 +2000,7 @@ int main() {
 			go func(wg *sync.WaitGroup) {
 				pg := testCreateEmptyPage(activeSession)
 				cb := testCreateCodeBlock(pg["uuid"].(string), activeSession)
-				testAddEmulatorToCodeBlock(pg["uuid"].(string), cb["uuid"].(string), `while(true) {}`, runner.NodeLts, activeSession)
+				testAddEmulatorToCodeBlock(pg["uuid"].(string), cb["uuid"].(string), `while(true) {}`, repository.NodeLts, activeSession)
 				sessionUuid := testCreateTemporarySession(activeSession, pg["uuid"].(string), cb["uuid"].(string), "single_file")
 
 				bm := map[string]interface{}{

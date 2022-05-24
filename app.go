@@ -11,7 +11,7 @@ import (
 	"therebelsource/emulator/execution"
 	"therebelsource/emulator/projectExecution"
 	"therebelsource/emulator/rateLimiter"
-	"therebelsource/emulator/runner"
+	"therebelsource/emulator/repository"
 	"therebelsource/emulator/singleFileExecution"
 	_var "therebelsource/emulator/var"
 )
@@ -76,62 +76,62 @@ func initExecutioners() {
 		{
 			WorkerNum:    1,
 			ContainerNum: 1,
-			Tag:          string(runner.NodeLts.Tag),
+			Tag:          string(repository.NodeLts.Tag),
 		},
 		{
 			WorkerNum:    1,
 			ContainerNum: 1,
-			Tag:          string(runner.NodeEsm.Tag),
+			Tag:          string(repository.NodeEsm.Tag),
 		},
 		{
 			WorkerNum:    1,
 			ContainerNum: 1,
-			Tag:          string(runner.Ruby.Tag),
+			Tag:          string(repository.Ruby.Tag),
 		},
 		{
 			WorkerNum:    1,
 			ContainerNum: 1,
-			Tag:          string(runner.Rust.Tag),
+			Tag:          string(repository.Rust.Tag),
 		},
 		{
 			WorkerNum:    1,
 			ContainerNum: 1,
-			Tag:          string(runner.CPlus.Tag),
+			Tag:          string(repository.CPlus.Tag),
 		},
 		{
 			WorkerNum:    1,
 			ContainerNum: 1,
-			Tag:          string(runner.Haskell.Tag),
+			Tag:          string(repository.Haskell.Tag),
 		},
 		{
 			WorkerNum:    1,
 			ContainerNum: 1,
-			Tag:          string(runner.CLang.Tag),
+			Tag:          string(repository.CLang.Tag),
 		},
 		{
 			WorkerNum:    1,
 			ContainerNum: 1,
-			Tag:          string(runner.CSharpMono.Tag),
+			Tag:          string(repository.CSharpMono.Tag),
 		},
 		{
 			WorkerNum:    1,
 			ContainerNum: 1,
-			Tag:          string(runner.Python3.Tag),
+			Tag:          string(repository.Python3.Tag),
 		},
 		{
 			WorkerNum:    1,
 			ContainerNum: 1,
-			Tag:          string(runner.Python2.Tag),
+			Tag:          string(repository.Python2.Tag),
 		},
 		{
 			WorkerNum:    1,
 			ContainerNum: 1,
-			Tag:          string(runner.Php74.Tag),
+			Tag:          string(repository.Php74.Tag),
 		},
 		{
 			WorkerNum:    1,
 			ContainerNum: 1,
-			Tag:          string(runner.GoLang.Tag),
+			Tag:          string(repository.GoLang.Tag),
 		},
 	})
 
@@ -143,62 +143,62 @@ func initExecutioners() {
 		{
 			WorkerNum:    1,
 			ContainerNum: 1,
-			Tag:          string(runner.NodeLts.Tag),
+			Tag:          string(repository.NodeLts.Tag),
 		},
 		{
 			WorkerNum:    1,
 			ContainerNum: 1,
-			Tag:          string(runner.NodeEsm.Tag),
+			Tag:          string(repository.NodeEsm.Tag),
 		},
 		{
 			WorkerNum:    1,
 			ContainerNum: 1,
-			Tag:          string(runner.Ruby.Tag),
+			Tag:          string(repository.Ruby.Tag),
 		},
 		{
 			WorkerNum:    1,
 			ContainerNum: 1,
-			Tag:          string(runner.Rust.Tag),
+			Tag:          string(repository.Rust.Tag),
 		},
 		{
 			WorkerNum:    1,
 			ContainerNum: 1,
-			Tag:          string(runner.CPlus.Tag),
+			Tag:          string(repository.CPlus.Tag),
 		},
 		{
 			WorkerNum:    1,
 			ContainerNum: 1,
-			Tag:          string(runner.Haskell.Tag),
+			Tag:          string(repository.Haskell.Tag),
 		},
 		{
 			WorkerNum:    1,
 			ContainerNum: 1,
-			Tag:          string(runner.CLang.Tag),
+			Tag:          string(repository.CLang.Tag),
 		},
 		{
 			WorkerNum:    1,
 			ContainerNum: 1,
-			Tag:          string(runner.CSharpMono.Tag),
+			Tag:          string(repository.CSharpMono.Tag),
 		},
 		{
 			WorkerNum:    1,
 			ContainerNum: 1,
-			Tag:          string(runner.Python3.Tag),
+			Tag:          string(repository.Python3.Tag),
 		},
 		{
 			WorkerNum:    1,
 			ContainerNum: 1,
-			Tag:          string(runner.Python2.Tag),
+			Tag:          string(repository.Python2.Tag),
 		},
 		{
 			WorkerNum:    1,
 			ContainerNum: 1,
-			Tag:          string(runner.Php74.Tag),
+			Tag:          string(repository.Php74.Tag),
 		},
 		{
 			WorkerNum:    1,
 			ContainerNum: 1,
-			Tag:          string(runner.GoLang.Tag),
+			Tag:          string(repository.GoLang.Tag),
 		},
 	})
 

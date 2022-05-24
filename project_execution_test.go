@@ -33,7 +33,7 @@ var _ = GinkgoDescribe("Project execution tests", func() {
 			{
 				WorkerNum:    1,
 				ContainerNum: 1,
-				Tag:          string(runner.NodeEsm.Tag),
+				Tag:          string(repository.NodeEsm.Tag),
 			},
 		})).Should(gomega.BeNil())
 
@@ -56,7 +56,7 @@ var _ = GinkgoDescribe("Project execution tests", func() {
 		subDir.Children = append(subDir.Children, subSubDir.Uuid)
 		subSubDir.Children = append(subSubDir.Children, subSubDirFile.Uuid)
 
-		environment := runner.NodeEsm
+		environment := repository.NodeEsm
 		codeProject := testCreateCodeProjectStub(projectName, "", []*repository.File{
 			&root,
 			&rootFile1,
@@ -149,7 +149,7 @@ export {subDirDirFileExecute}
 		defer testCleanup()
 
 		activeSession := testCreateAccount()
-		cp := testCreateCodeProject(activeSession, uuid.New().String(), runner.CSharpMono)
+		cp := testCreateCodeProject(activeSession, uuid.New().String(), repository.CSharpMono)
 		cpUuid := cp["uuid"].(string)
 
 		var rootDirectory map[string]interface{}
@@ -226,7 +226,7 @@ public class NewClass {
 
 		gomega.Expect(err).To(gomega.BeNil())
 
-		var result runner.ProjectRunResult
+		var result repository.ProjectRunResult
 		gomega.Expect(json.Unmarshal(b, &result)).To(gomega.BeNil())
 
 		gomega.Expect(result.Timeout).Should(gomega.Equal(5))
@@ -241,7 +241,7 @@ public class NewClass {
 		defer testCleanup()
 
 		activeSession := testCreateAccount()
-		cp := testCreateCodeProject(activeSession, uuid.New().String(), runner.GoLang)
+		cp := testCreateCodeProject(activeSession, uuid.New().String(), repository.GoLang)
 		cpUuid := cp["uuid"].(string)
 
 		var rootDirectory map[string]interface{}
@@ -315,7 +315,7 @@ public class NewClass {
 		defer testCleanup()
 
 		activeSession := testCreateAccount()
-		cp := testCreateCodeProject(activeSession, uuid.New().String(), runner.GoLang)
+		cp := testCreateCodeProject(activeSession, uuid.New().String(), repository.GoLang)
 		cpUuid := cp["uuid"].(string)
 
 		var rootDirectory map[string]interface{}
@@ -409,7 +409,7 @@ func main() {
 		defer testCleanup()
 
 		activeSession := testCreateAccount()
-		cp := testCreateCodeProject(activeSession, uuid.New().String(), runner.GoLang)
+		cp := testCreateCodeProject(activeSession, uuid.New().String(), repository.GoLang)
 		cpUuid := cp["uuid"].(string)
 
 		var rootDirectory map[string]interface{}
@@ -485,7 +485,7 @@ func main() {
 		defer testCleanup()
 
 		activeSession := testCreateAccount()
-		cp := testCreateCodeProject(activeSession, uuid.New().String(), runner.Rust)
+		cp := testCreateCodeProject(activeSession, uuid.New().String(), repository.Rust)
 		cpUuid := cp["uuid"].(string)
 
 		var rootDirectory map[string]interface{}
@@ -559,7 +559,7 @@ func main() {
 		defer testCleanup()
 
 		activeSession := testCreateAccount()
-		cp := testCreateCodeProject(activeSession, uuid.New().String(), runner.CLang)
+		cp := testCreateCodeProject(activeSession, uuid.New().String(), repository.CLang)
 		cpUuid := cp["uuid"].(string)
 
 		var rootDirectory map[string]interface{}
@@ -634,7 +634,7 @@ func main() {
 		defer testCleanup()
 
 		activeSession := testCreateAccount()
-		cp := testCreateCodeProject(activeSession, uuid.New().String(), runner.CPlus)
+		cp := testCreateCodeProject(activeSession, uuid.New().String(), repository.CPlus)
 		cpUuid := cp["uuid"].(string)
 
 		var rootDirectory map[string]interface{}
@@ -709,7 +709,7 @@ func main() {
 		defer testCleanup()
 
 		activeSession := testCreateAccount()
-		cp := testCreateCodeProject(activeSession, uuid.New().String(), runner.Haskell)
+		cp := testCreateCodeProject(activeSession, uuid.New().String(), repository.Haskell)
 		cpUuid := cp["uuid"].(string)
 
 		var rootDirectory *repository.File
@@ -796,7 +796,7 @@ module Bar.FooBar where
 		defer testCleanup()
 
 		activeSession := testCreateAccount()
-		cp := testCreateCodeProject(activeSession, uuid.New().String(), runner.Ruby)
+		cp := testCreateCodeProject(activeSession, uuid.New().String(), repository.Ruby)
 		cpUuid := cp["uuid"].(string)
 
 		var rootDirectory *repository.File
@@ -880,7 +880,7 @@ puts "Hello world!"
 		defer testCleanup()
 
 		activeSession := testCreateAccount()
-		cp := testCreateCodeProject(activeSession, uuid.New().String(), runner.Php74)
+		cp := testCreateCodeProject(activeSession, uuid.New().String(), repository.Php74)
 		cpUuid := cp["uuid"].(string)
 
 		var rootDirectory *repository.File
@@ -961,7 +961,7 @@ echo "Hello world!";
 		defer testCleanup()
 
 		activeSession := testCreateAccount()
-		cp := testCreateCodeProject(activeSession, uuid.New().String(), runner.Python2)
+		cp := testCreateCodeProject(activeSession, uuid.New().String(), repository.Python2)
 		cpUuid := cp["uuid"].(string)
 
 		var rootDirectory *repository.File
@@ -1045,7 +1045,7 @@ def greeting(name):
 		defer testCleanup()
 
 		activeSession := testCreateAccount()
-		cp := testCreateCodeProject(activeSession, uuid.New().String(), runner.Python3)
+		cp := testCreateCodeProject(activeSession, uuid.New().String(), repository.Python3)
 		cpUuid := cp["uuid"].(string)
 
 		var rootDirectory *repository.File

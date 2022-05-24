@@ -5,7 +5,7 @@ import (
 	"therebelsource/emulator/httpUtil"
 	"therebelsource/emulator/linkedProjectExecution"
 	"therebelsource/emulator/projectExecution"
-	"therebelsource/emulator/runner"
+	"therebelsource/emulator/repository"
 	"therebelsource/emulator/singleFileExecution"
 	"therebelsource/emulator/staticTypes"
 )
@@ -13,20 +13,20 @@ import (
 func getEnvironmentsHandler(w http.ResponseWriter, r *http.Request) {
 	cr := httpUtil.InitCurrentRequest(w, r)
 
-	var languages []runner.Language
+	var languages []repository.Language
 
-	languages = append(languages, runner.CSharpMono)
-	languages = append(languages, runner.NodeEsm)
-	languages = append(languages, runner.NodeLts)
-	languages = append(languages, runner.Haskell)
-	languages = append(languages, runner.CLang)
-	languages = append(languages, runner.CPlus)
-	languages = append(languages, runner.GoLang)
-	languages = append(languages, runner.Python2)
-	languages = append(languages, runner.Python3)
-	languages = append(languages, runner.Ruby)
-	languages = append(languages, runner.Php74)
-	languages = append(languages, runner.Rust)
+	languages = append(languages, repository.CSharpMono)
+	languages = append(languages, repository.NodeEsm)
+	languages = append(languages, repository.NodeLts)
+	languages = append(languages, repository.Haskell)
+	languages = append(languages, repository.CLang)
+	languages = append(languages, repository.CPlus)
+	languages = append(languages, repository.GoLang)
+	languages = append(languages, repository.Python2)
+	languages = append(languages, repository.Python3)
+	languages = append(languages, repository.Ruby)
+	languages = append(languages, repository.Php74)
+	languages = append(languages, repository.Rust)
 
 	apiResponse := httpUtil.CreateSuccessResponse(cr, staticTypes.RESPONSE_RESOURCE, languages, http.StatusOK, "An instance of file content")
 

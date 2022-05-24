@@ -1,7 +1,5 @@
 package repository
 
-import "therebelsource/emulator/runner"
-
 type Token struct {
 	ExpiresAt int64 `json:"expiresAt"`
 }
@@ -61,8 +59,8 @@ type CodeBlock struct {
 	Readonly    bool   `json:"readonly"`
 	PackageName string `json:"packageName"`
 
-	GistData *GistData        `json:"gistData"`
-	Emulator *runner.Language `json:"emulator"`
+	GistData *GistData `json:"gistData"`
+	Emulator *Language `json:"emulator"`
 
 	CodeProjectUuid *string `json:"codeProjectUuid"`
 	CodeResult      *string `json:"codeResult"`
@@ -74,14 +72,14 @@ type GistData struct {
 }
 
 type CodeProject struct {
-	Uuid           string           `json:"uuid"`
-	ShortId        string           `json:"shortId"`
-	Name           string           `json:"name"`
-	Description    string           `json:"description"`
-	Environment    *runner.Language `json:"environment"`
-	Structure      []*File          `json:"structure"`
-	StructureCount int              `json:"structureCount"`
-	PackageName    string           `json:"packageName"`
+	Uuid           string    `json:"uuid"`
+	ShortId        string    `json:"shortId"`
+	Name           string    `json:"name"`
+	Description    string    `json:"description"`
+	Environment    *Language `json:"environment"`
+	Structure      []*File   `json:"structure"`
+	StructureCount int       `json:"structureCount"`
+	PackageName    string    `json:"packageName"`
 
 	RootDirectory *File `json:"rootDirectory"`
 

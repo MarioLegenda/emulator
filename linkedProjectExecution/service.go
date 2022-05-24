@@ -4,6 +4,7 @@ import (
 	"github.com/google/uuid"
 	"therebelsource/emulator/appErrors"
 	"therebelsource/emulator/builders"
+	"therebelsource/emulator/repository"
 	"therebelsource/emulator/runner"
 )
 
@@ -34,7 +35,7 @@ func goDestroy(dir string) {
 	}(dir)
 }
 
-func createCommand(params interface{}, lang *runner.Language, containerName string) []string {
+func createCommand(params interface{}, lang *repository.Language, containerName string) []string {
 	commandFactory := runner.RunCommandFactory{}
 
 	if lang.Name == "c" {
@@ -66,7 +67,7 @@ func createCommand(params interface{}, lang *runner.Language, containerName stri
 	return commandFactory.CreateCommand(containerName, br.ExecutionDirectory, br.FileName, lang, br.DirectoryName)
 }
 
-func (s Service) RunProject(model *LinkedProjectRunRequest) (runner.ProjectRunResult, *appErrors.Error) {
+func (s Service) RunProject(model *LinkedProjectRunRequest) (repository.ProjectRunResult, *appErrors.Error) {
 	if model.sessionData.CodeProject.Environment.Name == "c" {
 		projectBuilder := builders.CreateBuilder("linked_compiled_project").(builders.LinkedBuildFn)
 
@@ -80,12 +81,12 @@ func (s Service) RunProject(model *LinkedProjectRunRequest) (runner.ProjectRunRe
 		buildResult.Args = args
 
 		if err != nil {
-			return runner.ProjectRunResult{}, err
+			return repository.ProjectRunResult{}, err
 		}
 
 		builtRunner := runner.CreateRunner("singleFile").(runner.SingleFileRunFn)
 
-		runResult, err := builtRunner(runner.SingleFileBuildResult{
+		runResult, err := builtRunner(repository.SingleFileBuildResult{
 			ContainerName:      containerName,
 			ExecutionDirectory: buildResult.ExecutionDirectory,
 			Environment:        model.sessionData.CodeProject.Environment,
@@ -94,10 +95,10 @@ func (s Service) RunProject(model *LinkedProjectRunRequest) (runner.ProjectRunRe
 		})
 
 		if err != nil {
-			return runner.ProjectRunResult{}, err
+			return repository.ProjectRunResult{}, err
 		}
 
-		return runner.ProjectRunResult{
+		return repository.ProjectRunResult{
 			Success: runResult.Success,
 			Result:  runResult.Result,
 			Timeout: runResult.Timeout,
@@ -117,12 +118,12 @@ func (s Service) RunProject(model *LinkedProjectRunRequest) (runner.ProjectRunRe
 		buildResult.Args = args
 
 		if err != nil {
-			return runner.ProjectRunResult{}, err
+			return repository.ProjectRunResult{}, err
 		}
 
 		builtRunner := runner.CreateRunner("singleFile").(runner.SingleFileRunFn)
 
-		runResult, err := builtRunner(runner.SingleFileBuildResult{
+		runResult, err := builtRunner(repository.SingleFileBuildResult{
 			ContainerName:      containerName,
 			ExecutionDirectory: buildResult.ExecutionDirectory,
 			Environment:        model.sessionData.CodeProject.Environment,
@@ -131,10 +132,10 @@ func (s Service) RunProject(model *LinkedProjectRunRequest) (runner.ProjectRunRe
 		})
 
 		if err != nil {
-			return runner.ProjectRunResult{}, err
+			return repository.ProjectRunResult{}, err
 		}
 
-		return runner.ProjectRunResult{
+		return repository.ProjectRunResult{
 			Success: runResult.Success,
 			Result:  runResult.Result,
 			Timeout: runResult.Timeout,
@@ -154,12 +155,12 @@ func (s Service) RunProject(model *LinkedProjectRunRequest) (runner.ProjectRunRe
 		buildResult.Args = args
 
 		if err != nil {
-			return runner.ProjectRunResult{}, err
+			return repository.ProjectRunResult{}, err
 		}
 
 		builtRunner := runner.CreateRunner("singleFile").(runner.SingleFileRunFn)
 
-		runResult, err := builtRunner(runner.SingleFileBuildResult{
+		runResult, err := builtRunner(repository.SingleFileBuildResult{
 			ContainerName:      containerName,
 			ExecutionDirectory: buildResult.ExecutionDirectory,
 			Environment:        model.sessionData.CodeProject.Environment,
@@ -168,10 +169,10 @@ func (s Service) RunProject(model *LinkedProjectRunRequest) (runner.ProjectRunRe
 		})
 
 		if err != nil {
-			return runner.ProjectRunResult{}, err
+			return repository.ProjectRunResult{}, err
 		}
 
-		return runner.ProjectRunResult{
+		return repository.ProjectRunResult{
 			Success: runResult.Success,
 			Result:  runResult.Result,
 			Timeout: runResult.Timeout,
@@ -195,14 +196,14 @@ func (s Service) RunProject(model *LinkedProjectRunRequest) (runner.ProjectRunRe
 	defer goDestroy(buildResult.ExecutionDirectory)
 
 	if err != nil {
-		return runner.ProjectRunResult{}, err
+		return repository.ProjectRunResult{}, err
 	}
 
 	builtRunner := runner.CreateRunner("singleFile").(runner.SingleFileRunFn)
 
 	containerName := uuid.New().String()
 
-	runResult, err := builtRunner(runner.SingleFileBuildResult{
+	runResult, err := builtRunner(repository.SingleFileBuildResult{
 		ContainerName:      containerName,
 		DirectoryName:      buildResult.DirectoryName,
 		ExecutionDirectory: buildResult.ExecutionDirectory,
@@ -214,17 +215,17 @@ func (s Service) RunProject(model *LinkedProjectRunRequest) (runner.ProjectRunRe
 	})
 
 	if err != nil {
-		return runner.ProjectRunResult{}, err
+		return repository.ProjectRunResult{}, err
 	}
 
-	return runner.ProjectRunResult{
+	return repository.ProjectRunResult{
 		Success: runResult.Success,
 		Result:  runResult.Result,
 		Timeout: runResult.Timeout,
 	}, nil
 }
 
-func (s Service) RunPublicProject(model *PublicLinkedProjectRunRequest) (runner.ProjectRunResult, *appErrors.Error) {
+func (s Service) RunPublicProject(model *PublicLinkedProjectRunRequest) (repository.ProjectRunResult, *appErrors.Error) {
 	if model.sessionData.CodeProject.Environment.Name == "c" {
 		projectBuilder := builders.CreateBuilder("linked_compiled_project").(builders.LinkedBuildFn)
 
@@ -238,12 +239,12 @@ func (s Service) RunPublicProject(model *PublicLinkedProjectRunRequest) (runner.
 		buildResult.Args = args
 
 		if err != nil {
-			return runner.ProjectRunResult{}, err
+			return repository.ProjectRunResult{}, err
 		}
 
 		builtRunner := runner.CreateRunner("singleFile").(runner.SingleFileRunFn)
 
-		runResult, err := builtRunner(runner.SingleFileBuildResult{
+		runResult, err := builtRunner(repository.SingleFileBuildResult{
 			ContainerName:      containerName,
 			ExecutionDirectory: buildResult.ExecutionDirectory,
 			Environment:        model.sessionData.CodeProject.Environment,
@@ -252,10 +253,10 @@ func (s Service) RunPublicProject(model *PublicLinkedProjectRunRequest) (runner.
 		})
 
 		if err != nil {
-			return runner.ProjectRunResult{}, err
+			return repository.ProjectRunResult{}, err
 		}
 
-		return runner.ProjectRunResult{
+		return repository.ProjectRunResult{
 			Success: runResult.Success,
 			Result:  runResult.Result,
 			Timeout: runResult.Timeout,
@@ -275,12 +276,12 @@ func (s Service) RunPublicProject(model *PublicLinkedProjectRunRequest) (runner.
 		buildResult.Args = args
 
 		if err != nil {
-			return runner.ProjectRunResult{}, err
+			return repository.ProjectRunResult{}, err
 		}
 
 		builtRunner := runner.CreateRunner("singleFile").(runner.SingleFileRunFn)
 
-		runResult, err := builtRunner(runner.SingleFileBuildResult{
+		runResult, err := builtRunner(repository.SingleFileBuildResult{
 			ContainerName:      containerName,
 			ExecutionDirectory: buildResult.ExecutionDirectory,
 			Environment:        model.sessionData.CodeProject.Environment,
@@ -289,10 +290,10 @@ func (s Service) RunPublicProject(model *PublicLinkedProjectRunRequest) (runner.
 		})
 
 		if err != nil {
-			return runner.ProjectRunResult{}, err
+			return repository.ProjectRunResult{}, err
 		}
 
-		return runner.ProjectRunResult{
+		return repository.ProjectRunResult{
 			Success: runResult.Success,
 			Result:  runResult.Result,
 			Timeout: runResult.Timeout,
@@ -312,12 +313,12 @@ func (s Service) RunPublicProject(model *PublicLinkedProjectRunRequest) (runner.
 		buildResult.Args = args
 
 		if err != nil {
-			return runner.ProjectRunResult{}, err
+			return repository.ProjectRunResult{}, err
 		}
 
 		builtRunner := runner.CreateRunner("singleFile").(runner.SingleFileRunFn)
 
-		runResult, err := builtRunner(runner.SingleFileBuildResult{
+		runResult, err := builtRunner(repository.SingleFileBuildResult{
 			ContainerName:      containerName,
 			ExecutionDirectory: buildResult.ExecutionDirectory,
 			Environment:        model.sessionData.CodeProject.Environment,
@@ -326,10 +327,10 @@ func (s Service) RunPublicProject(model *PublicLinkedProjectRunRequest) (runner.
 		})
 
 		if err != nil {
-			return runner.ProjectRunResult{}, err
+			return repository.ProjectRunResult{}, err
 		}
 
-		return runner.ProjectRunResult{
+		return repository.ProjectRunResult{
 			Success: runResult.Success,
 			Result:  runResult.Result,
 			Timeout: runResult.Timeout,
@@ -354,14 +355,14 @@ func (s Service) RunPublicProject(model *PublicLinkedProjectRunRequest) (runner.
 	defer goDestroy(buildResult.ExecutionDirectory)
 
 	if err != nil {
-		return runner.ProjectRunResult{}, err
+		return repository.ProjectRunResult{}, err
 	}
 
 	builtRunner := runner.CreateRunner("singleFile").(runner.SingleFileRunFn)
 
 	containerName := uuid.New().String()
 
-	runResult, err := builtRunner(runner.SingleFileBuildResult{
+	runResult, err := builtRunner(repository.SingleFileBuildResult{
 		ContainerName:      containerName,
 		DirectoryName:      buildResult.DirectoryName,
 		ExecutionDirectory: buildResult.ExecutionDirectory,
@@ -373,10 +374,10 @@ func (s Service) RunPublicProject(model *PublicLinkedProjectRunRequest) (runner.
 	})
 
 	if err != nil {
-		return runner.ProjectRunResult{}, err
+		return repository.ProjectRunResult{}, err
 	}
 
-	return runner.ProjectRunResult{
+	return repository.ProjectRunResult{
 		Success: runResult.Success,
 		Result:  runResult.Result,
 		Timeout: runResult.Timeout,

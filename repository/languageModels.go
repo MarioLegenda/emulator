@@ -1,4 +1,4 @@
-package runner
+package repository
 
 type Name string
 type Text string

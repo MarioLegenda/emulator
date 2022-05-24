@@ -10,6 +10,7 @@ import (
 	"net/http/httptest"
 	"os"
 	"therebelsource/emulator/httpUtil"
+	"therebelsource/emulator/repository"
 	"therebelsource/emulator/runner"
 	"therebelsource/emulator/staticTypes"
 )
@@ -25,7 +26,7 @@ var _ = GinkgoDescribe("Single file public execution tests", func() {
 
 		pg := testCreateEmptyPage(activeSession)
 		cb := testCreateCodeBlock(pg["uuid"].(string), activeSession)
-		testAddEmulatorToCodeBlock(pg["uuid"].(string), cb["uuid"].(string), `console.log("mile")`, runner.NodeLts, activeSession)
+		testAddEmulatorToCodeBlock(pg["uuid"].(string), cb["uuid"].(string), `console.log("mile")`, repository.NodeLts, activeSession)
 		sessionUuid := testCreateTemporarySession(activeSession, pg["uuid"].(string), cb["uuid"].(string), "single_file")
 
 		bm := map[string]interface{}{
@@ -92,7 +93,7 @@ console.log('mile');
 
 		pg := testCreateEmptyPage(activeSession)
 		cb := testCreateCodeBlock(pg["uuid"].(string), activeSession)
-		testAddEmulatorToCodeBlock(pg["uuid"].(string), cb["uuid"].(string), `console.log("mile")`, runner.NodeEsm, activeSession)
+		testAddEmulatorToCodeBlock(pg["uuid"].(string), cb["uuid"].(string), `console.log("mile")`, repository.NodeEsm, activeSession)
 		sessionUuid := testCreateTemporarySession(activeSession, pg["uuid"].(string), cb["uuid"].(string), "single_file")
 
 		bm := map[string]interface{}{
@@ -159,7 +160,7 @@ console.log('mile');
 
 		pg := testCreateEmptyPage(activeSession)
 		cb := testCreateCodeBlock(pg["uuid"].(string), activeSession)
-		testAddEmulatorToCodeBlock(pg["uuid"].(string), cb["uuid"].(string), ``, runner.CSharpMono, activeSession)
+		testAddEmulatorToCodeBlock(pg["uuid"].(string), cb["uuid"].(string), ``, repository.CSharpMono, activeSession)
 		sessionUuid := testCreateTemporarySession(activeSession, pg["uuid"].(string), cb["uuid"].(string), "single_file")
 
 		bm := map[string]interface{}{
@@ -234,7 +235,7 @@ public class HelloWorld
 
 		pg := testCreateEmptyPage(activeSession)
 		cb := testCreateCodeBlock(pg["uuid"].(string), activeSession)
-		testAddEmulatorToCodeBlock(pg["uuid"].(string), cb["uuid"].(string), `console.log("mile")`, runner.NodeLts, activeSession)
+		testAddEmulatorToCodeBlock(pg["uuid"].(string), cb["uuid"].(string), `console.log("mile")`, repository.NodeLts, activeSession)
 		sessionUuid := testCreateTemporarySession(activeSession, pg["uuid"].(string), cb["uuid"].(string), "single_file")
 
 		bm := map[string]interface{}{
@@ -305,7 +306,7 @@ console.log('mile');
 <?php
 
 echo "mile";
-`, runner.Php74, activeSession)
+`, repository.Php74, activeSession)
 		sessionUuid := testCreateTemporarySession(activeSession, pg["uuid"].(string), cb["uuid"].(string), "single_file")
 
 		bm := map[string]interface{}{
@@ -374,7 +375,7 @@ echo "mile";
 
 		pg := testCreateEmptyPage(activeSession)
 		cb := testCreateCodeBlock(pg["uuid"].(string), activeSession)
-		testAddEmulatorToCodeBlock(pg["uuid"].(string), cb["uuid"].(string), `puts "mile"`, runner.Ruby, activeSession)
+		testAddEmulatorToCodeBlock(pg["uuid"].(string), cb["uuid"].(string), `puts "mile"`, repository.Ruby, activeSession)
 		sessionUuid := testCreateTemporarySession(activeSession, pg["uuid"].(string), cb["uuid"].(string), "single_file")
 
 		bm := map[string]interface{}{
@@ -449,7 +450,7 @@ import "fmt"
 func main() {
 	fmt.Println("mile")
 }
-`, runner.GoLang, activeSession)
+`, repository.GoLang, activeSession)
 		sessionUuid := testCreateTemporarySession(activeSession, pg["uuid"].(string), cb["uuid"].(string), "single_file")
 
 		bm := map[string]interface{}{
@@ -522,7 +523,7 @@ func main() {
 
 		pg := testCreateEmptyPage(activeSession)
 		cb := testCreateCodeBlock(pg["uuid"].(string), activeSession)
-		testAddEmulatorToCodeBlock(pg["uuid"].(string), cb["uuid"].(string), `print("mile")`, runner.Python2, activeSession)
+		testAddEmulatorToCodeBlock(pg["uuid"].(string), cb["uuid"].(string), `print("mile")`, repository.Python2, activeSession)
 		sessionUuid := testCreateTemporarySession(activeSession, pg["uuid"].(string), cb["uuid"].(string), "single_file")
 
 		bm := map[string]interface{}{
@@ -589,7 +590,7 @@ print("This line will be printed.")
 
 		pg := testCreateEmptyPage(activeSession)
 		cb := testCreateCodeBlock(pg["uuid"].(string), activeSession)
-		testAddEmulatorToCodeBlock(pg["uuid"].(string), cb["uuid"].(string), `print("mile")`, runner.Python2, activeSession)
+		testAddEmulatorToCodeBlock(pg["uuid"].(string), cb["uuid"].(string), `print("mile")`, repository.Python2, activeSession)
 		sessionUuid := testCreateTemporarySession(activeSession, pg["uuid"].(string), cb["uuid"].(string), "single_file")
 
 		bm := map[string]interface{}{
@@ -656,7 +657,7 @@ print("This line will be printed.")
 
 		pg := testCreateEmptyPage(activeSession)
 		cb := testCreateCodeBlock(pg["uuid"].(string), activeSession)
-		testAddEmulatorToCodeBlock(pg["uuid"].(string), cb["uuid"].(string), `main = putStrLn "mile"`, runner.Haskell, activeSession)
+		testAddEmulatorToCodeBlock(pg["uuid"].(string), cb["uuid"].(string), `main = putStrLn "mile"`, repository.Haskell, activeSession)
 		sessionUuid := testCreateTemporarySession(activeSession, pg["uuid"].(string), cb["uuid"].(string), "single_file")
 
 		bm := map[string]interface{}{
@@ -729,7 +730,7 @@ int main() {
    printf("mile");
    return 0;
 }
-`, runner.CLang, activeSession)
+`, repository.CLang, activeSession)
 		sessionUuid := testCreateTemporarySession(activeSession, pg["uuid"].(string), cb["uuid"].(string), "single_file")
 
 		bm := map[string]interface{}{
@@ -807,7 +808,7 @@ int main() {
     std::cout << "mile";
     return 0;
 }
-`, runner.CPlus, activeSession)
+`, repository.CPlus, activeSession)
 		sessionUuid := testCreateTemporarySession(activeSession, pg["uuid"].(string), cb["uuid"].(string), "single_file")
 
 		bm := map[string]interface{}{

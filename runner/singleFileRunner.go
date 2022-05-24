@@ -7,10 +7,11 @@ import (
 	"os/exec"
 	"strings"
 	"therebelsource/emulator/appErrors"
+	"therebelsource/emulator/repository"
 	"time"
 )
 
-type SingleFileRunFn func(br SingleFileBuildResult) (SingleFileRunResult, *appErrors.Error)
+type SingleFileRunFn func(br repository.SingleFileBuildResult) (SingleFileRunResult, *appErrors.Error)
 
 type SingleFileRunResult struct {
 	Success bool   `json:"success"`
@@ -19,7 +20,7 @@ type SingleFileRunResult struct {
 }
 
 func createSingleFileRunner() SingleFileRunFn {
-	return func(br SingleFileBuildResult) (SingleFileRunResult, *appErrors.Error) {
+	return func(br repository.SingleFileBuildResult) (SingleFileRunResult, *appErrors.Error) {
 		context := context.TODO()
 
 		userState := "anonymous"

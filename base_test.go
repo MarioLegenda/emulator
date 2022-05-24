@@ -609,7 +609,7 @@ func testLinkCodeProject(activeSession repository.ActiveSession, codeProjectUuid
 	return data
 }
 
-func testAddEmulatorToCodeBlock(pageUuid string, blockUuid string, code string, lang runner.Language, activeSession repository.ActiveSession) map[string]interface{} {
+func testAddEmulatorToCodeBlock(pageUuid string, blockUuid string, code string, lang repository.Language, activeSession repository.ActiveSession) map[string]interface{} {
 	url := fmt.Sprintf("%s/page/code-block", repository.CreateApiUrl())
 
 	client, err := httpClient.NewHttpClient(&tls.Config{
@@ -679,7 +679,7 @@ func testAddEmulatorToCodeBlock(pageUuid string, blockUuid string, code string, 
 	return data
 }
 
-func testCreateCodeProject(activeSession repository.ActiveSession, name string, lang runner.Language) map[string]interface{} {
+func testCreateCodeProject(activeSession repository.ActiveSession, name string, lang repository.Language) map[string]interface{} {
 	url := fmt.Sprintf("%s/code-project", repository.CreateApiUrl())
 
 	client, err := httpClient.NewHttpClient(&tls.Config{
@@ -856,7 +856,7 @@ func testCreateCodeProjectStub(
 	packageName string,
 	structure []*repository.File,
 	rootDirectory *repository.File,
-	environment *runner.Language,
+	environment *repository.Language,
 ) repository.CodeProject {
 	return repository.CodeProject{
 		Uuid:           uuid.New().String(),
