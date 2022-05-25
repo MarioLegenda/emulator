@@ -446,5 +446,29 @@ func Run(params Params) Result {
 		})
 	}
 
+	if params.EmulatorName == string(csharpMono.name) && params.BuilderType == "project" && params.ExecutionType == "project" {
+		build, err := project.CsharpProjectFileBuild(project.InitCsharpProjectParams(
+			params.CodeProject,
+			params.Contents,
+			fmt.Sprintf("%s/%s", os.Getenv("EXECUTION_DIR"), params.ContainerName),
+			params.ExecutingFile,
+		))
+
+		if err != nil {
+			return Result{
+				Result:  "",
+				Success: false,
+				Error:   err,
+			}
+		}
+
+		return csharpRunner(CsharpExecParams{
+			ExecutionDirectory: build.ExecutionDirectory,
+			ContainerDirectory: build.ContainerDirectory,
+			ExecutionFile:      build.FileName,
+			ContainerName:      params.ContainerName,
+		})
+	}
+
 	return Result{}
 }
