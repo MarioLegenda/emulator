@@ -422,5 +422,29 @@ func Run(params Params) Result {
 		})
 	}
 
+	if params.EmulatorName == string(cPlus.name) && params.BuilderType == "project" && params.ExecutionType == "project" {
+		build, err := project.CPlusProjectBuild(project.InitCPlusParams(
+			params.CodeProject,
+			params.Contents,
+			fmt.Sprintf("%s/%s", os.Getenv("EXECUTION_DIR"), params.ContainerName),
+		))
+
+		if err != nil {
+			return Result{
+				Result:  "",
+				Success: false,
+				Error:   err,
+			}
+		}
+
+		return cPlusProjectRunner(CPlusProjectExecParams{
+			ContainerName:      params.ContainerName,
+			ExecutionDirectory: build.ExecutionDirectory,
+			ContainerDirectory: build.ContainerDirectory,
+			ResolvedPaths:      build.ResolvedFiles,
+			BinaryFileName:     build.BinaryFileName,
+		})
+	}
+
 	return Result{}
 }
