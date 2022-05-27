@@ -470,5 +470,29 @@ func Run(params Params) Result {
 		})
 	}
 
+	if params.EmulatorName == string(python2.name) && params.BuilderType == "project" && params.ExecutionType == "project" {
+		build, err := project.Python2ProjectBuild(project.InitPython2Params(
+			params.CodeProject,
+			params.Contents,
+			fmt.Sprintf("%s/%s", os.Getenv("EXECUTION_DIR"), params.ContainerName),
+			params.ExecutingFile,
+		))
+
+		if err != nil {
+			return Result{
+				Result:  "",
+				Success: false,
+				Error:   err,
+			}
+		}
+
+		return pythonRunner(PythonExecParams{
+			ExecutionDirectory: build.ExecutionDirectory,
+			ContainerDirectory: build.ContainerDirectory,
+			ExecutionFile:      build.FileName,
+			ContainerName:      params.ContainerName,
+		})
+	}
+
 	return Result{}
 }

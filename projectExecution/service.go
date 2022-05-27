@@ -238,6 +238,31 @@ func (s Service) RunProject(model *ProjectRunRequest) (repository.ProjectRunResu
 		}, nil
 	}
 
+	if model.sessionData.CodeProject.Environment.Name == "python2" {
+		res := execution.Service(_var.PROJECT_EXECUTION).RunJob(execution.Job{
+			BuilderType:   "project",
+			ExecutionType: "project",
+			EmulatorTag:   string(model.sessionData.CodeProject.Environment.Tag),
+			EmulatorName:  string(model.sessionData.CodeProject.Environment.Name),
+			CodeProject:   model.sessionData.CodeProject,
+			ExecutingFile: model.sessionData.ExecutingFile,
+			Contents:      model.sessionData.Content,
+			PackageName:   model.sessionData.PackageName,
+		})
+
+		result := res.Result
+
+		if result == "" && res.Error != nil && appErrors.TimeoutError == res.Error.Code {
+			result = "timeout"
+		}
+
+		return repository.ProjectRunResult{
+			Success: res.Success,
+			Result:  result,
+			Timeout: 5,
+		}, nil
+	}
+
 	if model.sessionData.CodeProject.Environment.Name == "c" {
 		projectBuilder := builders.CreateBuilder("c_project").(builders.CProjectBuildFn)
 
