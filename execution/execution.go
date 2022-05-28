@@ -12,6 +12,9 @@ import (
 
 var services map[string]Execution
 
+type ProjectExecutionData struct {
+}
+
 type Job struct {
 	BuilderType   string
 	ExecutionType string

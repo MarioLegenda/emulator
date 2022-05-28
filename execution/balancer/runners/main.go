@@ -3,6 +3,7 @@ package runners
 import (
 	"fmt"
 	"os"
+	"therebelsource/emulator/execution/balancer/builders/linked"
 	"therebelsource/emulator/execution/balancer/builders/project"
 	"therebelsource/emulator/execution/balancer/builders/single"
 	"therebelsource/emulator/repository"
@@ -579,6 +580,54 @@ func Run(params Params) Result {
 		}
 
 		return phpRunner(PhpExecParams{
+			ExecutionDirectory: build.ExecutionDirectory,
+			ContainerDirectory: build.ContainerDirectory,
+			ExecutionFile:      build.FileName,
+			ContainerName:      params.ContainerName,
+		})
+	}
+
+	if params.EmulatorName == string(ruby.name) && params.BuilderType == "linked" && params.ExecutionType == "linked" {
+		build, err := linked.RubyProjectBuild(linked.InitRubyParams(
+			params.CodeProject,
+			params.Contents,
+			fmt.Sprintf("%s/%s", os.Getenv("EXECUTION_DIR"), params.ContainerName),
+			params.EmulatorText,
+		))
+
+		if err != nil {
+			return Result{
+				Result:  "",
+				Success: false,
+				Error:   err,
+			}
+		}
+
+		return rubyRunner(RubyExecParams{
+			ExecutionDirectory: build.ExecutionDirectory,
+			ContainerDirectory: build.ContainerDirectory,
+			ExecutionFile:      build.FileName,
+			ContainerName:      params.ContainerName,
+		})
+	}
+
+	if params.EmulatorName == string(nodeLts.name) && params.BuilderType == "linked" && params.ExecutionType == "linked" {
+		build, err := linked.NodeProjectBuild(linked.InitNodeParams(
+			params.CodeProject,
+			params.Contents,
+			fmt.Sprintf("%s/%s", os.Getenv("EXECUTION_DIR"), params.ContainerName),
+			params.EmulatorText,
+		))
+
+		if err != nil {
+			return Result{
+				Result:  "",
+				Success: false,
+				Error:   err,
+			}
+		}
+
+		return nodeRunner(NodeExecParams{
 			ExecutionDirectory: build.ExecutionDirectory,
 			ContainerDirectory: build.ContainerDirectory,
 			ExecutionFile:      build.FileName,

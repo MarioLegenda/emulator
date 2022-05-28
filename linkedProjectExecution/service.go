@@ -4,8 +4,10 @@ import (
 	"github.com/google/uuid"
 	"therebelsource/emulator/appErrors"
 	"therebelsource/emulator/builders"
+	"therebelsource/emulator/execution"
 	"therebelsource/emulator/repository"
 	"therebelsource/emulator/runner"
+	_var "therebelsource/emulator/var"
 )
 
 var ExecutionService Service
@@ -68,6 +70,54 @@ func createCommand(params interface{}, lang *repository.Language, containerName 
 }
 
 func (s Service) RunProject(model *LinkedProjectRunRequest) (repository.ProjectRunResult, *appErrors.Error) {
+	if model.sessionData.CodeProject.Environment.Name == "ruby" {
+		res := execution.Service(_var.PROJECT_EXECUTION).RunJob(execution.Job{
+			BuilderType:   "linked",
+			ExecutionType: "linked",
+			EmulatorTag:   string(model.sessionData.CodeProject.Environment.Tag),
+			EmulatorName:  string(model.sessionData.CodeProject.Environment.Name),
+			EmulatorText:  model.sessionData.CodeBlock.Text,
+			CodeProject:   model.sessionData.CodeProject,
+			Contents:      model.sessionData.Content,
+		})
+
+		result := res.Result
+
+		if result == "" && res.Error != nil && appErrors.TimeoutError == res.Error.Code {
+			result = "timeout"
+		}
+
+		return repository.ProjectRunResult{
+			Success: res.Success,
+			Result:  result,
+			Timeout: 5,
+		}, nil
+	}
+
+	if model.sessionData.CodeProject.Environment.Name == "node_latest" {
+		res := execution.Service(_var.PROJECT_EXECUTION).RunJob(execution.Job{
+			BuilderType:   "linked",
+			ExecutionType: "linked",
+			EmulatorTag:   string(model.sessionData.CodeProject.Environment.Tag),
+			EmulatorName:  string(model.sessionData.CodeProject.Environment.Name),
+			EmulatorText:  model.sessionData.CodeBlock.Text,
+			CodeProject:   model.sessionData.CodeProject,
+			Contents:      model.sessionData.Content,
+		})
+
+		result := res.Result
+
+		if result == "" && res.Error != nil && appErrors.TimeoutError == res.Error.Code {
+			result = "timeout"
+		}
+
+		return repository.ProjectRunResult{
+			Success: res.Success,
+			Result:  result,
+			Timeout: 5,
+		}, nil
+	}
+
 	if model.sessionData.CodeProject.Environment.Name == "c" {
 		projectBuilder := builders.CreateBuilder("linked_compiled_project").(builders.LinkedBuildFn)
 
@@ -189,7 +239,8 @@ func (s Service) RunProject(model *LinkedProjectRunRequest) (repository.ProjectR
 	buildResult, err := projectBuilder(
 		model.sessionData.CodeProject,
 		model.sessionData.Content,
-		builders.PROJECT_EXECUTION_STATE, model.sessionData.CodeBlock,
+		builders.PROJECT_EXECUTION_STATE,
+		model.sessionData.CodeBlock,
 		executingDir,
 	)
 
@@ -226,6 +277,54 @@ func (s Service) RunProject(model *LinkedProjectRunRequest) (repository.ProjectR
 }
 
 func (s Service) RunPublicProject(model *PublicLinkedProjectRunRequest) (repository.ProjectRunResult, *appErrors.Error) {
+	if model.sessionData.CodeProject.Environment.Name == "ruby" {
+		res := execution.Service(_var.PROJECT_EXECUTION).RunJob(execution.Job{
+			BuilderType:   "linked",
+			ExecutionType: "linked",
+			EmulatorTag:   string(model.sessionData.CodeProject.Environment.Tag),
+			EmulatorName:  string(model.sessionData.CodeProject.Environment.Name),
+			EmulatorText:  model.sessionData.CodeBlock.Text,
+			CodeProject:   model.sessionData.CodeProject,
+			Contents:      model.sessionData.Content,
+		})
+
+		result := res.Result
+
+		if result == "" && res.Error != nil && appErrors.TimeoutError == res.Error.Code {
+			result = "timeout"
+		}
+
+		return repository.ProjectRunResult{
+			Success: res.Success,
+			Result:  result,
+			Timeout: 5,
+		}, nil
+	}
+
+	if model.sessionData.CodeProject.Environment.Name == "node_latest" {
+		res := execution.Service(_var.PROJECT_EXECUTION).RunJob(execution.Job{
+			BuilderType:   "linked",
+			ExecutionType: "linked",
+			EmulatorTag:   string(model.sessionData.CodeProject.Environment.Tag),
+			EmulatorName:  string(model.sessionData.CodeProject.Environment.Name),
+			EmulatorText:  model.sessionData.CodeBlock.Text,
+			CodeProject:   model.sessionData.CodeProject,
+			Contents:      model.sessionData.Content,
+		})
+
+		result := res.Result
+
+		if result == "" && res.Error != nil && appErrors.TimeoutError == res.Error.Code {
+			result = "timeout"
+		}
+
+		return repository.ProjectRunResult{
+			Success: res.Success,
+			Result:  result,
+			Timeout: 5,
+		}, nil
+	}
+
 	if model.sessionData.CodeProject.Environment.Name == "c" {
 		projectBuilder := builders.CreateBuilder("linked_compiled_project").(builders.LinkedBuildFn)
 
