@@ -802,5 +802,77 @@ func Run(params Params) Result {
 		})
 	}
 
+	if params.EmulatorName == string(php.name) && params.BuilderType == "linked" && params.ExecutionType == "linked" {
+		build, err := linked.Php74ProjectBuild(linked.InitPhp74Params(
+			params.CodeProject,
+			params.Contents,
+			fmt.Sprintf("%s/%s", os.Getenv("EXECUTION_DIR"), params.ContainerName),
+			params.EmulatorText,
+		))
+
+		if err != nil {
+			return Result{
+				Result:  "",
+				Success: false,
+				Error:   err,
+			}
+		}
+
+		return phpRunner(PhpExecParams{
+			ExecutionDirectory: build.ExecutionDirectory,
+			ContainerDirectory: build.ContainerDirectory,
+			ExecutionFile:      build.FileName,
+			ContainerName:      params.ContainerName,
+		})
+	}
+
+	if params.EmulatorName == string(python2.name) && params.BuilderType == "linked" && params.ExecutionType == "linked" {
+		build, err := linked.Python2ProjectBuild(linked.InitPython2Params(
+			params.CodeProject,
+			params.Contents,
+			fmt.Sprintf("%s/%s", os.Getenv("EXECUTION_DIR"), params.ContainerName),
+			params.EmulatorText,
+		))
+
+		if err != nil {
+			return Result{
+				Result:  "",
+				Success: false,
+				Error:   err,
+			}
+		}
+
+		return pythonRunner(PythonExecParams{
+			ExecutionDirectory: build.ExecutionDirectory,
+			ContainerDirectory: build.ContainerDirectory,
+			ExecutionFile:      build.FileName,
+			ContainerName:      params.ContainerName,
+		})
+	}
+
+	if params.EmulatorName == string(python3.name) && params.BuilderType == "linked" && params.ExecutionType == "linked" {
+		build, err := linked.Python3ProjectBuild(linked.InitPython3Params(
+			params.CodeProject,
+			params.Contents,
+			fmt.Sprintf("%s/%s", os.Getenv("EXECUTION_DIR"), params.ContainerName),
+			params.EmulatorText,
+		))
+
+		if err != nil {
+			return Result{
+				Result:  "",
+				Success: false,
+				Error:   err,
+			}
+		}
+
+		return python3Runner(PythonExecParams{
+			ExecutionDirectory: build.ExecutionDirectory,
+			ContainerDirectory: build.ContainerDirectory,
+			ExecutionFile:      build.FileName,
+			ContainerName:      params.ContainerName,
+		})
+	}
+
 	return Result{}
 }
