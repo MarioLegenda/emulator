@@ -118,6 +118,30 @@ func (s Service) RunProject(model *LinkedProjectRunRequest) (repository.ProjectR
 		}, nil
 	}
 
+	if model.sessionData.CodeProject.Environment.Name == "node_latest_esm" {
+		res := execution.Service(_var.PROJECT_EXECUTION).RunJob(execution.Job{
+			BuilderType:   "linked",
+			ExecutionType: "linked",
+			EmulatorTag:   string(model.sessionData.CodeProject.Environment.Tag),
+			EmulatorName:  string(model.sessionData.CodeProject.Environment.Name),
+			EmulatorText:  model.sessionData.CodeBlock.Text,
+			CodeProject:   model.sessionData.CodeProject,
+			Contents:      model.sessionData.Content,
+		})
+
+		result := res.Result
+
+		if result == "" && res.Error != nil && appErrors.TimeoutError == res.Error.Code {
+			result = "timeout"
+		}
+
+		return repository.ProjectRunResult{
+			Success: res.Success,
+			Result:  result,
+			Timeout: 5,
+		}, nil
+	}
+
 	if model.sessionData.CodeProject.Environment.Name == "go" {
 		res := execution.Service(_var.PROJECT_EXECUTION).RunJob(execution.Job{
 			BuilderType:   "linked",
@@ -410,6 +434,30 @@ func (s Service) RunPublicProject(model *PublicLinkedProjectRunRequest) (reposit
 			CodeProject:   model.sessionData.CodeProject,
 			Contents:      model.sessionData.Content,
 			PackageName:   model.sessionData.PackageName,
+		})
+
+		result := res.Result
+
+		if result == "" && res.Error != nil && appErrors.TimeoutError == res.Error.Code {
+			result = "timeout"
+		}
+
+		return repository.ProjectRunResult{
+			Success: res.Success,
+			Result:  result,
+			Timeout: 5,
+		}, nil
+	}
+
+	if model.sessionData.CodeProject.Environment.Name == "node_latest_esm" {
+		res := execution.Service(_var.PROJECT_EXECUTION).RunJob(execution.Job{
+			BuilderType:   "linked",
+			ExecutionType: "linked",
+			EmulatorTag:   string(model.sessionData.CodeProject.Environment.Tag),
+			EmulatorName:  string(model.sessionData.CodeProject.Environment.Name),
+			EmulatorText:  model.Text,
+			CodeProject:   model.sessionData.CodeProject,
+			Contents:      model.sessionData.Content,
 		})
 
 		result := res.Result

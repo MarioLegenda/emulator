@@ -634,6 +634,30 @@ func Run(params Params) Result {
 		})
 	}
 
+	if params.EmulatorName == string(nodeEsm.name) && params.BuilderType == "linked" && params.ExecutionType == "linked" {
+		build, err := linked.NodeProjectBuild(linked.InitNodeParams(
+			params.CodeProject,
+			params.Contents,
+			fmt.Sprintf("%s/%s", os.Getenv("EXECUTION_DIR"), params.ContainerName),
+			params.EmulatorText,
+		))
+
+		if err != nil {
+			return Result{
+				Result:  "",
+				Success: false,
+				Error:   err,
+			}
+		}
+
+		return nodeRunner(NodeExecParams{
+			ExecutionDirectory: build.ExecutionDirectory,
+			ContainerDirectory: build.ContainerDirectory,
+			ExecutionFile:      build.FileName,
+			ContainerName:      params.ContainerName,
+		})
+	}
+
 	if params.EmulatorName == string(goLang.name) && params.BuilderType == "linked" && params.ExecutionType == "linked" {
 		build, err := linked.GoProjectBuild(linked.InitGoParams(
 			params.CodeProject,
