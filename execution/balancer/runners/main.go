@@ -658,5 +658,28 @@ func Run(params Params) Result {
 		})
 	}
 
+	if params.EmulatorName == string(haskell.name) && params.BuilderType == "linked" && params.ExecutionType == "linked" {
+		build, err := linked.HaskellProjectBuild(linked.InitHaskellProjectParams(
+			params.CodeProject,
+			params.Contents,
+			fmt.Sprintf("%s/%s", os.Getenv("EXECUTION_DIR"), params.ContainerName),
+			params.EmulatorText,
+		))
+
+		if err != nil {
+			return Result{
+				Result:  "",
+				Success: false,
+				Error:   err,
+			}
+		}
+
+		return haskellProjectRunner(HaskellExecProjectParams{
+			ExecutionDirectory: build.ExecutionDirectory,
+			ContainerDirectory: build.ContainerDirectory,
+			ContainerName:      params.ContainerName,
+		})
+	}
+
 	return Result{}
 }
