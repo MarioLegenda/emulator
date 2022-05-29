@@ -705,5 +705,102 @@ func Run(params Params) Result {
 		})
 	}
 
+	if params.EmulatorName == string(rust.name) && params.BuilderType == "linked" && params.ExecutionType == "linked" {
+		build, err := linked.RustProjectBuild(linked.InitRustParams(
+			params.CodeProject,
+			params.Contents,
+			fmt.Sprintf("%s/%s", os.Getenv("EXECUTION_DIR"), params.ContainerName),
+			params.EmulatorText,
+		))
+
+		if err != nil {
+			return Result{
+				Result:  "",
+				Success: false,
+				Error:   err,
+			}
+		}
+
+		return rustRunner(RustExecParams{
+			ExecutionDirectory: build.ExecutionDirectory,
+			ContainerDirectory: build.ContainerDirectory,
+			ContainerName:      params.ContainerName,
+		})
+	}
+
+	if params.EmulatorName == string(cLang.name) && params.BuilderType == "linked" && params.ExecutionType == "linked" {
+		build, err := linked.CProjectBuild(linked.InitCParams(
+			params.CodeProject,
+			params.Contents,
+			fmt.Sprintf("%s/%s", os.Getenv("EXECUTION_DIR"), params.ContainerName),
+			params.EmulatorText,
+		))
+
+		if err != nil {
+			return Result{
+				Result:  "",
+				Success: false,
+				Error:   err,
+			}
+		}
+
+		return cProjectRunner(CProjectExecParams{
+			ContainerName:      params.ContainerName,
+			ExecutionDirectory: build.ExecutionDirectory,
+			ContainerDirectory: build.ContainerDirectory,
+			ResolvedPaths:      build.ResolvedFiles,
+			BinaryFileName:     build.BinaryFileName,
+		})
+	}
+
+	if params.EmulatorName == string(cPlus.name) && params.BuilderType == "linked" && params.ExecutionType == "linked" {
+		build, err := linked.CPlusProjectBuild(linked.InitCPlusParams(
+			params.CodeProject,
+			params.Contents,
+			fmt.Sprintf("%s/%s", os.Getenv("EXECUTION_DIR"), params.ContainerName),
+			params.EmulatorText,
+		))
+
+		if err != nil {
+			return Result{
+				Result:  "",
+				Success: false,
+				Error:   err,
+			}
+		}
+
+		return cPlusProjectRunner(CPlusProjectExecParams{
+			ContainerName:      params.ContainerName,
+			ExecutionDirectory: build.ExecutionDirectory,
+			ContainerDirectory: build.ContainerDirectory,
+			ResolvedPaths:      build.ResolvedFiles,
+			BinaryFileName:     build.BinaryFileName,
+		})
+	}
+
+	if params.EmulatorName == string(csharpMono.name) && params.BuilderType == "linked" && params.ExecutionType == "linked" {
+		build, err := linked.CsharpProjectFileBuild(linked.InitCsharpProjectParams(
+			params.CodeProject,
+			params.Contents,
+			fmt.Sprintf("%s/%s", os.Getenv("EXECUTION_DIR"), params.ContainerName),
+			params.EmulatorText,
+		))
+
+		if err != nil {
+			return Result{
+				Result:  "",
+				Success: false,
+				Error:   err,
+			}
+		}
+
+		return csharpRunner(CsharpExecParams{
+			ExecutionDirectory: build.ExecutionDirectory,
+			ContainerDirectory: build.ContainerDirectory,
+			ExecutionFile:      build.FileName,
+			ContainerName:      params.ContainerName,
+		})
+	}
+
 	return Result{}
 }
