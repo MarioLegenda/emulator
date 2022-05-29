@@ -85,7 +85,6 @@ func nodeRunner(params NodeExecParams) Result {
 	select {
 	case res := <-tc:
 		if res == "error" {
-			fmt.Println("ERROR HAPPENED")
 			out := makeRunDecision(errb, outb, params.ExecutionDirectory)
 			if out != "" {
 				runResult.Success = true

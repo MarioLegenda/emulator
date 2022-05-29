@@ -61,10 +61,6 @@ func testExecutionDirEmpty() {
 		return
 	}
 
-	if len(executionDir) != 0 {
-		fmt.Println(executionDir[0].Name())
-	}
-
 	gomega.Expect(err).Should(gomega.BeNil())
 	gomega.Expect(len(executionDir)).Should(gomega.Equal(0))
 }

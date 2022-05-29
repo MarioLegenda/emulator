@@ -123,5 +123,6 @@ type SingleFileSessionData struct {
 type LinkedSessionData struct {
 	CodeProject *CodeProject   `json:"codeProject"`
 	CodeBlock   *CodeBlock     `json:"codeBlock"`
+	PackageName string         `json:"packageName"`
 	Content     []*FileContent `json:"fileContent"`
 }

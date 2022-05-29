@@ -13,7 +13,6 @@ type GoProjectExecParams struct {
 	ContainerName      string
 	ExecutionDirectory string
 	ContainerDirectory string
-	ExecutionFile      string
 }
 
 func goProjectRunner(params GoProjectExecParams) Result {
@@ -25,8 +24,6 @@ func goProjectRunner(params GoProjectExecParams) Result {
 
 	tc := make(chan string)
 	pidC := make(chan int, 1)
-
-	fmt.Println(params.ContainerName, params.ContainerDirectory)
 
 	go func() {
 		cmd := exec.Command("docker", []string{"exec", params.ContainerName, "/bin/bash", "-c", fmt.Sprintf("cd %s && go mod init app/%s >/dev/null 2>&1 && go build && ./%s", params.ContainerDirectory, params.ContainerDirectory, params.ContainerDirectory)}...)

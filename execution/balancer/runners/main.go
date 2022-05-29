@@ -370,7 +370,6 @@ func Run(params Params) Result {
 		return goProjectRunner(GoProjectExecParams{
 			ExecutionDirectory: build.ExecutionDirectory,
 			ContainerDirectory: params.PackageName,
-			ExecutionFile:      build.FileName,
 			ContainerName:      params.ContainerName,
 		})
 	}
@@ -631,6 +630,30 @@ func Run(params Params) Result {
 			ExecutionDirectory: build.ExecutionDirectory,
 			ContainerDirectory: build.ContainerDirectory,
 			ExecutionFile:      build.FileName,
+			ContainerName:      params.ContainerName,
+		})
+	}
+
+	if params.EmulatorName == string(goLang.name) && params.BuilderType == "linked" && params.ExecutionType == "linked" {
+		build, err := linked.GoProjectBuild(linked.InitGoParams(
+			params.CodeProject,
+			params.Contents,
+			fmt.Sprintf("%s/%s", os.Getenv("EXECUTION_DIR"), params.ContainerName),
+			params.EmulatorText,
+			params.PackageName,
+		))
+
+		if err != nil {
+			return Result{
+				Result:  "",
+				Success: false,
+				Error:   err,
+			}
+		}
+
+		return goProjectRunner(GoProjectExecParams{
+			ExecutionDirectory: build.ExecutionDirectory,
+			ContainerDirectory: build.ContainerDirectory,
 			ContainerName:      params.ContainerName,
 		})
 	}

@@ -27,8 +27,6 @@ func cPlusProjectRunner(params CPlusProjectExecParams) Result {
 	tc := make(chan string)
 	pidC := make(chan int, 1)
 
-	fmt.Println(params.BinaryFileName, params.ResolvedPaths)
-
 	process := fmt.Sprintf(
 		"cd %s && g++ main.cpp -o %s > output.txt && ./%s > output.txt",
 		params.ContainerDirectory,

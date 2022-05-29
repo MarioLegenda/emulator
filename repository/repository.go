@@ -281,7 +281,7 @@ func (r Repository) ValidateTemporarySession(sessionUuid string) (ValidatedTempo
 	if clientError != nil {
 		return ValidatedTemporarySession{}, appErrors.New(appErrors.ApplicationError, appErrors.ApplicationRuntimeError, clientError.GetMessage())
 	}
-	
+
 	if response.Status != 200 {
 		return ValidatedTemporarySession{}, appErrors.New(appErrors.ApplicationError, appErrors.ApplicationRuntimeError, fmt.Sprintf("Request did not succeed with status: %d", response.Status))
 	}

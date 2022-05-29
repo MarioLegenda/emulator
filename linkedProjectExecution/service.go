@@ -118,6 +118,56 @@ func (s Service) RunProject(model *LinkedProjectRunRequest) (repository.ProjectR
 		}, nil
 	}
 
+	if model.sessionData.CodeProject.Environment.Name == "go" {
+		res := execution.Service(_var.PROJECT_EXECUTION).RunJob(execution.Job{
+			BuilderType:   "linked",
+			ExecutionType: "linked",
+			EmulatorTag:   string(model.sessionData.CodeProject.Environment.Tag),
+			EmulatorName:  string(model.sessionData.CodeProject.Environment.Name),
+			EmulatorText:  model.sessionData.CodeBlock.Text,
+			CodeProject:   model.sessionData.CodeProject,
+			Contents:      model.sessionData.Content,
+			PackageName:   model.sessionData.PackageName,
+		})
+
+		result := res.Result
+
+		if result == "" && res.Error != nil && appErrors.TimeoutError == res.Error.Code {
+			result = "timeout"
+		}
+
+		return repository.ProjectRunResult{
+			Success: res.Success,
+			Result:  result,
+			Timeout: 5,
+		}, nil
+	}
+
+	if model.sessionData.CodeProject.Environment.Name == "haskell" {
+		res := execution.Service(_var.PROJECT_EXECUTION).RunJob(execution.Job{
+			BuilderType:   "linked",
+			ExecutionType: "linked",
+			EmulatorTag:   string(model.sessionData.CodeProject.Environment.Tag),
+			EmulatorName:  string(model.sessionData.CodeProject.Environment.Name),
+			EmulatorText:  model.sessionData.CodeBlock.Text,
+			CodeProject:   model.sessionData.CodeProject,
+			Contents:      model.sessionData.Content,
+			PackageName:   model.sessionData.PackageName,
+		})
+
+		result := res.Result
+
+		if result == "" && res.Error != nil && appErrors.TimeoutError == res.Error.Code {
+			result = "timeout"
+		}
+
+		return repository.ProjectRunResult{
+			Success: res.Success,
+			Result:  result,
+			Timeout: 5,
+		}, nil
+	}
+
 	if model.sessionData.CodeProject.Environment.Name == "c" {
 		projectBuilder := builders.CreateBuilder("linked_compiled_project").(builders.LinkedBuildFn)
 
@@ -283,7 +333,7 @@ func (s Service) RunPublicProject(model *PublicLinkedProjectRunRequest) (reposit
 			ExecutionType: "linked",
 			EmulatorTag:   string(model.sessionData.CodeProject.Environment.Tag),
 			EmulatorName:  string(model.sessionData.CodeProject.Environment.Name),
-			EmulatorText:  model.sessionData.CodeBlock.Text,
+			EmulatorText:  model.Text,
 			CodeProject:   model.sessionData.CodeProject,
 			Contents:      model.sessionData.Content,
 		})
@@ -307,9 +357,34 @@ func (s Service) RunPublicProject(model *PublicLinkedProjectRunRequest) (reposit
 			ExecutionType: "linked",
 			EmulatorTag:   string(model.sessionData.CodeProject.Environment.Tag),
 			EmulatorName:  string(model.sessionData.CodeProject.Environment.Name),
-			EmulatorText:  model.sessionData.CodeBlock.Text,
+			EmulatorText:  model.Text,
 			CodeProject:   model.sessionData.CodeProject,
 			Contents:      model.sessionData.Content,
+		})
+
+		result := res.Result
+
+		if result == "" && res.Error != nil && appErrors.TimeoutError == res.Error.Code {
+			result = "timeout"
+		}
+
+		return repository.ProjectRunResult{
+			Success: res.Success,
+			Result:  result,
+			Timeout: 5,
+		}, nil
+	}
+
+	if model.sessionData.CodeProject.Environment.Name == "go" {
+		res := execution.Service(_var.PROJECT_EXECUTION).RunJob(execution.Job{
+			BuilderType:   "linked",
+			ExecutionType: "linked",
+			EmulatorTag:   string(model.sessionData.CodeProject.Environment.Tag),
+			EmulatorName:  string(model.sessionData.CodeProject.Environment.Name),
+			EmulatorText:  model.Text,
+			CodeProject:   model.sessionData.CodeProject,
+			Contents:      model.sessionData.Content,
+			PackageName:   model.sessionData.PackageName,
 		})
 
 		result := res.Result
