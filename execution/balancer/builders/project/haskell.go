@@ -9,10 +9,11 @@ import (
 )
 
 type HaskellProjectBuildResult struct {
-	BinaryFileName     string
-	ResolvedFiles      string
-	ExecutionDirectory string
-	ContainerDirectory string
+	BinaryFileName      string
+	ResolvedFiles       string
+	ExecutionDirectory  string
+	ContainerDirectory  string
+	CompilationFileName string
 }
 
 type HaskellProjectBuildParams struct {
@@ -59,9 +60,10 @@ func HaskellProjectBuild(params HaskellProjectBuildParams) (HaskellProjectBuildR
 	}
 
 	return HaskellProjectBuildResult{
-		BinaryFileName:     params.CodeProject.Uuid,
-		ResolvedFiles:      resolvedFiles,
-		ExecutionDirectory: executionDir,
-		ContainerDirectory: execDirConstant,
+		BinaryFileName:      params.CodeProject.Uuid,
+		ResolvedFiles:       resolvedFiles,
+		ExecutionDirectory:  executionDir,
+		ContainerDirectory:  execDirConstant,
+		CompilationFileName: "main.hs",
 	}, nil
 }

@@ -89,28 +89,28 @@ func initExecutioners() {
 			Tag:          string(repository.Ruby.Tag),
 		},
 		{
-			WorkerNum:    1,
-			ContainerNum: 1,
+			WorkerNum:    30,
+			ContainerNum: 20,
 			Tag:          string(repository.Rust.Tag),
 		},
 		{
-			WorkerNum:    1,
-			ContainerNum: 1,
+			WorkerNum:    30,
+			ContainerNum: 20,
 			Tag:          string(repository.CPlus.Tag),
 		},
 		{
-			WorkerNum:    1,
-			ContainerNum: 1,
+			WorkerNum:    30,
+			ContainerNum: 20,
 			Tag:          string(repository.Haskell.Tag),
 		},
 		{
-			WorkerNum:    1,
-			ContainerNum: 1,
+			WorkerNum:    30,
+			ContainerNum: 20,
 			Tag:          string(repository.CLang.Tag),
 		},
 		{
-			WorkerNum:    1,
-			ContainerNum: 1,
+			WorkerNum:    30,
+			ContainerNum: 20,
 			Tag:          string(repository.CSharpMono.Tag),
 		},
 		{
@@ -129,8 +129,8 @@ func initExecutioners() {
 			Tag:          string(repository.Php74.Tag),
 		},
 		{
-			WorkerNum:    1,
-			ContainerNum: 1,
+			WorkerNum:    30,
+			ContainerNum: 20,
 			Tag:          string(repository.GoLang.Tag),
 		},
 	})
@@ -156,28 +156,28 @@ func initExecutioners() {
 			Tag:          string(repository.Ruby.Tag),
 		},
 		{
-			WorkerNum:    1,
-			ContainerNum: 1,
+			WorkerNum:    30,
+			ContainerNum: 20,
 			Tag:          string(repository.Rust.Tag),
 		},
 		{
-			WorkerNum:    1,
-			ContainerNum: 1,
+			WorkerNum:    30,
+			ContainerNum: 20,
 			Tag:          string(repository.CPlus.Tag),
 		},
 		{
-			WorkerNum:    1,
-			ContainerNum: 1,
+			WorkerNum:    30,
+			ContainerNum: 20,
 			Tag:          string(repository.Haskell.Tag),
 		},
 		{
-			WorkerNum:    1,
-			ContainerNum: 1,
+			WorkerNum:    30,
+			ContainerNum: 20,
 			Tag:          string(repository.CLang.Tag),
 		},
 		{
-			WorkerNum:    1,
-			ContainerNum: 1,
+			WorkerNum:    30,
+			ContainerNum: 20,
 			Tag:          string(repository.CSharpMono.Tag),
 		},
 		{
@@ -196,8 +196,8 @@ func initExecutioners() {
 			Tag:          string(repository.Php74.Tag),
 		},
 		{
-			WorkerNum:    1,
-			ContainerNum: 1,
+			WorkerNum:    30,
+			ContainerNum: 20,
 			Tag:          string(repository.GoLang.Tag),
 		},
 	})

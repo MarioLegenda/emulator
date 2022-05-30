@@ -49,6 +49,7 @@ func (s Service) RunPublicProject(model *PublicLinkedProjectRunRequest) (reposit
 		EmulatorText:  model.Text,
 		CodeProject:   model.sessionData.CodeProject,
 		Contents:      model.sessionData.Content,
+		PackageName:   model.sessionData.PackageName,
 	})
 
 	result := res.Result

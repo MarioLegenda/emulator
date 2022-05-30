@@ -51,7 +51,7 @@ func CProjectBuild(params CProjectBuildParams) (CProjectBuildResult, *appErrors.
 		return CProjectBuildResult{}, err
 	}
 
-	resolvedFiles := ""
+	resolvedFiles := fmt.Sprintf("%s ", fmt.Sprintf("%s.%s", execDirConstant, params.CodeProject.Environment.Extension))
 	for dir, files := range paths {
 		s := strings.Split(dir, execDirConstant)
 		dockerPath := s[1]

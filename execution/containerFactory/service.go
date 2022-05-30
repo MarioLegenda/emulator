@@ -22,6 +22,7 @@ type Container interface {
 
 type service struct {
 	containers map[string]container
+	lock       sync.Mutex
 }
 
 type message struct {
@@ -101,7 +102,9 @@ func (d *service) CreateContainers(tag string, workerNum int) []*appErrors.Error
 				}
 
 				close(container.output)
+				d.lock.Lock()
 				d.containers[name] = container
+				d.lock.Unlock()
 
 				fmt.Println(fmt.Sprintf("Container for %s with name %s started!", container.Tag, container.Name))
 

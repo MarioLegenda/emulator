@@ -122,7 +122,7 @@ var CPlus = Language{
 	Tag:           "c-plus:c-plus",
 	InDevelopment: false,
 	InMaintenance: false,
-	Language:      "c++",
+	Language:      "c",
 	Extension:     "cpp",
 }
 

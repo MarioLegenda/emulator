@@ -3,16 +3,15 @@ package linked
 import (
 	"fmt"
 	"github.com/google/uuid"
-	"strings"
 	"therebelsource/emulator/appErrors"
 	"therebelsource/emulator/repository"
 )
 
 type CPlusProjectBuildResult struct {
-	BinaryFileName     string
-	ResolvedFiles      string
-	ExecutionDirectory string
-	ContainerDirectory string
+	BinaryFileName      string
+	ExecutionDirectory  string
+	ContainerDirectory  string
+	CompilationFileName string
 }
 
 type CPlusProjectBuildParams struct {
@@ -51,24 +50,10 @@ func CPlusProjectBuild(params CPlusProjectBuildParams) (CPlusProjectBuildResult,
 		return CPlusProjectBuildResult{}, err
 	}
 
-	resolvedFiles := ""
-	for dir, files := range paths {
-		s := strings.Split(dir, execDirConstant)
-		dockerPath := s[1]
-
-		for _, file := range files {
-			if dockerPath == "" {
-				resolvedFiles += fmt.Sprintf("%s ", file.Name)
-			} else {
-				resolvedFiles += fmt.Sprintf("%s/%s ", dockerPath, file.Name)
-			}
-		}
-	}
-
 	return CPlusProjectBuildResult{
-		BinaryFileName:     params.CodeProject.Uuid,
-		ResolvedFiles:      resolvedFiles,
-		ExecutionDirectory: executionDir,
-		ContainerDirectory: execDirConstant,
+		BinaryFileName:      params.CodeProject.Uuid,
+		ExecutionDirectory:  executionDir,
+		CompilationFileName: fileName,
+		ContainerDirectory:  execDirConstant,
 	}, nil
 }

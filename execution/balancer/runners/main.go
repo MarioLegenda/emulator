@@ -438,11 +438,11 @@ func Run(params Params) Result {
 		}
 
 		return cPlusProjectRunner(CPlusProjectExecParams{
-			ContainerName:      params.ContainerName,
-			ExecutionDirectory: build.ExecutionDirectory,
-			ContainerDirectory: build.ContainerDirectory,
-			ResolvedPaths:      build.ResolvedFiles,
-			BinaryFileName:     build.BinaryFileName,
+			ContainerName:       params.ContainerName,
+			ExecutionDirectory:  build.ExecutionDirectory,
+			ContainerDirectory:  build.ContainerDirectory,
+			BinaryFileName:      build.BinaryFileName,
+			CompilationFileName: build.CompilationFileName,
 		})
 	}
 
@@ -534,9 +534,10 @@ func Run(params Params) Result {
 		}
 
 		return haskellProjectRunner(HaskellExecProjectParams{
-			ExecutionDirectory: build.ExecutionDirectory,
-			ContainerDirectory: build.ContainerDirectory,
-			ContainerName:      params.ContainerName,
+			ExecutionDirectory:  build.ExecutionDirectory,
+			ContainerDirectory:  build.ContainerDirectory,
+			ContainerName:       params.ContainerName,
+			CompilationFileName: build.CompilationFileName,
 		})
 	}
 
@@ -699,9 +700,10 @@ func Run(params Params) Result {
 		}
 
 		return haskellProjectRunner(HaskellExecProjectParams{
-			ExecutionDirectory: build.ExecutionDirectory,
-			ContainerDirectory: build.ContainerDirectory,
-			ContainerName:      params.ContainerName,
+			ExecutionDirectory:  build.ExecutionDirectory,
+			ContainerDirectory:  build.ContainerDirectory,
+			ContainerName:       params.ContainerName,
+			CompilationFileName: build.CompilationFileName,
 		})
 	}
 
@@ -770,11 +772,11 @@ func Run(params Params) Result {
 		}
 
 		return cPlusProjectRunner(CPlusProjectExecParams{
-			ContainerName:      params.ContainerName,
-			ExecutionDirectory: build.ExecutionDirectory,
-			ContainerDirectory: build.ContainerDirectory,
-			ResolvedPaths:      build.ResolvedFiles,
-			BinaryFileName:     build.BinaryFileName,
+			ContainerName:       params.ContainerName,
+			ExecutionDirectory:  build.ExecutionDirectory,
+			ContainerDirectory:  build.ContainerDirectory,
+			BinaryFileName:      build.BinaryFileName,
+			CompilationFileName: build.CompilationFileName,
 		})
 	}
 

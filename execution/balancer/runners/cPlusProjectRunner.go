@@ -10,11 +10,11 @@ import (
 )
 
 type CPlusProjectExecParams struct {
-	ContainerName      string
-	ContainerDirectory string
-	ExecutionDirectory string
-	BinaryFileName     string
-	ResolvedPaths      string
+	ContainerName       string
+	ContainerDirectory  string
+	ExecutionDirectory  string
+	BinaryFileName      string
+	CompilationFileName string
 }
 
 func cPlusProjectRunner(params CPlusProjectExecParams) Result {
@@ -28,8 +28,9 @@ func cPlusProjectRunner(params CPlusProjectExecParams) Result {
 	pidC := make(chan int, 1)
 
 	process := fmt.Sprintf(
-		"cd %s && g++ main.cpp -o %s > output.txt && ./%s > output.txt",
+		"cd %s && g++ %s -o %s > output.txt && ./%s > output.txt",
 		params.ContainerDirectory,
+		params.CompilationFileName,
 		params.BinaryFileName,
 		params.BinaryFileName,
 	)

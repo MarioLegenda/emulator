@@ -10,9 +10,10 @@ import (
 )
 
 type HaskellExecProjectParams struct {
-	ContainerName      string
-	ExecutionDirectory string
-	ContainerDirectory string
+	ContainerName       string
+	ExecutionDirectory  string
+	ContainerDirectory  string
+	CompilationFileName string
 }
 
 func haskellProjectRunner(params HaskellExecProjectParams) Result {
@@ -26,7 +27,17 @@ func haskellProjectRunner(params HaskellExecProjectParams) Result {
 	pidC := make(chan int, 1)
 
 	go func() {
-		cmd := exec.Command("docker", []string{"exec", params.ContainerName, "/bin/bash", "-c", fmt.Sprintf("cd %s && ghc -o %s main.hs > output.txt && ./%s > output.txt", params.ContainerDirectory, params.ContainerDirectory, params.ContainerDirectory)}...)
+		cmd := exec.Command(
+			"docker",
+			[]string{
+				"exec",
+				params.ContainerName,
+				"/bin/bash",
+				"-c",
+				fmt.Sprintf("cd %s && ghc -o %s %s > output.txt && ./%s > output.txt", params.ContainerDirectory, params.ContainerDirectory, params.CompilationFileName, params.ContainerDirectory),
+			}...,
+		)
+
 		errPipe, err := cmd.StderrPipe()
 
 		if err != nil {

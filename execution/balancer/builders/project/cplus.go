@@ -9,10 +9,11 @@ import (
 )
 
 type CPlusProjectBuildResult struct {
-	BinaryFileName     string
-	ResolvedFiles      string
-	ExecutionDirectory string
-	ContainerDirectory string
+	BinaryFileName      string
+	ResolvedFiles       string
+	ExecutionDirectory  string
+	ContainerDirectory  string
+	CompilationFileName string
 }
 
 type CPlusProjectBuildParams struct {
@@ -59,9 +60,10 @@ func CPlusProjectBuild(params CPlusProjectBuildParams) (CPlusProjectBuildResult,
 	}
 
 	return CPlusProjectBuildResult{
-		BinaryFileName:     params.CodeProject.Uuid,
-		ResolvedFiles:      resolvedFiles,
-		ExecutionDirectory: executionDir,
-		ContainerDirectory: execDirConstant,
+		BinaryFileName:      params.CodeProject.Uuid,
+		ResolvedFiles:       resolvedFiles,
+		ExecutionDirectory:  executionDir,
+		ContainerDirectory:  execDirConstant,
+		CompilationFileName: "main.cpp",
 	}, nil
 }
