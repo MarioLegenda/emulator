@@ -45,6 +45,11 @@ func RustProjectBuild(params RustProjectBuildParams) (RustProjectBuildResult, *a
 		return RustProjectBuildResult{}, nil
 	}
 
+	fileName := fmt.Sprintf("%s.%s", execDirConstant, params.CodeProject.Environment.Extension)
+	if err := writeContent(fileName, executionDir, params.Text); err != nil {
+		return RustProjectBuildResult{}, err
+	}
+
 	if err := writeContent("Cargo.toml", executionDir, fmt.Sprintf(`
 [package]
 name = "All executions"
@@ -53,13 +58,8 @@ authors = [ "No name" ]
 
 [[bin]]
 name = "%s"
-path = "main.rs"
-`, execDirConstant)); err != nil {
-		return RustProjectBuildResult{}, err
-	}
-
-	fileName := fmt.Sprintf("%s.%s", execDirConstant, params.CodeProject.Environment.Extension)
-	if err := writeContent(fileName, executionDir, params.Text); err != nil {
+path = "%s"
+`, execDirConstant, fileName)); err != nil {
 		return RustProjectBuildResult{}, err
 	}
 
