@@ -122,7 +122,7 @@ var CPlus = Language{
 	Tag:           "c-plus:c-plus",
 	InDevelopment: false,
 	InMaintenance: false,
-	Language:      "c",
+	Language:      "c++",
 	Extension:     "cpp",
 }
 
@@ -145,10 +145,4 @@ type SingleFileBuildResult struct {
 	StateDirectory     string
 	Timeout            int
 	Args               []string
-}
-
-type ProjectRunResult struct {
-	Success bool   `json:"success"`
-	Result  string `json:"result"`
-	Timeout int    `json:"timeout"`
 }

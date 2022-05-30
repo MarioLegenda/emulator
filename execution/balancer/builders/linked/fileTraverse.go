@@ -25,13 +25,14 @@ func (ft fileTraverse) createPaths() map[string][]*repository.File {
 
 			continue
 		}
+
 		mappedSystem[file.Uuid] = file
 	}
 
 	for _, u := range rootDirectory.Children {
 		f := mappedSystem[u]
 
-		if *f.Parent == rootDirectory.Uuid && f.IsFile {
+		if !f.IsMain && *f.Parent == rootDirectory.Uuid && f.IsFile {
 			path := fmt.Sprintf("%s", ft.rootPath)
 
 			if paths[path] == nil {

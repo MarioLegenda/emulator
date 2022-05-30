@@ -59,7 +59,7 @@ func goProjectRunner(params GoProjectExecParams) Result {
 			waitErr := cmd.Wait()
 
 			if waitErr != nil {
-				runResult.Error = appErrors.New(appErrors.ApplicationError, appErrors.ExecutionStartError, "Execution failed!")
+				runResult.Error = appErrors.New(appErrors.ApplicationError, appErrors.ExecutionStartError, fmt.Sprintf("Execution failed: %s", waitErr.Error()))
 
 				tc <- "error"
 
@@ -68,7 +68,7 @@ func goProjectRunner(params GoProjectExecParams) Result {
 		}
 
 		if startErr != nil {
-			runResult.Error = appErrors.New(appErrors.ApplicationError, appErrors.ExecutionStartError, "Execution failed!")
+			runResult.Error = appErrors.New(appErrors.ApplicationError, appErrors.ExecutionStartError, fmt.Sprintf("Execution failed: %s", startErr.Error()))
 
 			tc <- "error"
 
@@ -90,15 +90,14 @@ func goProjectRunner(params GoProjectExecParams) Result {
 
 			destroyContainerProcess(extractUniqueIdentifier(params.ContainerDirectory, false), true)
 			destroy(params.ExecutionDirectory)
+
 			return runResult
 		}
 
 		out := makeRunDecision(errb, outb, params.ExecutionDirectory)
-		if out != "" {
-			runResult.Success = true
-			runResult.Result = out
-			runResult.Error = nil
-		}
+		runResult.Success = true
+		runResult.Result = out
+		runResult.Error = nil
 
 		closeExecSession(<-pidC)
 		destroy(params.ExecutionDirectory)

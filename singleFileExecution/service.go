@@ -3,7 +3,7 @@ package singleFileExecution
 import (
 	"therebelsource/emulator/appErrors"
 	"therebelsource/emulator/execution"
-	"therebelsource/emulator/runner"
+	"therebelsource/emulator/repository"
 	_var "therebelsource/emulator/var"
 )
 
@@ -15,7 +15,7 @@ func InitService() {
 	SingleFileExecutionService = Service{}
 }
 
-func (s Service) RunSingleFile(model *SingleFileRunRequest) (runner.SingleFileRunResult, *appErrors.Error) {
+func (s Service) RunSingleFile(model *SingleFileRunRequest) (repository.RunResult, *appErrors.Error) {
 	model.Sanitize()
 
 	res := execution.Service(_var.SINGLE_FILE_EXECUTION).RunJob(execution.Job{
@@ -33,14 +33,14 @@ func (s Service) RunSingleFile(model *SingleFileRunRequest) (runner.SingleFileRu
 		result = "timeout"
 	}
 
-	return runner.SingleFileRunResult{
+	return repository.RunResult{
 		Success: res.Success,
 		Result:  result,
 		Timeout: 5,
 	}, nil
 }
 
-func (s Service) RunPublicSingleFile(model *PublicSingleFileRunRequest) (runner.SingleFileRunResult, *appErrors.Error) {
+func (s Service) RunPublicSingleFile(model *PublicSingleFileRunRequest) (repository.RunResult, *appErrors.Error) {
 	model.Sanitize()
 
 	res := execution.Service(_var.SINGLE_FILE_EXECUTION).RunJob(execution.Job{
@@ -58,7 +58,7 @@ func (s Service) RunPublicSingleFile(model *PublicSingleFileRunRequest) (runner.
 		result = "timeout"
 	}
 
-	return runner.SingleFileRunResult{
+	return repository.RunResult{
 		Success: res.Success,
 		Result:  result,
 		Timeout: 5,

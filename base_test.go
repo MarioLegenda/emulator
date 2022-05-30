@@ -19,7 +19,6 @@ import (
 	"therebelsource/emulator/appErrors"
 	"therebelsource/emulator/httpClient"
 	"therebelsource/emulator/repository"
-	"therebelsource/emulator/runner"
 	"time"
 )
 
@@ -28,6 +27,7 @@ var GinkgoFail = ginkgo.Fail
 var GinkgoRunSpecs = ginkgo.RunSpecs
 var GinkgoBeforeEach = ginkgo.BeforeEach
 var GinkgoAfterEach = ginkgo.AfterEach
+var GinkgoAfterAll = ginkgo.AfterSuite
 var GinkgoBeforeSuite = ginkgo.BeforeSuite
 var GinkgoAfterSuite = ginkgo.AfterSuite
 var GinkgoDescribe = ginkgo.Describe
@@ -96,8 +96,6 @@ func testCleanup() {
 		appErrors.TerminateWithMessage(fmt.Sprintf("Cannot do cleanup: %s", err.Error()))
 		return
 	}
-
-	runner.StopContainerBalancer()
 }
 
 func testCreateEmptyPage(activeSession repository.ActiveSession) map[string]interface{} {

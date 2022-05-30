@@ -1,5 +1,17 @@
 package repository
 
+type RunResult struct {
+	Success bool   `json:"success"`
+	Result  string `json:"result"`
+	Timeout int    `json:"timeout"`
+}
+
+type ProjectRunResult struct {
+	Success bool   `json:"success"`
+	Result  string `json:"result"`
+	Timeout int    `json:"timeout"`
+}
+
 type Token struct {
 	ExpiresAt int64 `json:"expiresAt"`
 }
@@ -88,7 +100,8 @@ type CodeProject struct {
 }
 
 type File struct {
-	Name string `json:"name" bson:"name"`
+	Name   string `json:"name" bson:"name"`
+	IsMain bool   `json:"isMain" bson:"isMain"`
 
 	IsRoot bool `json:"isRoot" bson:"isRoot"`
 	Depth  int  `json:"depth" bson:"depth"`

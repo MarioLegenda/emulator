@@ -12,7 +12,6 @@ import (
 	"os/signal"
 	"syscall"
 	errorHandler "therebelsource/emulator/appErrors"
-	"therebelsource/emulator/runner"
 	"time"
 )
 
@@ -46,10 +45,6 @@ func InitServer(r *mux.Router) *http.Server {
 		Addr:         os.Getenv("SERVER_HOST") + ":" + os.Getenv("SERVER_PORT"),
 	}
 
-	fmt.Println("")
-	fmt.Println("Starting container balancer...")
-	runner.StartContainerBalancer()
-
 	// Run our server in a goroutine so that it doesn't block.
 	go func() {
 		fmt.Printf("Starting server on %s:%v...\n", os.Getenv("SERVER_HOST"), os.Getenv("SERVER_PORT"))
@@ -70,10 +65,6 @@ func WatchServerShutdown(srv *http.Server) {
 	c := make(chan os.Signal, 1)
 	signal.Notify(c, os.Interrupt, syscall.SIGINT, syscall.SIGTERM)
 	<-c
-
-	fmt.Println("Stopping container balancer...")
-	runner.StopContainerBalancer()
-	fmt.Println("Container balancer stopped!")
 
 	fmt.Println("Stopping emulator workers...")
 	closeExecutioners()

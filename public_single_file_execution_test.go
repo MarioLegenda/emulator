@@ -11,7 +11,6 @@ import (
 	"os"
 	"therebelsource/emulator/httpUtil"
 	"therebelsource/emulator/repository"
-	"therebelsource/emulator/runner"
 	"therebelsource/emulator/staticTypes"
 )
 
@@ -75,7 +74,7 @@ console.log('mile');
 
 		gomega.Expect(err).To(gomega.BeNil())
 
-		var result runner.SingleFileRunResult
+		var result repository.RunResult
 		gomega.Expect(json.Unmarshal(b, &result)).To(gomega.BeNil())
 
 		gomega.Expect(result.Timeout).Should(gomega.Equal(5))
@@ -142,7 +141,7 @@ console.log('mile');
 
 		gomega.Expect(err).To(gomega.BeNil())
 
-		var result runner.SingleFileRunResult
+		var result repository.RunResult
 		gomega.Expect(json.Unmarshal(b, &result)).To(gomega.BeNil())
 
 		gomega.Expect(result.Timeout).Should(gomega.Equal(5))
@@ -217,7 +216,7 @@ public class HelloWorld
 
 		gomega.Expect(err).To(gomega.BeNil())
 
-		var result runner.SingleFileRunResult
+		var result repository.RunResult
 		gomega.Expect(json.Unmarshal(b, &result)).To(gomega.BeNil())
 
 		gomega.Expect(result.Timeout).Should(gomega.Equal(5))
@@ -284,7 +283,7 @@ console.log('mile');
 
 		gomega.Expect(err).To(gomega.BeNil())
 
-		var result runner.SingleFileRunResult
+		var result repository.RunResult
 		gomega.Expect(json.Unmarshal(b, &result)).To(gomega.BeNil())
 
 		gomega.Expect(result.Timeout).Should(gomega.Equal(5))
@@ -357,7 +356,7 @@ echo "mile";
 
 		gomega.Expect(err).To(gomega.BeNil())
 
-		var result runner.SingleFileRunResult
+		var result repository.RunResult
 		gomega.Expect(json.Unmarshal(b, &result)).To(gomega.BeNil())
 
 		gomega.Expect(result.Timeout).Should(gomega.Equal(5))
@@ -424,7 +423,7 @@ print "mile"
 
 		gomega.Expect(err).To(gomega.BeNil())
 
-		var result runner.SingleFileRunResult
+		var result repository.RunResult
 		gomega.Expect(json.Unmarshal(b, &result)).To(gomega.BeNil())
 
 		gomega.Expect(result.Timeout).Should(gomega.Equal(5))
@@ -505,7 +504,7 @@ func main() {
 
 		gomega.Expect(err).To(gomega.BeNil())
 
-		var result runner.SingleFileRunResult
+		var result repository.RunResult
 		gomega.Expect(json.Unmarshal(b, &result)).To(gomega.BeNil())
 
 		gomega.Expect(result.Timeout).Should(gomega.Equal(5))
@@ -572,7 +571,7 @@ print("This line will be printed.")
 
 		gomega.Expect(err).To(gomega.BeNil())
 
-		var result runner.SingleFileRunResult
+		var result repository.RunResult
 		gomega.Expect(json.Unmarshal(b, &result)).To(gomega.BeNil())
 
 		gomega.Expect(result.Timeout).Should(gomega.Equal(5))
@@ -639,7 +638,7 @@ print("This line will be printed.")
 
 		gomega.Expect(err).To(gomega.BeNil())
 
-		var result runner.SingleFileRunResult
+		var result repository.RunResult
 		gomega.Expect(json.Unmarshal(b, &result)).To(gomega.BeNil())
 
 		gomega.Expect(result.Timeout).Should(gomega.Equal(5))
@@ -706,7 +705,7 @@ main = putStrLn "mile"
 
 		gomega.Expect(err).To(gomega.BeNil())
 
-		var result runner.SingleFileRunResult
+		var result repository.RunResult
 		gomega.Expect(json.Unmarshal(b, &result)).To(gomega.BeNil())
 
 		gomega.Expect(result.Timeout).Should(gomega.Equal(5))
@@ -783,7 +782,7 @@ int main() {
 
 		gomega.Expect(err).To(gomega.BeNil())
 
-		var result runner.SingleFileRunResult
+		var result repository.RunResult
 		gomega.Expect(json.Unmarshal(b, &result)).To(gomega.BeNil())
 
 		gomega.Expect(result.Timeout).Should(gomega.Equal(5))
@@ -862,7 +861,7 @@ int main() {
 
 		gomega.Expect(err).To(gomega.BeNil())
 
-		var result runner.SingleFileRunResult
+		var result repository.RunResult
 		gomega.Expect(json.Unmarshal(b, &result)).To(gomega.BeNil())
 
 		gomega.Expect(result.Timeout).Should(gomega.Equal(5))
