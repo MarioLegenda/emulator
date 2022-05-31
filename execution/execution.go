@@ -162,7 +162,6 @@ func (e *execution) init(name string, blueprints []ContainerBlueprint) *appError
 			containerFactory.Service(name).Close()
 
 			// TODO: Slack service notification and sve to log
-
 			return appErrors.New(appErrors.ServerError, appErrors.ApplicationRuntimeError, fmt.Sprintf("Cannot boot container for tag %s", blueprint.Tag))
 		}
 
@@ -173,7 +172,6 @@ func (e *execution) init(name string, blueprints []ContainerBlueprint) *appError
 
 	for _, c := range containers {
 		workerNum := workers[c.Tag]
-		fmt.Println(fmt.Sprintf("Creating %d workers for %s", workerNum, c.Tag))
 		b := balancer.NewBalancer(c.Name, workerNum)
 		b.StartWorkers()
 		e.balancers[c.Tag] = make([]balancer.Balancer, 0)

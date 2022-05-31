@@ -36,23 +36,16 @@ func isContainerRunning(name string) bool {
 }
 
 func stopDockerContainer(containerName string, pid int) {
-	var stopCmd *exec.Cmd
+	var rmCmd *exec.Cmd
 
-	stopCmd = exec.Command("docker", []string{"container", "stop", containerName}...)
-	stopErr := stopCmd.Run()
+	rmCmd = exec.Command("docker", []string{"rm", "-f", containerName}...)
+	rmErr := rmCmd.Run()
 
-	if stopErr == nil {
-		var rmCmd *exec.Cmd
+	if rmErr != nil {
+		killErr := syscall.Kill(pid, 9)
 
-		rmCmd = exec.Command("docker", []string{"rm", "-f", containerName}...)
-		rmErr := rmCmd.Run()
-
-		if rmErr != nil {
-			killErr := syscall.Kill(pid, 9)
-
-			if killErr != nil {
-				// TODO: notify by slack that the container could not be stopped and time happened
-			}
+		if killErr != nil {
+			// TODO: notify by slack that the container could not be stopped and time happened
 		}
 	}
 }

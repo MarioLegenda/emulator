@@ -106,8 +106,6 @@ func (d *service) CreateContainers(tag string, workerNum int) []*appErrors.Error
 				d.containers[name] = container
 				d.lock.Unlock()
 
-				fmt.Println(fmt.Sprintf("Container for %s with name %s started!", container.Tag, container.Name))
-
 				wg.Done()
 			case msg := <-container.output:
 				if msg.messageType == "error" {
@@ -122,6 +120,8 @@ func (d *service) CreateContainers(tag string, workerNum int) []*appErrors.Error
 	}
 
 	wg.Wait()
+
+	time.Sleep(2 * time.Second)
 
 	return errs
 }
@@ -143,16 +143,14 @@ func (d service) Close() {
 
 		pid := <-out
 
-		fmt.Println(fmt.Sprintf("Stopping container! Name: %s, PID: %d", c.Name, pid))
 		stopDockerContainer(c.Name, pid)
 
 		close(c.pid)
 
-		fmt.Println("Removing associated file system volume...")
 		err := os.RemoveAll(c.dir)
 
 		if err == nil {
-			fmt.Println(fmt.Sprintf("Volume for %s removed", c.Name))
+			// TODO: // send slack error and log
 		}
 
 		if err != nil {
@@ -161,24 +159,14 @@ func (d service) Close() {
 			err := cmd.Run()
 
 			if err != nil {
-				fmt.Println(fmt.Sprintf("Failed to remove volume for %s: %s", c.Name, err.Error()))
-
+				// TODO: send slack error and log
 				return
 			}
-
-			fmt.Println(fmt.Sprintf("Volume for %s removed", c.Name))
 		}
 	}
 
-	fmt.Println("Removing leftover volumes...")
 	cmd := exec.Command("docker", []string{"volume", "rm", "$(docker volume ls -q)"}...)
-	err := cmd.Run()
-
-	if err != nil {
-		fmt.Println("Volumes could not be removed. Either there are no volumes to be removed or you must do it manually!")
-	}
-
-	fmt.Println("Volumes removed!")
+	cmd.Run()
 }
 
 func createContainer(c container) {
