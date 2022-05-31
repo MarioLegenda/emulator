@@ -9,10 +9,12 @@ import (
 	"therebelsource/emulator/appErrors"
 	errorHandler "therebelsource/emulator/appErrors"
 	"therebelsource/emulator/execution"
+	"therebelsource/emulator/logger"
 	"therebelsource/emulator/projectExecution"
 	"therebelsource/emulator/rateLimiter"
 	"therebelsource/emulator/repository"
 	"therebelsource/emulator/singleFileExecution"
+	"therebelsource/emulator/slack"
 	_var "therebelsource/emulator/var"
 )
 
@@ -74,136 +76,140 @@ func initRequiredDirectories(output bool) {
 func initExecutioners() {
 	err := execution.Init(_var.SINGLE_FILE_EXECUTION, []execution.ContainerBlueprint{
 		{
-			WorkerNum:    200,
-			ContainerNum: 10,
+			WorkerNum:    1,
+			ContainerNum: 1,
 			Tag:          string(repository.NodeLts.Tag),
 		},
 		{
-			WorkerNum:    200,
-			ContainerNum: 10,
+			WorkerNum:    1,
+			ContainerNum: 1,
 			Tag:          string(repository.NodeEsm.Tag),
 		},
 		{
-			WorkerNum:    200,
-			ContainerNum: 10,
+			WorkerNum:    1,
+			ContainerNum: 1,
 			Tag:          string(repository.Ruby.Tag),
 		},
 		{
-			WorkerNum:    200,
-			ContainerNum: 10,
+			WorkerNum:    1,
+			ContainerNum: 1,
 			Tag:          string(repository.Rust.Tag),
 		},
 		{
-			WorkerNum:    200,
-			ContainerNum: 10,
+			WorkerNum:    1,
+			ContainerNum: 1,
 			Tag:          string(repository.CPlus.Tag),
 		},
 		{
-			WorkerNum:    200,
-			ContainerNum: 10,
+			WorkerNum:    1,
+			ContainerNum: 1,
 			Tag:          string(repository.Haskell.Tag),
 		},
 		{
-			WorkerNum:    200,
-			ContainerNum: 10,
+			WorkerNum:    1,
+			ContainerNum: 1,
 			Tag:          string(repository.CLang.Tag),
 		},
 		{
-			WorkerNum:    200,
-			ContainerNum: 10,
+			WorkerNum:    1,
+			ContainerNum: 1,
 			Tag:          string(repository.CSharpMono.Tag),
 		},
 		{
-			WorkerNum:    200,
-			ContainerNum: 10,
+			WorkerNum:    1,
+			ContainerNum: 1,
 			Tag:          string(repository.Python3.Tag),
 		},
 		{
-			WorkerNum:    200,
-			ContainerNum: 10,
+			WorkerNum:    1,
+			ContainerNum: 1,
 			Tag:          string(repository.Python2.Tag),
 		},
 		{
-			WorkerNum:    200,
-			ContainerNum: 10,
+			WorkerNum:    1,
+			ContainerNum: 1,
 			Tag:          string(repository.Php74.Tag),
 		},
 		{
-			WorkerNum:    200,
-			ContainerNum: 10,
+			WorkerNum:    1,
+			ContainerNum: 1,
 			Tag:          string(repository.GoLang.Tag),
 		},
 	})
 
 	if err != nil {
+		slack.SendErrorLog(err, "deploy_log")
+
+		execution.Service(_var.SINGLE_FILE_EXECUTION).Close()
+
 		appErrors.TerminateWithMessage("Cannot boot executioner. Server cannot start!")
 	}
 
 	err = execution.Init(_var.PROJECT_EXECUTION, []execution.ContainerBlueprint{
 		{
-			WorkerNum:    200,
-			ContainerNum: 10,
+			WorkerNum:    1,
+			ContainerNum: 1,
 			Tag:          string(repository.NodeLts.Tag),
 		},
 		{
-			WorkerNum:    200,
-			ContainerNum: 10,
+			WorkerNum:    1,
+			ContainerNum: 1,
 			Tag:          string(repository.NodeEsm.Tag),
 		},
 		{
-			WorkerNum:    200,
-			ContainerNum: 10,
+			WorkerNum:    1,
+			ContainerNum: 1,
 			Tag:          string(repository.Ruby.Tag),
 		},
 		{
-			WorkerNum:    200,
-			ContainerNum: 10,
+			WorkerNum:    1,
+			ContainerNum: 1,
 			Tag:          string(repository.Rust.Tag),
 		},
 		{
-			WorkerNum:    200,
-			ContainerNum: 10,
+			WorkerNum:    1,
+			ContainerNum: 1,
 			Tag:          string(repository.CPlus.Tag),
 		},
 		{
-			WorkerNum:    200,
-			ContainerNum: 10,
+			WorkerNum:    1,
+			ContainerNum: 1,
 			Tag:          string(repository.Haskell.Tag),
 		},
 		{
-			WorkerNum:    200,
-			ContainerNum: 10,
+			WorkerNum:    1,
+			ContainerNum: 1,
 			Tag:          string(repository.CLang.Tag),
 		},
 		{
-			WorkerNum:    200,
-			ContainerNum: 10,
+			WorkerNum:    1,
+			ContainerNum: 1,
 			Tag:          string(repository.CSharpMono.Tag),
 		},
 		{
-			WorkerNum:    200,
-			ContainerNum: 10,
+			WorkerNum:    1,
+			ContainerNum: 1,
 			Tag:          string(repository.Python3.Tag),
 		},
 		{
-			WorkerNum:    200,
-			ContainerNum: 10,
+			WorkerNum:    1,
+			ContainerNum: 1,
 			Tag:          string(repository.Python2.Tag),
 		},
 		{
-			WorkerNum:    200,
-			ContainerNum: 10,
+			WorkerNum:    1,
+			ContainerNum: 1,
 			Tag:          string(repository.Php74.Tag),
 		},
 		{
-			WorkerNum:    200,
-			ContainerNum: 10,
+			WorkerNum:    1,
+			ContainerNum: 1,
 			Tag:          string(repository.GoLang.Tag),
 		},
 	})
 
 	if err != nil {
-		execution.Service(_var.SINGLE_FILE_EXECUTION).Close()
+		execution.Service(_var.PROJECT_EXECUTION).Close()
 
 		appErrors.TerminateWithMessage("Cannot boot executioner. Server cannot start!")
 	}
@@ -225,6 +231,8 @@ func closeExecutioners() {
 func App() {
 	loadEnv()
 	initRequiredDirectories(true)
+
+	logger.BuildLoggers()
 
 	rateLimiter.InitRateLimiter()
 

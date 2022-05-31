@@ -32,7 +32,6 @@ func destroy(path string) {
 
 		if err != nil {
 			// TODO: slack error notification
-			fmt.Println(err)
 		}
 	}
 }

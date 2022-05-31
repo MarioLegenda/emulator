@@ -12,6 +12,7 @@ import (
 	"os/signal"
 	"syscall"
 	errorHandler "therebelsource/emulator/appErrors"
+	"therebelsource/emulator/slack"
 	"time"
 )
 
@@ -48,6 +49,7 @@ func InitServer(r *mux.Router) *http.Server {
 	// Run our server in a goroutine so that it doesn't block.
 	go func() {
 		fmt.Printf("Starting server on %s:%v...\n", os.Getenv("SERVER_HOST"), os.Getenv("SERVER_PORT"))
+		slack.SendLog("Deploy", "Server is booted and ready", "deploy_log")
 
 		if os.Getenv("APP_ENV") == "prod" || os.Getenv("APP_ENV") == "staging" {
 			daemon.SdNotify(false, daemon.SdNotifyReady)
@@ -80,6 +82,8 @@ func WatchServerShutdown(srv *http.Server) {
 
 	fmt.Println("Server is terminated. App shutting down!")
 	fmt.Println("")
+
+	slack.SendLog("Shutdown", "Server has successfully shutdown", "deploy_log")
 
 	if os.Getenv("APP_ENV") == "prod" || os.Getenv("APP_ENV") == "staging" {
 		daemon.SdNotify(false, daemon.SdNotifyStopping)

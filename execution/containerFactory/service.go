@@ -9,6 +9,7 @@ import (
 	"os/exec"
 	"sync"
 	"therebelsource/emulator/appErrors"
+	"therebelsource/emulator/logger"
 	"time"
 )
 
@@ -59,7 +60,7 @@ func (d *service) Containers() map[string]container {
 }
 
 func (d *service) CreateContainers(tag string, workerNum int) []*appErrors.Error {
-	fmt.Println(fmt.Sprintf("Creating %d container(s) for %s", workerNum, tag))
+	logger.Info(fmt.Sprintf("Creating %d container(s) for %s", workerNum, tag))
 
 	errs := make([]*appErrors.Error, 0)
 	wg := sync.WaitGroup{}
