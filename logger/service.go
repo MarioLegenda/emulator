@@ -8,6 +8,7 @@ import (
 	"os"
 	"therebelsource/emulator/appErrors"
 	"therebelsource/emulator/slack"
+	"time"
 )
 
 var infoLogger *zap.SugaredLogger
@@ -24,8 +25,12 @@ func wrapLumberjack(level zapcore.Level, fileName string) func(core zapcore.Core
 		MaxAge:     10,
 	})
 
+	encoderConfig := zap.NewProductionEncoderConfig()
+	encoderConfig.TimeKey = "timestamp"
+	encoderConfig.EncodeTime = zapcore.TimeEncoderOfLayout(time.RFC3339)
+
 	core := zapcore.NewCore(
-		zapcore.NewJSONEncoder(zap.NewProductionEncoderConfig()),
+		zapcore.NewJSONEncoder(encoderConfig),
 		w,
 		level,
 	)
@@ -39,7 +44,7 @@ func buildBaseLogger(level zapcore.Level, fileName string) *zap.SugaredLogger {
 	logFile := fmt.Sprintf("%s/%s", os.Getenv("LOG_DIRECTORY"), fileName)
 
 	cfg := zap.NewProductionConfig()
-	cfg.OutputPaths = []string{"stdout", logFile}
+	cfg.OutputPaths = []string{logFile}
 	cfg.ErrorOutputPaths = []string{"stderr"}
 	cfg.DisableStacktrace = false
 	cfg.Level = zap.NewAtomicLevelAt(level)
@@ -94,16 +99,25 @@ func BuildLoggers() {
 }
 
 func Info(msg ...interface{}) {
-	fmt.Println(fmt.Sprintf("INFO: %v", msg))
+	if os.Getenv("APP_ENV") != "prod" && os.Getenv("APP_ENV") != "staging" {
+		fmt.Println(fmt.Sprintf("INFO: %v", msg))
+	}
+
 	infoLogger.Info(msg)
 }
 
-func Error(msg ...[]string) {
-	fmt.Println(fmt.Sprintf("ERROR: %v", msg))
+func Error(msg ...interface{}) {
+	if os.Getenv("APP_ENV") != "prod" && os.Getenv("APP_ENV") != "staging" {
+		fmt.Println(fmt.Sprintf("ERROR: %v", msg))
+	}
+
 	errorLogger.Error(msg)
 }
 
-func Warn(msg ...[]string) {
-	fmt.Println(fmt.Sprintf("WARNING: %v", msg))
+func Warn(msg ...interface{}) {
+	if os.Getenv("APP_ENV") != "prod" && os.Getenv("APP_ENV") != "staging" {
+		fmt.Println(fmt.Sprintf("WARNING: %v", msg))
+	}
+
 	warningLogger.Warn(msg)
 }

@@ -6,12 +6,12 @@ import (
 	"github.com/coreos/go-systemd/daemon"
 	"github.com/gorilla/mux"
 	"github.com/rs/cors"
-	"log"
 	"net/http"
 	"os"
 	"os/signal"
 	"syscall"
 	errorHandler "therebelsource/emulator/appErrors"
+	"therebelsource/emulator/logger"
 	"therebelsource/emulator/slack"
 	"time"
 )
@@ -48,7 +48,7 @@ func InitServer(r *mux.Router) *http.Server {
 
 	// Run our server in a goroutine so that it doesn't block.
 	go func() {
-		fmt.Printf("Starting server on %s:%v...\n", os.Getenv("SERVER_HOST"), os.Getenv("SERVER_PORT"))
+		logger.Info(fmt.Sprintf("Starting server on %s:%v...\n", os.Getenv("SERVER_HOST"), os.Getenv("SERVER_PORT")))
 		slack.SendLog("Deploy", "Server is booted and ready", "deploy_log")
 
 		if os.Getenv("APP_ENV") == "prod" || os.Getenv("APP_ENV") == "staging" {
@@ -56,7 +56,8 @@ func InitServer(r *mux.Router) *http.Server {
 		}
 
 		if err := srv.ListenAndServe(); err != nil {
-			log.Println(err)
+			logger.Error(fmt.Sprintf("Cannot start server: %s", err.Error()))
+			slack.SendErrorLog(errorHandler.New(errorHandler.ApplicationError, errorHandler.ShutdownError, fmt.Sprintf("Cannot start server: %s", err.Error())), "deploy_log")
 		}
 	}()
 
@@ -68,19 +69,19 @@ func WatchServerShutdown(srv *http.Server) {
 	signal.Notify(c, os.Interrupt, syscall.SIGINT, syscall.SIGTERM)
 	<-c
 
-	fmt.Println("Stopping emulator workers...")
+	logger.Info("Stopping emulator workers...")
 	closeExecutioners()
-	fmt.Println("Emulator workers stopped")
+	logger.Info("Emulator workers stopped")
 
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 	err := srv.Shutdown(ctx)
 
 	if err != nil {
-		fmt.Println(errorHandler.ConstructError(errorHandler.ServerError, 0, err.Error()))
+		logger.Info(errorHandler.ConstructError(errorHandler.ServerError, 0, err.Error()))
 	}
 
-	fmt.Println("Server is terminated. App shutting down!")
+	logger.Info("Server is terminated. App shutting down!")
 	fmt.Println("")
 
 	slack.SendLog("Shutdown", "Server has successfully shutdown", "deploy_log")

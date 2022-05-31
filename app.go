@@ -34,7 +34,7 @@ func initRequiredDirectories(output bool) {
 
 		if output {
 			fmt.Println("")
-			fmt.Println("Creating required directories...")
+			logger.Info("Creating required directories...")
 		}
 		fsErr := os.Mkdir(projectsDir, os.ModePerm)
 
@@ -60,14 +60,14 @@ func initRequiredDirectories(output bool) {
 	} else {
 		if output {
 			fmt.Println("")
-			fmt.Println("Required directories already created! Skipping...")
+			logger.Info("Required directories already created! Skipping...")
 			fmt.Println("")
 		}
 	}
 
 	if !directoriesExist {
 		if output {
-			fmt.Println("Required directories created!")
+			logger.Info("Required directories created!")
 			fmt.Println("")
 		}
 	}
@@ -139,6 +139,7 @@ func initExecutioners() {
 
 	if err != nil {
 		slack.SendErrorLog(err, "deploy_log")
+		logger.Error(fmt.Sprintf("Cannot boot single file execution: %s", err.Error()))
 
 		execution.Service(_var.SINGLE_FILE_EXECUTION).Close()
 
@@ -209,6 +210,9 @@ func initExecutioners() {
 	})
 
 	if err != nil {
+		slack.SendErrorLog(err, "deploy_log")
+		logger.Error(fmt.Sprintf("Cannot boot project execution: %s", err.Error()))
+
 		execution.Service(_var.PROJECT_EXECUTION).Close()
 
 		appErrors.TerminateWithMessage("Cannot boot executioner. Server cannot start!")
@@ -230,9 +234,8 @@ func closeExecutioners() {
 
 func App() {
 	loadEnv()
-	initRequiredDirectories(true)
-
 	logger.BuildLoggers()
+	initRequiredDirectories(true)
 
 	rateLimiter.InitRateLimiter()
 

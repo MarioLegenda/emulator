@@ -2,12 +2,15 @@ package execution
 
 import (
 	"fmt"
+	"os"
 	"sync"
 	"therebelsource/emulator/appErrors"
 	"therebelsource/emulator/execution/balancer"
 	"therebelsource/emulator/execution/balancer/runners"
 	"therebelsource/emulator/execution/containerFactory"
+	"therebelsource/emulator/logger"
 	"therebelsource/emulator/repository"
+	"therebelsource/emulator/slack"
 )
 
 var services map[string]Execution
@@ -77,6 +80,14 @@ func Service(name string) Execution {
 }
 
 func (e *execution) RunJob(j Job) runners.Result {
+	defer func() {
+		if err := recover(); err != nil {
+			slack.SendLog("Error", fmt.Sprintf("A panic occurred while running a job. The server will close right away and you have to clean up after it. Error: %v", err), "critical_log")
+			logger.Error(fmt.Sprintf("A panic occurred while running a job. The server will close right away and you have to clean up after it. Error: %v", err))
+			os.Exit(125)
+		}
+	}()
+
 	e.lock.Lock()
 
 	balancers := e.balancers[j.EmulatorTag]
@@ -133,13 +144,6 @@ func (e *execution) RunJob(j Job) runners.Result {
 }
 
 func (e *execution) Close() {
-	defer func() {
-		if err := recover(); err != nil {
-			panic(err)
-			// send to slack/log
-		}
-	}()
-
 	e.lock.Lock()
 	e.close = true
 	e.lock.Unlock()
@@ -161,7 +165,9 @@ func (e *execution) init(name string, blueprints []ContainerBlueprint) *appError
 		if len(errs) != 0 {
 			containerFactory.Service(name).Close()
 
-			// TODO: Slack service notification and sve to log
+			slack.SendLog("Error", fmt.Sprintf("Cannot boot container for tag %s: %v", blueprint.Tag, errs), "critical_log")
+			logger.Error(fmt.Sprintf("Cannot boot container for tag %s: %v", blueprint.Tag, errs))
+
 			return appErrors.New(appErrors.ServerError, appErrors.ApplicationRuntimeError, fmt.Sprintf("Cannot boot container for tag %s", blueprint.Tag))
 		}
 
