@@ -18,7 +18,7 @@ func InitService() {
 func (s Service) RunSingleFile(model *SingleFileRunRequest) (repository.RunResult, *appErrors.Error) {
 	model.Sanitize()
 
-	res := execution.Service(_var.SINGLE_FILE_EXECUTION).RunJob(execution.Job{
+	res := execution.Service(_var.PROJECT_EXECUTION).RunJob(execution.Job{
 		BuilderType:       "single_file",
 		ExecutionType:     "single_file",
 		EmulatorName:      string(model.codeBlock.Emulator.Name),
@@ -43,7 +43,7 @@ func (s Service) RunSingleFile(model *SingleFileRunRequest) (repository.RunResul
 func (s Service) RunPublicSingleFile(model *PublicSingleFileRunRequest) (repository.RunResult, *appErrors.Error) {
 	model.Sanitize()
 
-	res := execution.Service(_var.SINGLE_FILE_EXECUTION).RunJob(execution.Job{
+	res := execution.Service(_var.PROJECT_EXECUTION).RunJob(execution.Job{
 		BuilderType:       "single_file",
 		ExecutionType:     "single_file",
 		EmulatorName:      string(model.codeBlock.Emulator.Name),

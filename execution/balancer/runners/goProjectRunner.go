@@ -16,14 +16,14 @@ type GoProjectExecParams struct {
 }
 
 func goProjectRunner(params GoProjectExecParams) Result {
-	ctx, cancel := context.WithDeadline(context.Background(), time.Now().Add(5*time.Second))
-	defer cancel()
-
 	var outb, errb string
 	var runResult Result
 
 	tc := make(chan string)
 	pidC := make(chan int, 1)
+
+	ctx, cancel := context.WithDeadline(context.Background(), time.Now().Add(5*time.Second))
+	defer cancel()
 
 	go func() {
 		cmd := exec.Command("docker", []string{"exec", params.ContainerName, "/bin/bash", "-c", fmt.Sprintf("cd %s && go mod init app/%s >/dev/null 2>&1 && go build && ./%s", params.ContainerDirectory, params.ContainerDirectory, params.ContainerDirectory)}...)

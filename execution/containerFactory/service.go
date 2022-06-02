@@ -62,65 +62,71 @@ func (d *service) Containers() map[string]container {
 func (d *service) CreateContainers(tag string, workerNum int) []*appErrors.Error {
 	logger.Info(fmt.Sprintf("Creating %d container(s) for %s", workerNum, tag))
 
+	blocks := makeBlocks(workerNum, 10)
+
 	errs := make([]*appErrors.Error, 0)
-	wg := sync.WaitGroup{}
-	for i := 0; i < workerNum; i++ {
-		wg.Add(1)
-		go func(wg *sync.WaitGroup) {
-			name := uuid.New().String()
+	for _, block := range blocks {
+		wg := sync.WaitGroup{}
 
-			containerDir := fmt.Sprintf("%s/%s", os.Getenv("EXECUTION_DIR"), name)
-			fsErr := os.Mkdir(containerDir, os.ModePerm)
+		for _ = range block {
+			wg.Add(1)
+			go func(wg *sync.WaitGroup) {
+				name := uuid.New().String()
 
-			if fsErr != nil {
-				errs = append(errs, appErrors.New(appErrors.ApplicationError, appErrors.ApplicationRuntimeError, fmt.Sprintf("Could not start container: %s", fsErr.Error())))
+				containerDir := fmt.Sprintf("%s/%s", os.Getenv("EXECUTION_DIR"), name)
+				fsErr := os.Mkdir(containerDir, os.ModePerm)
 
-				wg.Done()
-
-				return
-			}
-
-			container := container{
-				output: make(chan message),
-				pid:    make(chan int),
-				dir:    containerDir,
-
-				Tag:       tag,
-				Name:      name,
-				WorkerNum: workerNum,
-			}
-
-			createContainer(container)
-
-			select {
-			case <-time.After(1 * time.Second):
-				if !isContainerRunning(name) {
-					errs = append(errs, appErrors.New(appErrors.ApplicationError, appErrors.ApplicationRuntimeError, "Container startup timeout"))
+				if fsErr != nil {
+					errs = append(errs, appErrors.New(appErrors.ApplicationError, appErrors.ApplicationRuntimeError, fmt.Sprintf("Could not start container: %s", fsErr.Error())))
 
 					wg.Done()
 
 					return
 				}
 
-				close(container.output)
-				d.lock.Lock()
-				d.containers[name] = container
-				d.lock.Unlock()
+				container := container{
+					output: make(chan message),
+					pid:    make(chan int),
+					dir:    containerDir,
 
-				wg.Done()
-			case msg := <-container.output:
-				if msg.messageType == "error" {
-					err := msg.data.(error)
+					Tag:       tag,
+					Name:      name,
+					WorkerNum: workerNum,
+				}
 
-					errs = append(errs, appErrors.New(appErrors.ApplicationError, appErrors.ApplicationRuntimeError, fmt.Sprintf("Could not start container: %s", err.Error())))
+				createContainer(container)
+
+				select {
+				case <-time.After(3 * time.Second):
+					if !isContainerRunning(name) {
+						errs = append(errs, appErrors.New(appErrors.ApplicationError, appErrors.ApplicationRuntimeError, fmt.Sprintf("Container startup timeout: Tag: %s, Name: %s", container.Tag, container.Name)))
+
+						wg.Done()
+
+						return
+					}
+
+					close(container.output)
+					d.lock.Lock()
+					d.containers[name] = container
+					d.lock.Unlock()
 
 					wg.Done()
-				}
-			}
-		}(&wg)
-	}
+				case msg := <-container.output:
+					if msg.messageType == "error" {
+						err := msg.data.(error)
+						close(container.output)
 
-	wg.Wait()
+						errs = append(errs, appErrors.New(appErrors.ApplicationError, appErrors.ApplicationRuntimeError, fmt.Sprintf("Could not start container; Name: %s, Tag: %s: %s", container.Name, container.Tag, err.Error())))
+
+						wg.Done()
+					}
+				}
+			}(&wg)
+		}
+
+		wg.Wait()
+	}
 
 	time.Sleep(2 * time.Second)
 
@@ -128,42 +134,59 @@ func (d *service) CreateContainers(tag string, workerNum int) []*appErrors.Error
 }
 
 func (d service) Close() {
-	for _, c := range d.containers {
-		ctx, cancel := context.WithDeadline(context.Background(), time.Now().Add(20*time.Second))
-		out := make(chan int)
+	contArr := containersToSlice(d.containers)
+	blocks := makeBlocks(len(contArr), 10)
 
-		go func(pidCh chan int, out chan int) {
-			select {
-			case <-ctx.Done():
-				out <- 0
-			case pid := <-c.pid:
-				cancel()
-				out <- pid
-			}
-		}(c.pid, out)
+	for _, block := range blocks {
+		wg := sync.WaitGroup{}
 
-		pid := <-out
+		for _, b := range block {
+			wg.Add(1)
+			c := contArr[b]
 
-		stopDockerContainer(c.Name, pid)
+			go func(c container, wg *sync.WaitGroup) {
+				ctx, cancel := context.WithDeadline(context.Background(), time.Now().Add(20*time.Second))
+				out := make(chan int)
 
-		close(c.pid)
+				go func(pidCh chan int, out chan int) {
+					select {
+					case <-ctx.Done():
+						out <- 0
+					case pid := <-c.pid:
+						cancel()
+						out <- pid
+					}
+				}(c.pid, out)
 
-		err := os.RemoveAll(c.dir)
+				pid := <-out
 
-		if err == nil {
-			// TODO: // send slack error and log
+				stopDockerContainer(c.Name, pid)
+
+				close(c.pid)
+
+				err := os.RemoveAll(c.dir)
+
+				if err == nil {
+					// TODO: // send slack error and log
+				}
+
+				if err != nil {
+					cmd := exec.Command("rm", []string{"-rf", c.dir}...)
+
+					err := cmd.Run()
+
+					if err != nil {
+						wg.Done()
+						// TODO: send slack error and log
+						return
+					}
+				}
+
+				wg.Done()
+			}(c, &wg)
 		}
 
-		if err != nil {
-			cmd := exec.Command("rm", []string{"-rf", c.dir}...)
-
-			err := cmd.Run()
-
-			if err != nil {
-				// TODO: send slack error and log
-				return
-			}
-		}
+		wg.Wait()
 	}
 
 	cmd := exec.Command("docker", []string{"volume", "rm", "$(docker volume ls -q)"}...)
@@ -187,13 +210,13 @@ func createContainer(c container) {
 		}
 
 		cmd := exec.Command("docker", args...)
-
 		var outb, errb bytes.Buffer
 
 		cmd.Stderr = &errb
 		cmd.Stdout = &outb
 
 		startErr := cmd.Run()
+		c.pid <- cmd.Process.Pid
 
 		if startErr != nil {
 			c.output <- message{
@@ -203,7 +226,5 @@ func createContainer(c container) {
 
 			return
 		}
-
-		c.pid <- cmd.Process.Pid
 	}(c)
 }

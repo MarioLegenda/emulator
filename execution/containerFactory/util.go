@@ -7,6 +7,8 @@ import (
 	"regexp"
 	"strings"
 	"syscall"
+	"therebelsource/emulator/logger"
+	"therebelsource/emulator/slack"
 )
 
 func getVolumeDirectory(volume string) string {
@@ -36,16 +38,69 @@ func isContainerRunning(name string) bool {
 }
 
 func stopDockerContainer(containerName string, pid int) {
-	var rmCmd *exec.Cmd
+	var stopCmd *exec.Cmd
 
-	rmCmd = exec.Command("docker", []string{"rm", "-f", containerName}...)
-	rmErr := rmCmd.Run()
+	stopCmd = exec.Command("docker", []string{"container", "stop", containerName}...)
+	stopErr := stopCmd.Run()
 
-	if rmErr != nil {
-		killErr := syscall.Kill(pid, 9)
+	if stopErr == nil {
+		var rmCmd *exec.Cmd
 
-		if killErr != nil {
-			// TODO: notify by slack that the container could not be stopped and time happened
+		rmCmd = exec.Command("docker", []string{"rm", "-f", containerName}...)
+		rmErr := rmCmd.Run()
+
+		if rmErr != nil {
+			slack.SendLog("Container could not stop", stopErr.Error(), "critical_log")
+			logger.Warn(fmt.Sprintf("Container could not stop. rm error: %s", stopErr.Error()))
+
+			killErr := syscall.Kill(pid, 9)
+
+			if killErr != nil {
+				slack.SendLog("Container could not be killed", killErr.Error(), "critical_log")
+				logger.Warn(fmt.Sprintf("Container could not be killed. Kill error: %s", killErr.Error()))
+			}
 		}
 	}
+
+	if stopErr != nil {
+		slack.SendLog("Container could not be stopped", stopErr.Error(), "critical_log")
+		logger.Warn(fmt.Sprintf("Container could not stop. Stop error: %s", stopErr.Error()))
+	}
+}
+
+func makeBlocks(num int, delimiter int) [][]int {
+	portions := num / delimiter
+	leftover := num % delimiter
+	if leftover != 0 {
+		portions++
+	}
+
+	blocks := make([][]int, 0)
+	current := 0
+	for i := 0; i < portions; i++ {
+		b := make([]int, 0)
+		d := delimiter
+
+		if i == portions-1 {
+			d = leftover
+		}
+
+		for a := 0; a < d; a++ {
+			b = append(b, current)
+			current++
+		}
+
+		blocks = append(blocks, b)
+	}
+
+	return blocks
+}
+
+func containersToSlice(containers map[string]container) []container {
+	s := make([]container, 0)
+	for _, v := range containers {
+		s = append(s, v)
+	}
+
+	return s
 }

@@ -16,6 +16,7 @@ import (
 	"therebelsource/emulator/singleFileExecution"
 	"therebelsource/emulator/slack"
 	_var "therebelsource/emulator/var"
+	"time"
 )
 
 func loadEnv() {
@@ -74,137 +75,65 @@ func initRequiredDirectories(output bool) {
 }
 
 func initExecutioners() {
-	err := execution.Init(_var.SINGLE_FILE_EXECUTION, []execution.ContainerBlueprint{
+	err := execution.Init(_var.PROJECT_EXECUTION, []execution.ContainerBlueprint{
 		{
-			WorkerNum:    1,
-			ContainerNum: 1,
+			WorkerNum:    50,
+			ContainerNum: 50,
 			Tag:          string(repository.NodeLts.Tag),
 		},
 		{
-			WorkerNum:    1,
-			ContainerNum: 1,
+			WorkerNum:    50,
+			ContainerNum: 50,
 			Tag:          string(repository.NodeEsm.Tag),
 		},
 		{
-			WorkerNum:    1,
-			ContainerNum: 1,
+			WorkerNum:    50,
+			ContainerNum: 50,
 			Tag:          string(repository.Ruby.Tag),
 		},
 		{
-			WorkerNum:    1,
-			ContainerNum: 1,
+			WorkerNum:    50,
+			ContainerNum: 50,
 			Tag:          string(repository.Rust.Tag),
 		},
 		{
-			WorkerNum:    1,
-			ContainerNum: 1,
+			WorkerNum:    50,
+			ContainerNum: 50,
 			Tag:          string(repository.CPlus.Tag),
 		},
 		{
-			WorkerNum:    1,
-			ContainerNum: 1,
+			WorkerNum:    50,
+			ContainerNum: 50,
 			Tag:          string(repository.Haskell.Tag),
 		},
 		{
-			WorkerNum:    1,
-			ContainerNum: 1,
+			WorkerNum:    50,
+			ContainerNum: 50,
 			Tag:          string(repository.CLang.Tag),
 		},
 		{
-			WorkerNum:    1,
-			ContainerNum: 1,
+			WorkerNum:    50,
+			ContainerNum: 50,
 			Tag:          string(repository.CSharpMono.Tag),
 		},
 		{
-			WorkerNum:    1,
-			ContainerNum: 1,
+			WorkerNum:    50,
+			ContainerNum: 50,
 			Tag:          string(repository.Python3.Tag),
 		},
 		{
-			WorkerNum:    1,
-			ContainerNum: 1,
+			WorkerNum:    50,
+			ContainerNum: 50,
 			Tag:          string(repository.Python2.Tag),
 		},
 		{
-			WorkerNum:    1,
-			ContainerNum: 1,
+			WorkerNum:    50,
+			ContainerNum: 50,
 			Tag:          string(repository.Php74.Tag),
 		},
 		{
-			WorkerNum:    1,
-			ContainerNum: 1,
-			Tag:          string(repository.GoLang.Tag),
-		},
-	})
-
-	if err != nil {
-		slack.SendErrorLog(err, "deploy_log")
-		logger.Error(fmt.Sprintf("Cannot boot single file execution: %s", err.Error()))
-
-		execution.Service(_var.SINGLE_FILE_EXECUTION).Close()
-
-		appErrors.TerminateWithMessage("Cannot boot executioner. Server cannot start!")
-	}
-
-	err = execution.Init(_var.PROJECT_EXECUTION, []execution.ContainerBlueprint{
-		{
-			WorkerNum:    1,
-			ContainerNum: 1,
-			Tag:          string(repository.NodeLts.Tag),
-		},
-		{
-			WorkerNum:    1,
-			ContainerNum: 1,
-			Tag:          string(repository.NodeEsm.Tag),
-		},
-		{
-			WorkerNum:    1,
-			ContainerNum: 1,
-			Tag:          string(repository.Ruby.Tag),
-		},
-		{
-			WorkerNum:    1,
-			ContainerNum: 1,
-			Tag:          string(repository.Rust.Tag),
-		},
-		{
-			WorkerNum:    1,
-			ContainerNum: 1,
-			Tag:          string(repository.CPlus.Tag),
-		},
-		{
-			WorkerNum:    1,
-			ContainerNum: 1,
-			Tag:          string(repository.Haskell.Tag),
-		},
-		{
-			WorkerNum:    1,
-			ContainerNum: 1,
-			Tag:          string(repository.CLang.Tag),
-		},
-		{
-			WorkerNum:    1,
-			ContainerNum: 1,
-			Tag:          string(repository.CSharpMono.Tag),
-		},
-		{
-			WorkerNum:    1,
-			ContainerNum: 1,
-			Tag:          string(repository.Python3.Tag),
-		},
-		{
-			WorkerNum:    1,
-			ContainerNum: 1,
-			Tag:          string(repository.Python2.Tag),
-		},
-		{
-			WorkerNum:    1,
-			ContainerNum: 1,
-			Tag:          string(repository.Php74.Tag),
-		},
-		{
-			WorkerNum:    1,
-			ContainerNum: 1,
+			WorkerNum:    50,
+			ContainerNum: 50,
 			Tag:          string(repository.GoLang.Tag),
 		},
 	})
@@ -213,7 +142,12 @@ func initExecutioners() {
 		slack.SendErrorLog(err, "deploy_log")
 		logger.Error(fmt.Sprintf("Cannot boot project execution: %s", err.Error()))
 
-		execution.Service(_var.PROJECT_EXECUTION).Close()
+		if !execution.Service(_var.PROJECT_EXECUTION).Closed() {
+			execution.Service(_var.PROJECT_EXECUTION).Close()
+		}
+
+		time.Sleep(5 * time.Second)
+		execution.FinalCleanup(true)
 
 		appErrors.TerminateWithMessage("Cannot boot executioner. Server cannot start!")
 	}
@@ -221,15 +155,20 @@ func initExecutioners() {
 
 func closeExecutioners() {
 	wg := sync.WaitGroup{}
-	for _, e := range []string{_var.SINGLE_FILE_EXECUTION, _var.PROJECT_EXECUTION} {
+	for _, e := range []string{_var.PROJECT_EXECUTION} {
 		wg.Add(1)
 
 		go func(name string, wg *sync.WaitGroup) {
-			execution.Service(name).Close()
+			if !execution.Service(name).Closed() {
+				execution.Service(name).Close()
+			}
 			wg.Done()
 		}(e, &wg)
 	}
 	wg.Wait()
+
+	time.Sleep(5 * time.Second)
+	execution.FinalCleanup(true)
 }
 
 func App() {
@@ -242,6 +181,7 @@ func App() {
 	singleFileExecution.InitService()
 	projectExecution.InitService()
 
+	execution.FinalCleanup(false)
 	initExecutioners()
 
 	WatchServerShutdown(InitServer(RegisterRoutes()))

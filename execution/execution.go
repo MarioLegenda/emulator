@@ -35,6 +35,7 @@ type Job struct {
 
 type Execution interface {
 	Close()
+	Closed() bool
 	RunJob(j Job) runners.Result
 }
 
@@ -64,19 +65,23 @@ func Init(name string, blueprints []ContainerBlueprint) *appErrors.Error {
 		name:       name,
 	}
 
+	services[name] = s
+
 	err := s.init(name, blueprints)
 
 	if err != nil {
 		return err
 	}
 
-	services[name] = s
-
 	return nil
 }
 
 func Service(name string) Execution {
 	return services[name]
+}
+
+func (e *execution) Closed() bool {
+	return e.close
 }
 
 func (e *execution) RunJob(j Job) runners.Result {
@@ -163,7 +168,7 @@ func (e *execution) init(name string, blueprints []ContainerBlueprint) *appError
 		errs := containerFactory.Service(name).CreateContainers(blueprint.Tag, blueprint.ContainerNum)
 
 		if len(errs) != 0 {
-			containerFactory.Service(name).Close()
+			e.Close()
 
 			slack.SendLog("Error", fmt.Sprintf("Cannot boot container for tag %s: %v", blueprint.Tag, errs), "critical_log")
 			logger.Error(fmt.Sprintf("Cannot boot container for tag %s: %v", blueprint.Tag, errs))

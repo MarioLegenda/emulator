@@ -1,4 +1,4 @@
-FROM ruby:latest
+FROM ruby:3.0-slim-buster
 
 ENV APP_DIR /app
 
