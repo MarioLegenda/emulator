@@ -50,16 +50,23 @@ func RustProjectBuild(params RustProjectBuildParams) (RustProjectBuildResult, *a
 		return RustProjectBuildResult{}, err
 	}
 
-	if err := writeContent("Cargo.toml", executionDir, fmt.Sprintf(`
-[package]
-name = "All executions"
+	fmt.Println(execDirConstant, fileName)
+	fmt.Println([]byte(execDirConstant), []byte(fileName))
+
+	fmt.Println(fmt.Sprintf(`[[bin]]
+name = "%s"
+path = "%s"
+`, execDirConstant, fileName))
+
+	if err := writeContent("Cargo.toml", executionDir, fmt.Sprintf(`[package]
+name = "%s"
 version = "0.0.1"
-authors = [ "No name" ]
+authors = ["No name"]
 
 [[bin]]
 name = "%s"
 path = "%s"
-`, execDirConstant, fileName)); err != nil {
+`, execDirConstant, execDirConstant, fileName)); err != nil {
 		return RustProjectBuildResult{}, err
 	}
 

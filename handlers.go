@@ -33,6 +33,14 @@ func getEnvironmentsHandler(w http.ResponseWriter, r *http.Request) {
 	cr.SendResponse(apiResponse)
 }
 
+func healthHandler(w http.ResponseWriter, r *http.Request) {
+	cr := httpUtil.InitCurrentRequest(w, r)
+
+	apiResponse := httpUtil.CreateSuccessResponse(cr, staticTypes.RESPONSE_RESOURCE, nil, http.StatusOK, "Server healthy")
+
+	cr.SendResponse(apiResponse)
+}
+
 func executeSingleCodeBlockHandler(w http.ResponseWriter, r *http.Request) {
 	cr := httpUtil.InitCurrentRequest(w, r)
 

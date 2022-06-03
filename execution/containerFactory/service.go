@@ -97,7 +97,7 @@ func (d *service) CreateContainers(tag string, workerNum int) []*appErrors.Error
 				createContainer(container)
 
 				select {
-				case <-time.After(3 * time.Second):
+				case <-time.After(1 * time.Second):
 					if !isContainerRunning(name) {
 						errs = append(errs, appErrors.New(appErrors.ApplicationError, appErrors.ApplicationRuntimeError, fmt.Sprintf("Container startup timeout: Tag: %s, Name: %s", container.Tag, container.Name)))
 
