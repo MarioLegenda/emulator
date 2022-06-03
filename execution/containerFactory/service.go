@@ -62,7 +62,7 @@ func (d *service) Containers() map[string]container {
 func (d *service) CreateContainers(tag string, workerNum int) []*appErrors.Error {
 	logger.Info(fmt.Sprintf("Creating %d container(s) for %s", workerNum, tag))
 
-	blocks := makeBlocks(workerNum, 10)
+	blocks := makeBlocks(workerNum, 5)
 
 	errs := make([]*appErrors.Error, 0)
 	for _, block := range blocks {
