@@ -5,6 +5,7 @@ import (
 	"github.com/joho/godotenv"
 	"log"
 	"os"
+	"strconv"
 	"sync"
 	"therebelsource/emulator/appErrors"
 	errorHandler "therebelsource/emulator/appErrors"
@@ -25,6 +26,18 @@ func loadEnv() {
 	if err != nil {
 		log.Fatal(err)
 	}
+}
+
+func getEnvironmentWorkers(part string) int {
+	workers, _ := strconv.Atoi(os.Getenv(fmt.Sprintf("%s_WORKERS", part)))
+
+	return workers
+}
+
+func getEnvironmentContainers(part string) int {
+	containers, _ := strconv.Atoi(os.Getenv(fmt.Sprintf("%s_CONTAINERS", part)))
+
+	return containers
 }
 
 func initRequiredDirectories(output bool) {
@@ -77,63 +90,63 @@ func initRequiredDirectories(output bool) {
 func initExecutioners() {
 	err := execution.Init(_var.PROJECT_EXECUTION, []execution.ContainerBlueprint{
 		{
-			WorkerNum:    50,
-			ContainerNum: 50,
+			WorkerNum:    getEnvironmentWorkers("NODE_LTS"),
+			ContainerNum: getEnvironmentContainers("NODE_LTS"),
 			Tag:          string(repository.NodeLts.Tag),
 		},
 		{
-			WorkerNum:    50,
-			ContainerNum: 50,
+			WorkerNum:    getEnvironmentWorkers("NODE_ESM"),
+			ContainerNum: getEnvironmentContainers("NODE_ESM"),
 			Tag:          string(repository.NodeEsm.Tag),
 		},
 		{
-			WorkerNum:    10,
-			ContainerNum: 10,
+			WorkerNum:    getEnvironmentWorkers("RUBY"),
+			ContainerNum: getEnvironmentContainers("RUBY"),
 			Tag:          string(repository.Ruby.Tag),
 		},
 		{
-			WorkerNum:    10,
-			ContainerNum: 10,
+			WorkerNum:    getEnvironmentWorkers("RUST"),
+			ContainerNum: getEnvironmentContainers("RUST"),
 			Tag:          string(repository.Rust.Tag),
 		},
 		{
-			WorkerNum:    10,
-			ContainerNum: 10,
+			WorkerNum:    getEnvironmentWorkers("CPLUS"),
+			ContainerNum: getEnvironmentContainers("CPLUS"),
 			Tag:          string(repository.CPlus.Tag),
 		},
 		{
-			WorkerNum:    10,
-			ContainerNum: 10,
+			WorkerNum:    getEnvironmentWorkers("HASKELL"),
+			ContainerNum: getEnvironmentContainers("HASKELL"),
 			Tag:          string(repository.Haskell.Tag),
 		},
 		{
-			WorkerNum:    10,
-			ContainerNum: 10,
+			WorkerNum:    getEnvironmentWorkers("C"),
+			ContainerNum: getEnvironmentContainers("C"),
 			Tag:          string(repository.CLang.Tag),
 		},
 		{
-			WorkerNum:    10,
-			ContainerNum: 10,
+			WorkerNum:    getEnvironmentWorkers("C_SHARP"),
+			ContainerNum: getEnvironmentContainers("C_SHARP"),
 			Tag:          string(repository.CSharpMono.Tag),
 		},
 		{
-			WorkerNum:    10,
-			ContainerNum: 10,
+			WorkerNum:    getEnvironmentWorkers("PYTHON3"),
+			ContainerNum: getEnvironmentContainers("PYTHON3"),
 			Tag:          string(repository.Python3.Tag),
 		},
 		{
-			WorkerNum:    10,
-			ContainerNum: 10,
+			WorkerNum:    getEnvironmentWorkers("PYTHON2"),
+			ContainerNum: getEnvironmentContainers("PYTHON2"),
 			Tag:          string(repository.Python2.Tag),
 		},
 		{
-			WorkerNum:    20,
-			ContainerNum: 20,
+			WorkerNum:    getEnvironmentWorkers("PHP74"),
+			ContainerNum: getEnvironmentContainers("PHP74"),
 			Tag:          string(repository.Php74.Tag),
 		},
 		{
-			WorkerNum:    50,
-			ContainerNum: 50,
+			WorkerNum:    getEnvironmentWorkers("GO"),
+			ContainerNum: getEnvironmentContainers("GO"),
 			Tag:          string(repository.GoLang.Tag),
 		},
 	})
