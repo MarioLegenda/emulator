@@ -7,6 +7,7 @@ import (
 	"os"
 	"therebelsource/emulator/appErrors"
 	"therebelsource/emulator/httpClient"
+	"therebelsource/emulator/logger"
 )
 
 type Repository struct{}
@@ -51,6 +52,7 @@ func (r Repository) GetCodeBlock(sessionUuid string) (*CodeBlock, *appErrors.Err
 	}
 
 	if response.Status != 200 {
+		logger.Warn(fmt.Sprintf("Failed executing getting a code block: %v", string(response.Body)))
 		return nil, appErrors.New(appErrors.ApplicationError, appErrors.ApplicationRuntimeError, fmt.Sprintf("Request did not succeed with status: %d", response.Status))
 	}
 
@@ -109,6 +111,7 @@ func (r Repository) GetProjectSessionData(sessionUuid string) (*SessionCodeProje
 	}
 
 	if response.Status != 200 {
+		logger.Warn(fmt.Sprintf("Failed executing getting a code block: %v", string(response.Body)))
 		return nil, appErrors.New(appErrors.ApplicationError, appErrors.ApplicationRuntimeError, fmt.Sprintf("Request did not succeed with status: %d", response.Status))
 	}
 
@@ -163,6 +166,7 @@ func (r Repository) GetSingleFileSessionData(sessionUuid string) (*SingleFileSes
 	})
 
 	if clientError != nil {
+		logger.Warn(fmt.Sprintf("Failed executing getting a code block: %v", string(response.Body)))
 		return nil, appErrors.New(appErrors.ApplicationError, appErrors.ApplicationRuntimeError, clientError.GetMessage())
 	}
 
@@ -225,6 +229,7 @@ func (r Repository) GetLinkedSessionData(sessionUuid string) (*LinkedSessionData
 	}
 
 	if response.Status != 200 {
+		logger.Warn(fmt.Sprintf("Failed executing getting a code block: %v", string(response.Body)))
 		return nil, appErrors.New(appErrors.ApplicationError, appErrors.ApplicationRuntimeError, fmt.Sprintf("Request did not succeed with status: %d", response.Status))
 	}
 
@@ -283,6 +288,7 @@ func (r Repository) ValidateTemporarySession(sessionUuid string) (ValidatedTempo
 	}
 
 	if response.Status != 200 {
+		logger.Warn(fmt.Sprintf("Failed executing getting a code block: %v", string(response.Body)))
 		return ValidatedTemporarySession{}, appErrors.New(appErrors.ApplicationError, appErrors.ApplicationRuntimeError, fmt.Sprintf("Request did not succeed with status: %d", response.Status))
 	}
 
@@ -341,6 +347,7 @@ func (r Repository) InvalidateTemporarySession(sessionUuid string) *appErrors.Er
 	}
 
 	if response.Status != 200 {
+		logger.Warn(fmt.Sprintf("Failed executing getting a code block: %v", string(response.Body)))
 		return appErrors.New(appErrors.ApplicationError, appErrors.ApplicationRuntimeError, fmt.Sprintf("Request did not succeed with status: %d", response.Status))
 	}
 
@@ -389,6 +396,7 @@ func (r Repository) GetCodeProject(codeProjectUuid string) (*CodeProject, *appEr
 	}
 
 	if response.Status != 200 {
+		logger.Warn(fmt.Sprintf("Failed executing getting a code block: %v", string(response.Body)))
 		return nil, appErrors.New(appErrors.ApplicationError, appErrors.ApplicationRuntimeError, fmt.Sprintf("Request did not succeed with status: %d", response.Status))
 	}
 
@@ -437,6 +445,7 @@ func (r Repository) GetAllFileContent(codeProjectUuid string) ([]*FileContent, *
 	}
 
 	if response.Status != 200 {
+		logger.Warn(fmt.Sprintf("Failed executing getting a code block: %v", string(response.Body)))
 		return nil, appErrors.New(appErrors.ApplicationError, appErrors.ApplicationRuntimeError, fmt.Sprintf("Request did not succeed with status: %d", response.Status))
 	}
 

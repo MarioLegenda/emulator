@@ -81,7 +81,7 @@ func makeBlocks(num int, delimiter int) [][]int {
 		b := make([]int, 0)
 		d := delimiter
 
-		if i == portions-1 {
+		if i == portions-1 && leftover != 0 {
 			d = leftover
 		}
 

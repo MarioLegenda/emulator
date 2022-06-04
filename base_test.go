@@ -18,6 +18,7 @@ import (
 	"testing"
 	"therebelsource/emulator/appErrors"
 	"therebelsource/emulator/httpClient"
+	"therebelsource/emulator/logger"
 	"therebelsource/emulator/repository"
 	"time"
 )
@@ -42,6 +43,7 @@ func TestApi(t *testing.T) {
 
 func testPrepare() {
 	loadEnv()
+	logger.BuildLoggers()
 	initRequiredDirectories(false)
 
 	/*	singleFileExecution.InitService()

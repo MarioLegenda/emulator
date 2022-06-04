@@ -8,8 +8,8 @@ import (
 )
 
 func makeBlocks(num int, delimiter int) [][]int {
-	portions := num / 5
-	leftover := num % 5
+	portions := num / delimiter
+	leftover := num % delimiter
 	if leftover != 0 {
 		portions++
 	}
@@ -20,7 +20,7 @@ func makeBlocks(num int, delimiter int) [][]int {
 		b := make([]int, 0)
 		d := delimiter
 
-		if i == portions-1 {
+		if i == portions-1 && leftover != 0 {
 			d = leftover
 		}
 

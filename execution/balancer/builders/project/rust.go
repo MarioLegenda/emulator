@@ -43,11 +43,10 @@ func RustProjectBuild(params RustProjectBuildParams) (RustProjectBuildResult, *a
 		return RustProjectBuildResult{}, nil
 	}
 
-	if err := writeContent("Cargo.toml", executionDir, fmt.Sprintf(`
-[package]
-name = "All executions"
+	if err := writeContent("Cargo.toml", executionDir, fmt.Sprintf(`[package]
+name = "name"
 version = "0.0.1"
-authors = [ "No name" ]
+authors = ["No name"]
 
 [[bin]]
 name = "%s"

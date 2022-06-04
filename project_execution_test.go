@@ -13,6 +13,7 @@ import (
 	"os/exec"
 	"therebelsource/emulator/execution"
 	"therebelsource/emulator/httpUtil"
+	"therebelsource/emulator/logger"
 	"therebelsource/emulator/repository"
 	"therebelsource/emulator/staticTypes"
 	_var "therebelsource/emulator/var"
@@ -21,6 +22,7 @@ import (
 var _ = GinkgoDescribe("Project execution tests", func() {
 	GinkgoBeforeEach(func() {
 		loadEnv()
+		logger.BuildLoggers()
 		initRequiredDirectories(false)
 	})
 
@@ -39,8 +41,6 @@ var _ = GinkgoDescribe("Project execution tests", func() {
 	})
 
 	GinkgoIt("Should run a project execution in NodeJS ESM environment", func() {
-		ginkgo.Skip("")
-
 		environment := repository.NodeEsm
 		gomega.Expect(execution.Init(_var.PROJECT_EXECUTION, []execution.ContainerBlueprint{
 			{
@@ -138,8 +138,6 @@ export {subDirDirFileExecute}
 	})
 
 	GinkgoIt("Should run a project execution in NodeJS latest environment", func() {
-		ginkgo.Skip("")
-
 		environment := repository.NodeLts
 		gomega.Expect(execution.Init(_var.PROJECT_EXECUTION, []execution.ContainerBlueprint{
 			{
@@ -243,8 +241,6 @@ module.exports = {
 	})
 
 	GinkgoIt("Should run a project execution in C# environment", func() {
-		ginkgo.Skip("")
-
 		environment := repository.CSharpMono
 		gomega.Expect(execution.Init(_var.PROJECT_EXECUTION, []execution.ContainerBlueprint{
 			{
@@ -316,8 +312,6 @@ public class NewClass {
 	})
 
 	GinkgoIt("Should run a project execution in Go environment", func() {
-		ginkgo.Skip("")
-
 		environment := repository.GoLang
 		gomega.Expect(execution.Init(_var.PROJECT_EXECUTION, []execution.ContainerBlueprint{
 			{
@@ -390,8 +384,6 @@ func MyFunc() {
 	})
 
 	GinkgoIt("Should run a project execution in Rust environment", func() {
-		ginkgo.Skip("")
-
 		environment := repository.Rust
 		gomega.Expect(execution.Init(_var.PROJECT_EXECUTION, []execution.ContainerBlueprint{
 			{

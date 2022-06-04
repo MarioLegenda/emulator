@@ -44,11 +44,10 @@ func RustSingleFileBuild(params RustSingleFileBuildParams) (RustSingleFileBuildR
 		return RustSingleFileBuildResult{}, err
 	}
 
-	if err := writeContent("Cargo.toml", tempExecutionDir, fmt.Sprintf(`
-[package]
-name = "All executions"
+	if err := writeContent("Cargo.toml", tempExecutionDir, fmt.Sprintf(`[package]
+name = "name"
 version = "0.0.1"
-authors = [ "No name" ]
+authors = ["No name"]
 
 [[bin]]
 name = "%s"

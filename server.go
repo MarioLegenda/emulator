@@ -56,8 +56,8 @@ func InitServer(r *mux.Router) *http.Server {
 		}
 
 		if err := srv.ListenAndServe(); err != nil {
-			logger.Error(fmt.Sprintf("Cannot start server: %s", err.Error()))
-			slack.SendErrorLog(errorHandler.New(errorHandler.ApplicationError, errorHandler.ShutdownError, fmt.Sprintf("Cannot start server: %s", err.Error())), "deploy_log")
+			logger.Error(fmt.Sprintf("Server closed: %s", err.Error()))
+			slack.SendLog("Server closed", err.Error(), "deploy_log")
 		}
 	}()
 
