@@ -3,6 +3,7 @@ package execution
 import (
 	"fmt"
 	"os"
+	"runtime"
 	"sync"
 	"therebelsource/emulator/appErrors"
 	"therebelsource/emulator/execution/balancer"
@@ -87,7 +88,13 @@ func (e *execution) Closed() bool {
 func (e *execution) RunJob(j Job) runners.Result {
 	defer func() {
 		if err := recover(); err != nil {
-			slack.SendLog("Error", fmt.Sprintf("A panic occurred while running a job. The server will close right away and you have to clean up after it. Error: %v", err), "critical_log")
+			buf := make([]byte, 2048)
+			n := runtime.Stack(buf, false)
+			buf = buf[:n]
+
+			msg := fmt.Sprintf("Recovering from err %v\n %s", err, buf)
+			
+			slack.SendLog("Error", fmt.Sprintf("A panic occurred while running a job. The server will close right away and you have to clean up after it. Error: %s", msg), "critical_log")
 			logger.Error(fmt.Sprintf("A panic occurred while running a job. The server will close right away and you have to clean up after it. Error: %v", err))
 			os.Exit(125)
 		}
