@@ -96,11 +96,9 @@ func csharpRunner(params CsharpExecParams) Result {
 		}
 
 		out := makeRunDecision(errb, outb, params.ExecutionDirectory)
-		if out != "" {
-			runResult.Success = true
-			runResult.Result = out
-			runResult.Error = nil
-		}
+		runResult.Success = true
+		runResult.Result = out
+		runResult.Error = nil
 
 		closeExecSession(<-pidC)
 		destroy(params.ExecutionDirectory)

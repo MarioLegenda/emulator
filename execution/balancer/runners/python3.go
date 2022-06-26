@@ -91,11 +91,9 @@ func python3Runner(params PythonExecParams) Result {
 		}
 
 		out := makeRunDecision(errb, outb, params.ExecutionDirectory)
-		if out != "" {
-			runResult.Success = true
-			runResult.Result = out
-			runResult.Error = nil
-		}
+		runResult.Success = true
+		runResult.Result = out
+		runResult.Error = nil
 
 		closeExecSession(<-pidC)
 		destroy(params.ExecutionDirectory)

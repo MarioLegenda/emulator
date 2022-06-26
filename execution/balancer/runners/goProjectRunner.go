@@ -82,11 +82,9 @@ func goProjectRunner(params GoProjectExecParams) Result {
 	case res := <-tc:
 		if res == "error" {
 			out := makeRunDecision(errb, outb, params.ExecutionDirectory)
-			if out != "" {
-				runResult.Success = true
-				runResult.Result = out
-				runResult.Error = nil
-			}
+			runResult.Success = true
+			runResult.Result = out
+			runResult.Error = nil
 
 			destroyContainerProcess(extractUniqueIdentifier(params.ContainerDirectory, false), true)
 			destroy(params.ExecutionDirectory)
