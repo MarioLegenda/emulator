@@ -102,6 +102,8 @@ func (e *execution) RunJob(j Job) runners.Result {
 
 	e.lock.Lock()
 
+	fmt.Println("Job received: ", j.EmulatorTag, j.EmulatorName, j.EmulatorExtension)
+
 	balancers := e.balancers[j.EmulatorTag]
 	controller := e.controller[j.EmulatorTag]
 
@@ -114,6 +116,9 @@ func (e *execution) RunJob(j Job) runners.Result {
 			Error:   appErrors.New(appErrors.ApplicationError, appErrors.TimeoutError, "Closing executioner"),
 		}
 	}
+
+	fmt.Println("Length of controller is ", len(controller))
+	fmt.Println("Entire controller: ", controller)
 
 	idx := 0
 	first := controller[0]
@@ -188,7 +193,10 @@ func (e *execution) init(name string, blueprints []ContainerBlueprint) *appError
 
 	containers := containerFactory.Service(name).Containers()
 
+	fmt.Println("Length of containers is: ", len(containers))
+
 	for _, c := range containers {
+		fmt.Println("Creating: ", c.Tag, c.Name)
 		workerNum := workers[c.Tag]
 		b := balancer.NewBalancer(c.Name, workerNum)
 		b.StartWorkers()
