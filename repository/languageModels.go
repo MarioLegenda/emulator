@@ -136,6 +136,16 @@ var CSharpMono = Language{
 	Extension:     "cs",
 }
 
+var Julia = Language{
+	Name:          "julia",
+	Text:          "Julia",
+	Tag:           "julia:julia",
+	InDevelopment: false,
+	InMaintenance: false,
+	Language:      "julia",
+	Extension:     "jl",
+}
+
 type SingleFileBuildResult struct {
 	ContainerName      string
 	DirectoryName      string

@@ -876,5 +876,76 @@ func Run(params Params) Result {
 		})
 	}
 
+	if params.EmulatorName == string(julia.name) && params.BuilderType == "single_file" && params.ExecutionType == "single_file" {
+		build, err := single.JuliaSingleFileBuild(single.InitJuliaParams(
+			params.EmulatorExtension,
+			params.EmulatorText,
+			fmt.Sprintf("%s/%s", os.Getenv("EXECUTION_DIR"), params.ContainerName),
+		))
+
+		if err != nil {
+			return Result{
+				Result:  "",
+				Success: false,
+				Error:   err,
+			}
+		}
+
+		return juliaRunner(JuliaExecParams{
+			ExecutionDirectory: build.ExecutionDirectory,
+			ContainerDirectory: build.ContainerDirectory,
+			ExecutionFile:      build.FileName,
+			ContainerName:      params.ContainerName,
+		})
+	}
+
+	if params.EmulatorName == string(julia.name) && params.BuilderType == "project" && params.ExecutionType == "project" {
+		build, err := project.JuliaProjectBuild(project.InitJuliaParams(
+			params.CodeProject,
+			params.Contents,
+			fmt.Sprintf("%s/%s", os.Getenv("EXECUTION_DIR"), params.ContainerName),
+			params.ExecutingFile,
+		))
+
+		if err != nil {
+			return Result{
+				Result:  "",
+				Success: false,
+				Error:   err,
+			}
+		}
+
+		return juliaRunner(JuliaExecParams{
+			ExecutionDirectory: build.ExecutionDirectory,
+			ContainerDirectory: build.ContainerDirectory,
+			ExecutionFile:      build.FileName,
+			ContainerName:      params.ContainerName,
+		})
+	}
+
+	if params.EmulatorName == string(julia.name) && params.BuilderType == "linked" && params.ExecutionType == "linked" {
+		build, err := linked.JuliaProjectBuild(linked.InitJuliaParams(
+			params.CodeProject,
+			params.Contents,
+			fmt.Sprintf("%s/%s", os.Getenv("EXECUTION_DIR"), params.ContainerName),
+			params.EmulatorText,
+		))
+
+		if err != nil {
+			return Result{
+				Result:  "",
+				Success: false,
+				Error:   err,
+			}
+		}
+
+		return juliaRunner(JuliaExecParams{
+			ExecutionDirectory: build.ExecutionDirectory,
+			ContainerDirectory: build.ContainerDirectory,
+			ExecutionFile:      build.FileName,
+			ContainerName:      params.ContainerName,
+		})
+	}
+
 	return Result{}
 }

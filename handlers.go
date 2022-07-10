@@ -24,6 +24,7 @@ func getEnvironmentsHandler(w http.ResponseWriter, r *http.Request) {
 	languages = append(languages, repository.GoLang)
 	languages = append(languages, repository.Python2)
 	languages = append(languages, repository.Python3)
+	languages = append(languages, repository.Julia)
 	languages = append(languages, repository.Ruby)
 	languages = append(languages, repository.Php74)
 	languages = append(languages, repository.Rust)

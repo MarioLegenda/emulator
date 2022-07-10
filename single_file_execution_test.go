@@ -55,6 +55,33 @@ var _ = GinkgoDescribe("Single file execution tests", func() {
 		execution.Service(_var.SINGLE_FILE_EXECUTION).Close()
 	})
 
+	GinkgoIt("Should execute a single file in a Julia environment", func() {
+		gomega.Expect(execution.Init(_var.SINGLE_FILE_EXECUTION, []execution.ContainerBlueprint{
+			{
+				WorkerNum:    1,
+				ContainerNum: 1,
+				Tag:          string(repository.Julia.Tag),
+			},
+		})).Should(gomega.BeNil())
+
+		result := execution.Service(_var.SINGLE_FILE_EXECUTION).RunJob(execution.Job{
+			BuilderType:       "single_file",
+			ExecutionType:     "single_file",
+			EmulatorName:      string(repository.Julia.Name),
+			EmulatorExtension: repository.Julia.Extension,
+			EmulatorTag:       string(repository.Julia.Tag),
+			EmulatorText:      "println(\"Hello World\")",
+		})
+
+		gomega.Expect(result.Result).Should(gomega.Equal("Hello World\n"))
+		gomega.Expect(result.Success).Should(gomega.BeTrue())
+		gomega.Expect(result.Error).Should(gomega.BeNil())
+
+		testExecutionDirEmpty()
+
+		execution.Service(_var.SINGLE_FILE_EXECUTION).Close()
+	})
+
 	GinkgoIt("Should execute a single file in a node LTS environment if an infinite loop with a timeout with imports", func() {
 		gomega.Expect(execution.Init(_var.SINGLE_FILE_EXECUTION, []execution.ContainerBlueprint{
 			{

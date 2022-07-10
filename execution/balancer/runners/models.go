@@ -42,6 +42,10 @@ var python3 = language{
 	name: "python3",
 }
 
+var julia = language{
+	name: "julia",
+}
+
 var csharpMono = language{
 	name: "c_sharp_mono",
 }

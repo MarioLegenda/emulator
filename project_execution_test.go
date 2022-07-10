@@ -137,6 +137,97 @@ export {subDirDirFileExecute}
 		execution.Service(_var.PROJECT_EXECUTION).Close()
 	})
 
+	GinkgoIt("Should run a project execution in Julia environment", func() {
+		environment := repository.Julia
+		gomega.Expect(execution.Init(_var.PROJECT_EXECUTION, []execution.ContainerBlueprint{
+			{
+				WorkerNum:    1,
+				ContainerNum: 1,
+				Tag:          string(repository.Julia.Tag),
+			},
+		})).Should(gomega.BeNil())
+
+		projectName := "project name julia"
+		root := testCreateFileStub(projectName, true, 1, false, nil, []string{})
+
+		rootFile1 := testCreateFileStub("rootDirectoryFile1.mjs", false, 1, true, &root.Uuid, []string{})
+		rootFile2 := testCreateFileStub("rootDirectoryFile2.mjs", false, 1, true, &root.Uuid, []string{})
+
+		subDir := testCreateFileStub("subDir", false, 2, false, &root.Uuid, []string{})
+		subDirFile1 := testCreateFileStub("subDirFile.jl", false, 2, true, &subDir.Uuid, []string{})
+		subSubDir := testCreateFileStub("subSubDir", false, 3, false, &subDir.Uuid, []string{})
+
+		subSubDirFile := testCreateFileStub("subSubDirFile.jl", false, 3, true, &subSubDir.Uuid, []string{})
+
+		root.Children = append(root.Children, subDir.Uuid)
+		root.Children = append(root.Children, rootFile1.Uuid)
+		root.Children = append(root.Children, rootFile2.Uuid)
+		subDir.Children = append(subDir.Children, subDirFile1.Uuid)
+		subDir.Children = append(subDir.Children, subSubDir.Uuid)
+		subSubDir.Children = append(subSubDir.Children, subSubDirFile.Uuid)
+
+		codeProject := testCreateCodeProjectStub(projectName, "", []*repository.File{
+			&root,
+			&rootFile1,
+			&rootFile2,
+			&subDir,
+			&subDirFile1,
+			&subSubDir,
+			&subSubDirFile,
+		}, &root, &environment)
+
+		content1 := testCreateFileContent(codeProject.Uuid, rootFile1.Uuid, `
+include("rootDirectoryFile2.mjs")
+include("subDir/subSubDir/subSubDirFile.jl")
+
+execute()
+
+print("rootDirectoryFile1")
+`)
+		content2 := testCreateFileContent(codeProject.Uuid, rootFile2.Uuid, `
+include("./subDir/subDirFile.jl")
+
+function execute()
+    println("rootDirectoryFile2")
+
+    subDirFileExecute()
+end
+`)
+		content3 := testCreateFileContent(codeProject.Uuid, subDirFile1.Uuid, `
+function subDirFileExecute()
+    println("subDirFile")
+end
+`)
+		content4 := testCreateFileContent(codeProject.Uuid, subSubDirFile.Uuid, `
+function subDirDirFileExecute()
+    println("subSubDirFile")
+end
+`)
+
+		result := execution.Service(_var.PROJECT_EXECUTION).RunJob(execution.Job{
+			BuilderType:       "project",
+			ExecutionType:     "project",
+			EmulatorName:      string(environment.Name),
+			EmulatorExtension: string(environment.Extension),
+			EmulatorTag:       string(environment.Tag),
+			EmulatorText:      "",
+			PackageName:       "",
+			CodeProject:       &codeProject,
+			Contents: []*repository.FileContent{
+				&content1,
+				&content2,
+				&content3,
+				&content4,
+			},
+			ExecutingFile: &rootFile1,
+		})
+
+		gomega.Expect(result.Success).Should(gomega.BeTrue())
+		gomega.Expect(result.Result).Should(gomega.Equal("rootDirectoryFile2\nsubDirFile\nrootDirectoryFile1"))
+
+		execution.Service(_var.PROJECT_EXECUTION).Close()
+	})
+
 	GinkgoIt("Should run a project execution in NodeJS latest environment", func() {
 		environment := repository.NodeLts
 		gomega.Expect(execution.Init(_var.PROJECT_EXECUTION, []execution.ContainerBlueprint{

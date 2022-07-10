@@ -95,6 +95,11 @@ func initExecutioners() {
 			Tag:          string(repository.NodeLts.Tag),
 		},
 		{
+			WorkerNum:    getEnvironmentWorkers("JULIA"),
+			ContainerNum: getEnvironmentContainers("JULIA"),
+			Tag:          string(repository.Julia.Tag),
+		},
+		{
 			WorkerNum:    getEnvironmentWorkers("NODE_ESM"),
 			ContainerNum: getEnvironmentContainers("NODE_ESM"),
 			Tag:          string(repository.NodeEsm.Tag),
