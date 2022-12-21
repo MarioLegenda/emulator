@@ -8,15 +8,16 @@ import (
 func RegisterRoutes() *mux.Router {
 	r := mux.NewRouter()
 
-	registerBlogRoutes(r)
+	registerRoutes(r)
 
 	return r
 }
 
-func registerBlogRoutes(r *mux.Router) {
+func registerRoutes(r *mux.Router) {
 	r.HandleFunc("/api/environment-emulator/get-environments", getEnvironmentsHandler).Methods("GET")
 	r.HandleFunc("/api/environment-emulator/health", getEnvironmentsHandler).Methods("GET")
 	r.Handle("/api/environment-emulator/execute/single-file", rateLimiter.PackageService.LimitedMiddleware(executeSingleCodeBlockHandler)).Methods("POST")
+	r.Handle("/api/environment-emulator/execute/snippet", rateLimiter.PackageService.LimitedMiddleware(executeSnippet)).Methods("POST")
 	r.Handle("/api/environment-emulator/public/execute/single-file", rateLimiter.PackageService.LimitedMiddleware(executePublicSingleFileRunResult)).Methods("POST")
 	//r.HandleFunc("/api/environment-emulator/public/execute/single-file", executePublicSingleFileRunResult).Methods("POST")
 	r.Handle("/api/environment-emulator/execute/project", rateLimiter.PackageService.LimitedMiddleware(executeProjectHandler)).Methods("POST")

@@ -139,3 +139,34 @@ type LinkedSessionData struct {
 	PackageName string         `json:"packageName"`
 	Content     []*FileContent `json:"fileContent"`
 }
+
+type Snippet struct {
+	Uuid             string           `json:"uuid" bson:"uuid"`
+	ShortId          string           `json:"shortId" bson:"shortId"`
+	AccountUuid      string           `json:"accountUuid" bson:"accountUuid"`
+	SnippetCodeBlock SnippetCodeBlock `json:"snippetCodeBlock" bson:"snippetCodeBlock"`
+
+	CreatedAt int64  `json:"createdAt" bson:"createdAt"`
+	UpdatedAt *int64 `json:"updatedAt" bson:"updatedAt"`
+
+	PublishedAt   *int64 `json:"publishedAt" bson:"publishedAt"`
+	UnpublishedAt *int64 `json:"unPublishedAt" bson:"unPublishedAt"`
+	LastChangedAt *int64 `json:"lastChangedAt" bson:"lastChangedAt"`
+}
+
+type SnippetCodeBlock struct {
+	Uuid        string `json:"uuid" bson:"uuid"`
+	PackageName string `json:"packageName" bson:"packageName"`
+
+	Text string `json:"text" bson:"text"`
+
+	IsGist   bool `json:"isGist" bson:"isGist"`
+	IsCode   bool `json:"isCode" bson:"isCode"`
+	Readonly bool `json:"readonly" bson:"readonly"`
+
+	GistData *GistData `json:"gistData" bson:"gistData"`
+	Emulator *Language `json:"emulator" bson:"emulator"`
+
+	CodeProjectUuid string  `json:"codeProjectUuid" bson:"codeProjectUuid"`
+	CodeResult      *string `json:"codeResult" bson:"codeResult"`
+}

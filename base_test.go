@@ -195,7 +195,7 @@ func testCreateBlog(activeSession repository.ActiveSession) map[string]interface
 }
 
 func testCreateTemporarySession(activeSession repository.ActiveSession, pageUuid string, blockUuid string, t string) string {
-	url := fmt.Sprintf("%s/auth/temp-session/single-file", repository.CreateApiUrl())
+	url := fmt.Sprintf("%s/session/single-file", repository.CreateApiUrl())
 
 	client, err := httpClient.NewHttpClient(&tls.Config{
 		InsecureSkipVerify: true,
@@ -241,7 +241,7 @@ func testCreateTemporarySession(activeSession repository.ActiveSession, pageUuid
 }
 
 func testCreateLinkedSession(activeSession repository.ActiveSession, pageUuid string, codeBlockUuid string) string {
-	url := fmt.Sprintf("%s/auth/temp-session/linked-code-block", repository.CreateApiUrl())
+	url := fmt.Sprintf("%s/session/linked", repository.CreateApiUrl())
 
 	client, err := httpClient.NewHttpClient(&tls.Config{
 		InsecureSkipVerify: true,

@@ -12,7 +12,7 @@ COPY ./go.mod .
 COPY ./go.sum .
 RUN go mod download && go mod tidy
 
-COPY ./ .
+COPY . .
 
 RUN go build -o go_emulator_build
 

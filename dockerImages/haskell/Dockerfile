@@ -15,6 +15,7 @@ RUN apt-get install -y -q --no-install-recommends curl
 RUN apt-get install -y -q --no-install-recommends ca-certificates
 RUN apt-get install -y -q --no-install-recommends tar
 RUN apt-get install -y -q --no-install-recommends xz-utils
+RUN apt-get update
 RUN add-apt-repository -y ppa:hvr/ghc
 RUN apt-get update
 RUN apt-get install -y cabal-install-3.2 ghc-8.8.3
