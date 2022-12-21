@@ -42,7 +42,6 @@ func getEnvironmentContainers(part string) int {
 
 func initRequiredDirectories(output bool) {
 	projectsDir := os.Getenv("EXECUTION_DIR")
-
 	directoriesExist := true
 	if _, err := os.Stat(projectsDir); os.IsNotExist(err) {
 		directoriesExist = false
@@ -166,10 +165,7 @@ func initExecutioners() {
 		}
 
 		time.Sleep(5 * time.Second)
-
-		if os.Getenv("APP_ENV") == "prod" {
-			execution.FinalCleanup(true)
-		}
+		execution.FinalCleanup(true)
 
 		appErrors.TerminateWithMessage("Cannot boot executioner. Server cannot start!")
 	}
@@ -203,9 +199,7 @@ func App() {
 	singleFileExecution.InitService()
 	projectExecution.InitService()
 
-	if os.Getenv("APP_ENV") == "prod" {
-		execution.FinalCleanup(false)
-	}
+	execution.FinalCleanup(false)
 	initExecutioners()
 
 	WatchServerShutdown(InitServer(RegisterRoutes()))
