@@ -113,7 +113,7 @@ func (r Repository) GetSnippet(sessionUuid string) (*Snippet, *appErrors.Error) 
 	}
 
 	if response.Status != 200 {
-		logger.Warn(fmt.Sprintf("Failed executing getting a code block: %v", string(response.Body)))
+		logger.Warn(fmt.Sprintf("Failed executing getting a snippet: %v", string(response.Body)))
 		return nil, appErrors.New(appErrors.ApplicationError, appErrors.ApplicationRuntimeError, fmt.Sprintf("Request did not succeed with status: %d", response.Status))
 	}
 
@@ -173,7 +173,7 @@ func (r Repository) GetProjectSessionData(authenticatedSession string, sessionUu
 	}
 
 	if response.Status != 200 {
-		logger.Warn(fmt.Sprintf("Failed executing getting a code block: %v", string(response.Body)))
+		logger.Warn(fmt.Sprintf("Failed executing getting a project session data: %v", string(response.Body)))
 		return nil, appErrors.New(appErrors.ApplicationError, appErrors.ApplicationRuntimeError, fmt.Sprintf("Request did not succeed with status: %d", response.Status))
 	}
 
@@ -233,7 +233,7 @@ func (r Repository) GetLinkedSessionData(authenticatedSession string, sessionUui
 	}
 
 	if response.Status != 200 {
-		logger.Warn(fmt.Sprintf("Failed executing getting a code block: %v", string(response.Body)))
+		logger.Warn(fmt.Sprintf("Failed executing getting linked session data: %v", string(response.Body)))
 		return nil, appErrors.New(appErrors.ApplicationError, appErrors.ApplicationRuntimeError, fmt.Sprintf("Request did not succeed with status: %d", response.Status))
 	}
 
@@ -292,7 +292,7 @@ func (r Repository) ValidateTemporarySession(sessionUuid string) (ValidatedTempo
 	}
 
 	if response.Status != 200 {
-		logger.Warn(fmt.Sprintf("Failed executing getting a code block: %v", string(response.Body)))
+		logger.Warn(fmt.Sprintf("Failed executing validating temporary session: %v", string(response.Body)))
 		return ValidatedTemporarySession{}, appErrors.New(appErrors.ApplicationError, appErrors.ApplicationRuntimeError, fmt.Sprintf("Request did not succeed with status: %d", response.Status))
 	}
 
@@ -352,7 +352,7 @@ func (r Repository) InvalidateTemporarySession(authenticatedSession string, sess
 	}
 
 	if response.Status != 200 {
-		logger.Warn(fmt.Sprintf("Failed executing getting a code block: %v", string(response.Body)))
+		logger.Warn(fmt.Sprintf("Failed executing invalidating temporary session: %v", string(response.Body)))
 		return appErrors.New(appErrors.ApplicationError, appErrors.ApplicationRuntimeError, fmt.Sprintf("Request did not succeed with status: %d", response.Status))
 	}
 
@@ -401,7 +401,7 @@ func (r Repository) GetCodeProject(codeProjectUuid string) (*CodeProject, *appEr
 	}
 
 	if response.Status != 200 {
-		logger.Warn(fmt.Sprintf("Failed executing getting a code block: %v", string(response.Body)))
+		logger.Warn(fmt.Sprintf("Failed executing getting a code project: %v", string(response.Body)))
 		return nil, appErrors.New(appErrors.ApplicationError, appErrors.ApplicationRuntimeError, fmt.Sprintf("Request did not succeed with status: %d", response.Status))
 	}
 
@@ -450,7 +450,7 @@ func (r Repository) GetAllFileContent(codeProjectUuid string) ([]*FileContent, *
 	}
 
 	if response.Status != 200 {
-		logger.Warn(fmt.Sprintf("Failed executing getting a code block: %v", string(response.Body)))
+		logger.Warn(fmt.Sprintf("Failed executing getting all file content: %v", string(response.Body)))
 		return nil, appErrors.New(appErrors.ApplicationError, appErrors.ApplicationRuntimeError, fmt.Sprintf("Request did not succeed with status: %d", response.Status))
 	}
 

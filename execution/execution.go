@@ -78,6 +78,7 @@ func Init(name string, blueprints []ContainerBlueprint) *appErrors.Error {
 }
 
 func Service(name string) Execution {
+	fmt.Println(services)
 	return services[name]
 }
 
