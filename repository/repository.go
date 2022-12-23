@@ -20,8 +20,8 @@ func CreateApiUrl() string {
 	return fmt.Sprintf("%s://%s/%s/%s", os.Getenv("API_PROTOCOL"), os.Getenv("API_HOST"), os.Getenv("API_ENDPOINT"), os.Getenv("API_VERSION"))
 }
 
-func (r Repository) GetCodeBlock(sessionUuid string) (*CodeBlock, *appErrors.Error) {
-	url := fmt.Sprintf("%s/page/temp-session/single-file", CreateApiUrl())
+func (r Repository) GetCodeBlock(authenticatedSession string, sessionUuid string) (*CodeBlock, *appErrors.Error) {
+	url := fmt.Sprintf("%s/session/single-file-data", CreateApiUrl())
 
 	client, err := httpClient.NewHttpClient(&tls.Config{
 		InsecureSkipVerify: true,
@@ -42,9 +42,10 @@ func (r Repository) GetCodeBlock(sessionUuid string) (*CodeBlock, *appErrors.Err
 	}
 
 	response, clientError := client.MakeJsonRequest(&httpClient.JsonRequest{
-		Url:    url,
-		Method: "POST",
-		Body:   body,
+		Url:     url,
+		Method:  "POST",
+		Body:    body,
+		Session: authenticatedSession,
 	})
 
 	if clientError != nil {
@@ -101,9 +102,10 @@ func (r Repository) GetSnippet(sessionUuid string) (*Snippet, *appErrors.Error) 
 	}
 
 	response, clientError := client.MakeJsonRequest(&httpClient.JsonRequest{
-		Url:    url,
-		Method: "POST",
-		Body:   body,
+		Url:     url,
+		Method:  "POST",
+		Body:    body,
+		Session: sessionUuid,
 	})
 
 	if clientError != nil {
@@ -138,8 +140,8 @@ func (r Repository) GetSnippet(sessionUuid string) (*Snippet, *appErrors.Error) 
 	return snippet, nil
 }
 
-func (r Repository) GetProjectSessionData(sessionUuid string) (*SessionCodeProjectData, *appErrors.Error) {
-	url := fmt.Sprintf("%s/code-project/temp-session/project", CreateApiUrl())
+func (r Repository) GetProjectSessionData(authenticatedSession string, sessionUuid string) (*SessionCodeProjectData, *appErrors.Error) {
+	url := fmt.Sprintf("%s/session/project-data", CreateApiUrl())
 
 	client, err := httpClient.NewHttpClient(&tls.Config{
 		InsecureSkipVerify: true,
@@ -160,9 +162,10 @@ func (r Repository) GetProjectSessionData(sessionUuid string) (*SessionCodeProje
 	}
 
 	response, clientError := client.MakeJsonRequest(&httpClient.JsonRequest{
-		Url:    url,
-		Method: "POST",
-		Body:   body,
+		Url:     url,
+		Method:  "POST",
+		Body:    body,
+		Session: authenticatedSession,
 	})
 
 	if clientError != nil {
@@ -197,8 +200,8 @@ func (r Repository) GetProjectSessionData(sessionUuid string) (*SessionCodeProje
 	return sessionData, nil
 }
 
-func (r Repository) GetSingleFileSessionData(sessionUuid string) (*SingleFileSessionData, *appErrors.Error) {
-	url := fmt.Sprintf("%s/code-project/temp-session/single-file", CreateApiUrl())
+func (r Repository) GetLinkedSessionData(authenticatedSession string, sessionUuid string) (*LinkedSessionData, *appErrors.Error) {
+	url := fmt.Sprintf("%s/session/linked-data", CreateApiUrl())
 
 	client, err := httpClient.NewHttpClient(&tls.Config{
 		InsecureSkipVerify: true,
@@ -219,68 +222,10 @@ func (r Repository) GetSingleFileSessionData(sessionUuid string) (*SingleFileSes
 	}
 
 	response, clientError := client.MakeJsonRequest(&httpClient.JsonRequest{
-		Url:    url,
-		Method: "POST",
-		Body:   body,
-	})
-
-	if clientError != nil {
-		logger.Warn(fmt.Sprintf("Failed executing getting a code block: %v", string(response.Body)))
-		return nil, appErrors.New(appErrors.ApplicationError, appErrors.ApplicationRuntimeError, clientError.GetMessage())
-	}
-
-	if response.Status != 200 {
-		return nil, appErrors.New(appErrors.ApplicationError, appErrors.ApplicationRuntimeError, fmt.Sprintf("Request did not succeed with status: %d", response.Status))
-	}
-
-	var apiResponse map[string]interface{}
-	err = json.Unmarshal(response.Body, &apiResponse)
-
-	if err != nil {
-		return nil, appErrors.New(appErrors.ApplicationError, appErrors.ApplicationRuntimeError, err.Error())
-	}
-
-	d := apiResponse["data"]
-
-	b, err := json.Marshal(d)
-
-	if err != nil {
-		return nil, appErrors.New(appErrors.ApplicationError, appErrors.ApplicationRuntimeError, fmt.Sprintf("Cannot get session data: %s", err.Error()))
-	}
-
-	var sessionData *SingleFileSessionData
-	if err := json.Unmarshal(b, &sessionData); err != nil {
-		return nil, appErrors.New(appErrors.ApplicationError, appErrors.ApplicationRuntimeError, fmt.Sprintf("Cannot get session data: %s", err.Error()))
-	}
-
-	return sessionData, nil
-}
-
-func (r Repository) GetLinkedSessionData(sessionUuid string) (*LinkedSessionData, *appErrors.Error) {
-	url := fmt.Sprintf("%s/code-project/temp-session/linked-code-block", CreateApiUrl())
-
-	client, err := httpClient.NewHttpClient(&tls.Config{
-		InsecureSkipVerify: true,
-	})
-
-	if err != nil {
-		return nil, appErrors.New(appErrors.ApplicationError, appErrors.ApplicationRuntimeError, "Cannot create client to get environment data")
-	}
-
-	bm := map[string]interface{}{
-		"uuid": sessionUuid,
-	}
-
-	body, err := json.Marshal(bm)
-
-	if err != nil {
-		return nil, appErrors.New(appErrors.ApplicationError, appErrors.ApplicationRuntimeError, "Cannot create client to get environment data")
-	}
-
-	response, clientError := client.MakeJsonRequest(&httpClient.JsonRequest{
-		Url:    url,
-		Method: "POST",
-		Body:   body,
+		Url:     url,
+		Method:  "POST",
+		Body:    body,
+		Session: authenticatedSession,
 	})
 
 	if clientError != nil {
@@ -316,7 +261,7 @@ func (r Repository) GetLinkedSessionData(sessionUuid string) (*LinkedSessionData
 }
 
 func (r Repository) ValidateTemporarySession(sessionUuid string) (ValidatedTemporarySession, *appErrors.Error) {
-	url := fmt.Sprintf("%s/auth/validate/emulator-temporary-session", CreateApiUrl())
+	url := fmt.Sprintf("%s/session/validate", CreateApiUrl())
 
 	client, err := httpClient.NewHttpClient(&tls.Config{
 		InsecureSkipVerify: true,
@@ -366,16 +311,16 @@ func (r Repository) ValidateTemporarySession(sessionUuid string) (ValidatedTempo
 		return ValidatedTemporarySession{}, appErrors.New(appErrors.ApplicationError, appErrors.ApplicationRuntimeError, fmt.Sprintf("Cannot get code block: %s", err.Error()))
 	}
 
-	var codeBlock ValidatedTemporarySession
-	if err := json.Unmarshal(b, &codeBlock); err != nil {
+	var validatedSession ValidatedTemporarySession
+	if err := json.Unmarshal(b, &validatedSession); err != nil {
 		return ValidatedTemporarySession{}, appErrors.New(appErrors.ApplicationError, appErrors.ApplicationRuntimeError, fmt.Sprintf("Cannot get code block: %s", err.Error()))
 	}
 
-	return codeBlock, nil
+	return validatedSession, nil
 }
 
-func (r Repository) InvalidateTemporarySession(sessionUuid string) *appErrors.Error {
-	url := fmt.Sprintf("%s/auth/invalidate/emulator-temporary-session", CreateApiUrl())
+func (r Repository) InvalidateTemporarySession(authenticatedSession string, sessionUuid string) *appErrors.Error {
+	url := fmt.Sprintf("%s/session/invalidate", CreateApiUrl())
 
 	client, err := httpClient.NewHttpClient(&tls.Config{
 		InsecureSkipVerify: true,
@@ -396,9 +341,10 @@ func (r Repository) InvalidateTemporarySession(sessionUuid string) *appErrors.Er
 	}
 
 	response, clientError := client.MakeJsonRequest(&httpClient.JsonRequest{
-		Url:    url,
-		Method: "POST",
-		Body:   body,
+		Url:     url,
+		Method:  "POST",
+		Body:    body,
+		Session: authenticatedSession,
 	})
 
 	if clientError != nil {
