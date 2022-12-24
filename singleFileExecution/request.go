@@ -66,7 +66,7 @@ func (l *SingleFileRunRequest) Validate() error {
 			return errors.New("Code block does not exist")
 		}
 
-		go repo.InvalidateTemporarySession(validatedSession.Session, sessionUuid)
+		go repo.InvalidateTemporarySession(sessionUuid)
 
 		l.codeBlock = sessionData
 		l.validatedTemporarySession = validatedSession
@@ -104,7 +104,7 @@ func (l *PublicSingleFileRunRequest) Validate() error {
 			return errors.New("Code block does not exist")
 		}
 
-		sessionData, err := repo.GetCodeBlock(validatedSession.Session, sessionUuid)
+		sessionData, err := repo.GetAnonymousCodeBlock(sessionUuid)
 
 		if err != nil {
 			return errors.New("Code block does not exist")
@@ -112,7 +112,7 @@ func (l *PublicSingleFileRunRequest) Validate() error {
 
 		sessionData.Text = l.Text
 
-		go repo.InvalidateTemporarySession(validatedSession.Session, sessionUuid)
+		go repo.InvalidateTemporarySession(sessionUuid)
 
 		l.codeBlock = sessionData
 		l.validatedTemporarySession = validatedSession
@@ -161,7 +161,7 @@ func (l *SnippetRequest) Validate() error {
 			return errors.New("Snippet does not exist")
 		}
 
-		go repo.InvalidateTemporarySession(sessionUuid, "")
+		go repo.InvalidateTemporarySession(sessionUuid)
 
 		l.snippet = sessionData
 		l.validatedTemporarySession = session

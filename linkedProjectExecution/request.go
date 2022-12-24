@@ -55,7 +55,7 @@ func (l *PublicLinkedProjectRunRequest) Validate() error {
 			return errors.New("Project does not exist")
 		}
 
-		sessionData, err := repo.GetLinkedSessionData(session.Session, sessionUuid)
+		sessionData, err := repo.GetAnonymousLinkedSessionData(sessionUuid)
 
 		if err != nil {
 			return errors.New("Project does not exists")
@@ -63,7 +63,7 @@ func (l *PublicLinkedProjectRunRequest) Validate() error {
 
 		sessionData.CodeBlock.Text = l.Text
 
-		go repo.InvalidateTemporarySession(session.Session, sessionUuid)
+		go repo.InvalidateTemporarySession(sessionUuid)
 
 		l.validatedTemporarySession = session
 		l.sessionData = sessionData
@@ -106,7 +106,7 @@ func (l *LinkedProjectRunRequest) Validate() error {
 			return errors.New("Project does not exists")
 		}
 
-		go repo.InvalidateTemporarySession(session.Session, sessionUuid)
+		go repo.InvalidateTemporarySession(sessionUuid)
 
 		l.validatedTemporarySession = session
 		l.sessionData = sessionData
