@@ -90,6 +90,30 @@ func executeSnippet(w http.ResponseWriter, r *http.Request) {
 	cr.SendResponse(apiResponse)
 }
 
+func executePublicSnippet(w http.ResponseWriter, r *http.Request) {
+	cr := httpUtil.InitCurrentRequest(w, r)
+
+	requestModel := cr.ReadSnippetRequest()
+
+	if requestModel == nil {
+		return
+	}
+
+	runResult, err := singleFileExecution.SingleFileExecutionService.RunSnippet(requestModel)
+
+	if err != nil {
+		apiResponse := httpUtil.CreateErrorResponse(cr, err, err.GetData())
+
+		cr.SendResponse(apiResponse)
+
+		return
+	}
+
+	apiResponse := httpUtil.CreateSuccessResponse(cr, staticTypes.RESPONSE_RESOURCE, runResult, http.StatusOK, "Emulator run result")
+
+	cr.SendResponse(apiResponse)
+}
+
 func executePublicSingleFileRunResult(w http.ResponseWriter, r *http.Request) {
 	cr := httpUtil.InitCurrentRequest(w, r)
 

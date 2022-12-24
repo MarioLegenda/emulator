@@ -199,6 +199,65 @@ func (r Repository) GetAuthenticatedSnippet(authenticatedSession string, session
 	return snippet, nil
 }
 
+func (r Repository) GetAnonymousSnippet(sessionUuid string) (*Snippet, *appErrors.Error) {
+	url := fmt.Sprintf("%s/session/anonymous/snippet-data", CreateApiUrl())
+
+	client, err := httpClient.NewHttpClient(&tls.Config{
+		InsecureSkipVerify: true,
+	})
+
+	if err != nil {
+		return nil, appErrors.New(appErrors.ApplicationError, appErrors.ApplicationRuntimeError, "Cannot create client to get environment data")
+	}
+
+	bm := map[string]interface{}{
+		"uuid": sessionUuid,
+	}
+
+	body, err := json.Marshal(bm)
+
+	if err != nil {
+		return nil, appErrors.New(appErrors.ApplicationError, appErrors.ApplicationRuntimeError, "Cannot create client to get environment data")
+	}
+
+	response, clientError := client.MakeJsonRequest(&httpClient.JsonRequest{
+		Url:    url,
+		Method: "POST",
+		Body:   body,
+	})
+
+	if clientError != nil {
+		return nil, appErrors.New(appErrors.ApplicationError, appErrors.ApplicationRuntimeError, clientError.GetMessage())
+	}
+
+	if response.Status != 200 {
+		logger.Warn(fmt.Sprintf("Failed executing getting a snippet: %v", string(response.Body)))
+		return nil, appErrors.New(appErrors.ApplicationError, appErrors.ApplicationRuntimeError, fmt.Sprintf("Request did not succeed with status: %d", response.Status))
+	}
+
+	var apiResponse map[string]interface{}
+	err = json.Unmarshal(response.Body, &apiResponse)
+
+	if err != nil {
+		return nil, appErrors.New(appErrors.ApplicationError, appErrors.ApplicationRuntimeError, err.Error())
+	}
+
+	d := apiResponse["data"]
+
+	b, err := json.Marshal(d)
+
+	if err != nil {
+		return nil, appErrors.New(appErrors.ApplicationError, appErrors.ApplicationRuntimeError, fmt.Sprintf("Cannot get code block: %s", err.Error()))
+	}
+
+	var snippet *Snippet
+	if err := json.Unmarshal(b, &snippet); err != nil {
+		return nil, appErrors.New(appErrors.ApplicationError, appErrors.ApplicationRuntimeError, fmt.Sprintf("Cannot get code block: %s", err.Error()))
+	}
+
+	return snippet, nil
+}
+
 func (r Repository) GetProjectSessionData(authenticatedSession string, sessionUuid string) (*SessionCodeProjectData, *appErrors.Error) {
 	url := fmt.Sprintf("%s/session/project-data", CreateApiUrl())
 
