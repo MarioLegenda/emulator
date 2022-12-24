@@ -155,7 +155,7 @@ func (l *SnippetRequest) Validate() error {
 			return errors.New("Snippet does not exist")
 		}
 
-		sessionData, err := repo.GetSnippet(sessionUuid)
+		sessionData, err := repo.GetAuthenticatedSnippet(session.Session, sessionUuid)
 
 		if err != nil {
 			return errors.New("Snippet does not exist")

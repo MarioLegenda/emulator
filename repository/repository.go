@@ -139,8 +139,8 @@ func (r Repository) GetAnonymousCodeBlock(sessionUuid string) (*CodeBlock, *appE
 	return codeBlock, nil
 }
 
-func (r Repository) GetSnippet(sessionUuid string) (*Snippet, *appErrors.Error) {
-	url := fmt.Sprintf("%s/page/temp-session/snippet", CreateApiUrl())
+func (r Repository) GetAuthenticatedSnippet(authenticatedSession string, sessionUuid string) (*Snippet, *appErrors.Error) {
+	url := fmt.Sprintf("%s/session/snippet-data", CreateApiUrl())
 
 	client, err := httpClient.NewHttpClient(&tls.Config{
 		InsecureSkipVerify: true,
@@ -164,7 +164,7 @@ func (r Repository) GetSnippet(sessionUuid string) (*Snippet, *appErrors.Error) 
 		Url:     url,
 		Method:  "POST",
 		Body:    body,
-		Session: sessionUuid,
+		Session: authenticatedSession,
 	})
 
 	if clientError != nil {
