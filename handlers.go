@@ -93,13 +93,13 @@ func executeSnippet(w http.ResponseWriter, r *http.Request) {
 func executePublicSnippet(w http.ResponseWriter, r *http.Request) {
 	cr := httpUtil.InitCurrentRequest(w, r)
 
-	requestModel := cr.ReadSnippetRequest()
+	requestModel := cr.ReadPublicSnippetRequest()
 
 	if requestModel == nil {
 		return
 	}
 
-	runResult, err := singleFileExecution.SingleFileExecutionService.RunSnippet(requestModel)
+	runResult, err := singleFileExecution.SingleFileExecutionService.RunPublicSnippet(requestModel)
 
 	if err != nil {
 		apiResponse := httpUtil.CreateErrorResponse(cr, err, err.GetData())

@@ -123,6 +123,38 @@ func (cr CurrentHttpRequest) ReadSnippetRequest() *singleFileExecution.SnippetRe
 	return t
 }
 
+func (cr CurrentHttpRequest) ReadPublicSnippetRequest() *singleFileExecution.PublicSnippetRequest {
+	body := cr.ReadBodyOrSendError()
+
+	if body == nil {
+		return nil
+	}
+
+	var m singleFileExecution.PublicSnippetRequest
+	t := &m
+
+	err := json.Unmarshal(body, t)
+
+	if err != nil {
+		requestErr := appErrors.New(appErrors.ApplicationError, appErrors.ApplicationRuntimeError, "Request data is invalid")
+		apiResponse := CreateErrorResponse(cr, requestErr, nil)
+
+		cr.SendResponse(apiResponse)
+
+		return nil
+	}
+
+	err = t.Validate()
+
+	if err != nil {
+		cr.sendValidationError(err)
+
+		return nil
+	}
+
+	return t
+}
+
 func (cr CurrentHttpRequest) ReadPublicSingleFileRunResult() *singleFileExecution.PublicSingleFileRunRequest {
 	body := cr.ReadBodyOrSendError()
 
