@@ -3,6 +3,7 @@
 /public
 .env
 .env.test
+.env.docker
 api.test
 emulator.test
 /var/log
