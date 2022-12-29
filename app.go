@@ -165,7 +165,10 @@ func initExecutioners() {
 		}
 
 		time.Sleep(5 * time.Second)
-		execution.FinalCleanup(true)
+
+		if os.Getenv("APP_ENV") == "prod" {
+			execution.FinalCleanup(true)
+		}
 
 		appErrors.TerminateWithMessage("Cannot boot executioner. Server cannot start!")
 	}

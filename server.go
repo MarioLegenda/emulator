@@ -20,7 +20,7 @@ func InitServer(r *mux.Router) *http.Server {
 	origins := []string{"https://rebelsource.dev"}
 
 	if os.Getenv("APP_ENV") != "prod" {
-		origins = []string{"https://dev.therebelsource.local:8000"}
+		origins = []string{"http://localhost:8000"}
 	}
 
 	if os.Getenv("APP_ENV") == "staging" {
@@ -44,7 +44,7 @@ func InitServer(r *mux.Router) *http.Server {
 		ReadTimeout:  60 * time.Second,
 		WriteTimeout: 60 * time.Second,
 		IdleTimeout:  60 * time.Second,
-		Addr:         os.Getenv("SERVER_HOST") + ":" + os.Getenv("SERVER_PORT"),
+		Addr:         ":" + os.Getenv("SERVER_PORT"),
 	}
 
 	// Run our server in a goroutine so that it doesn't block.
