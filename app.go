@@ -199,7 +199,6 @@ func App() {
 	singleFileExecution.InitService()
 	projectExecution.InitService()
 
-	execution.FinalCleanup(false)
 	initExecutioners()
 
 	WatchServerShutdown(InitServer(RegisterRoutes()))
