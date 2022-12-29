@@ -6,7 +6,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/google/uuid"
-	"github.com/onsi/ginkgo"
+	"github.com/onsi/ginkgo/v2"
 	"github.com/onsi/gomega"
 	"io"
 	"io/ioutil"
@@ -28,9 +28,8 @@ var GinkgoFail = ginkgo.Fail
 var GinkgoRunSpecs = ginkgo.RunSpecs
 var GinkgoBeforeEach = ginkgo.BeforeEach
 var GinkgoAfterEach = ginkgo.AfterEach
-var GinkgoAfterAll = ginkgo.AfterSuite
-var GinkgoBeforeSuite = ginkgo.BeforeSuite
 var GinkgoAfterSuite = ginkgo.AfterSuite
+var GinkgoBeforeSuite = ginkgo.BeforeSuite
 var GinkgoDescribe = ginkgo.Describe
 var GinkgoIt = ginkgo.It
 
@@ -41,15 +40,20 @@ func TestApi(t *testing.T) {
 	GinkgoRunSpecs(t, "API Suite")
 }
 
+var _ = GinkgoAfterSuite(func() {
+	cmd := exec.Command("/usr/bin/docker", "rm", "-f", "$(docker ps -a -q)")
+
+	err := cmd.Start()
+
+	gomega.Expect(err).Should(gomega.BeNil())
+	err = cmd.Wait()
+	gomega.Expect(err).Should(gomega.BeNil())
+})
+
 func testPrepare() {
 	loadEnv()
 	logger.BuildLoggers()
 	initRequiredDirectories(false)
-
-	/*	singleFileExecution.InitService()
-		linkedProjectExecution.InitService()
-
-		runner.StartContainerBalancer()*/
 }
 
 func testExecutionDirEmpty() {
@@ -202,7 +206,7 @@ func testCreateTemporarySession(activeSession repository.ActiveSession, pageUuid
 	})
 
 	if err != nil {
-		appErrors.TerminateWithMessage(fmt.Sprintf("Cannot create temporary session: %s", err.Error()))
+		appErrors.TerminateWithMessage(fmt.Sprintf("Cannot create single file temporary session: %s", err.Error()))
 	}
 
 	bm := map[string]interface{}{
@@ -217,24 +221,25 @@ func testCreateTemporarySession(activeSession repository.ActiveSession, pageUuid
 	gomega.Expect(err).To(gomega.BeNil())
 
 	response, clientError := client.MakeJsonRequest(&httpClient.JsonRequest{
-		Url:    url,
-		Method: "POST",
-		Body:   body,
+		Url:     url,
+		Method:  "POST",
+		Body:    body,
+		Session: activeSession.Session.Uuid,
 	})
 
 	if clientError != nil {
-		appErrors.TerminateWithMessage(fmt.Sprintf("Cannot create temporary session: %s", err.Error()))
+		appErrors.TerminateWithMessage(fmt.Sprintf("Cannot create single file temporary session: %s", err.Error()))
 	}
 
 	if response.Status != 201 {
-		appErrors.TerminateWithMessage(fmt.Sprintf("Cannot create temporary session: Response status is %d", response.Status))
+		appErrors.TerminateWithMessage(fmt.Sprintf("Cannot create single file temporary session: Response status is %d", response.Status))
 	}
 
 	var apiResponse map[string]interface{}
 	err = json.Unmarshal(response.Body, &apiResponse)
 
 	if err != nil {
-		appErrors.TerminateWithMessage(fmt.Sprintf("Cannot create temporary session: %s", err.Error()))
+		appErrors.TerminateWithMessage(fmt.Sprintf("Cannot create single file temporary session: %s", err.Error()))
 	}
 
 	return apiResponse["data"].(string)
@@ -261,9 +266,10 @@ func testCreateLinkedSession(activeSession repository.ActiveSession, pageUuid st
 	gomega.Expect(err).To(gomega.BeNil())
 
 	response, clientError := client.MakeJsonRequest(&httpClient.JsonRequest{
-		Url:    url,
-		Method: "POST",
-		Body:   body,
+		Url:     url,
+		Method:  "POST",
+		Body:    body,
+		Session: activeSession.Session.Uuid,
 	})
 
 	if clientError != nil {
@@ -306,9 +312,10 @@ func testCreateProjectTemporarySession(activeSession repository.ActiveSession, c
 	gomega.Expect(err).To(gomega.BeNil())
 
 	response, clientError := client.MakeJsonRequest(&httpClient.JsonRequest{
-		Url:    url,
-		Method: "POST",
-		Body:   body,
+		Url:     url,
+		Method:  "POST",
+		Body:    body,
+		Session: activeSession.Session.Uuid,
 	})
 
 	if clientError != nil {

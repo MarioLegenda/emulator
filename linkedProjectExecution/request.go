@@ -55,7 +55,7 @@ func (l *PublicLinkedProjectRunRequest) Validate() error {
 			return errors.New("Project does not exist")
 		}
 
-		sessionData, err := repo.GetLinkedSessionData(sessionUuid)
+		sessionData, err := repo.GetAnonymousLinkedSessionData(sessionUuid)
 
 		if err != nil {
 			return errors.New("Project does not exists")
@@ -100,7 +100,7 @@ func (l *LinkedProjectRunRequest) Validate() error {
 			return errors.New("Project does not exist")
 		}
 
-		sessionData, err := repo.GetLinkedSessionData(sessionUuid)
+		sessionData, err := repo.GetLinkedSessionData(session.Session, sessionUuid)
 
 		if err != nil {
 			return errors.New("Project does not exists")

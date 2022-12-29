@@ -3,7 +3,7 @@ package main
 import (
 	"bytes"
 	"encoding/json"
-	"github.com/onsi/ginkgo"
+	"github.com/onsi/ginkgo/v2"
 	"github.com/onsi/gomega"
 	"net/http"
 	"net/http/httptest"
@@ -28,8 +28,8 @@ var _ = GinkgoDescribe("Single file execution tests", func() {
 		gomega.Expect(os.RemoveAll(os.Getenv("EXECUTION_DIR"))).Should(gomega.BeNil())
 	})
 
-	GinkgoIt("Should execute a single file in a node LTS environment with imports", func() {
-		gomega.Expect(execution.Init(_var.SINGLE_FILE_EXECUTION, []execution.ContainerBlueprint{
+	GinkgoIt("Should execute a single file in a node LTS environment with imports", ginkgo.Label("single_file", "1"), func() {
+		gomega.Expect(execution.Init(_var.PROJECT_EXECUTION, []execution.ContainerBlueprint{
 			{
 				WorkerNum:    1,
 				ContainerNum: 1,
@@ -37,7 +37,7 @@ var _ = GinkgoDescribe("Single file execution tests", func() {
 			},
 		})).Should(gomega.BeNil())
 
-		result := execution.Service(_var.SINGLE_FILE_EXECUTION).RunJob(execution.Job{
+		result := execution.Service(_var.PROJECT_EXECUTION).RunJob(execution.Job{
 			BuilderType:       "single_file",
 			ExecutionType:     "single_file",
 			EmulatorName:      string(repository.NodeEsm.Name),
@@ -52,11 +52,11 @@ var _ = GinkgoDescribe("Single file execution tests", func() {
 
 		testExecutionDirEmpty()
 
-		execution.Service(_var.SINGLE_FILE_EXECUTION).Close()
+		execution.Service(_var.PROJECT_EXECUTION).Close()
 	})
 
-	GinkgoIt("Should execute a single file in a Julia environment", func() {
-		gomega.Expect(execution.Init(_var.SINGLE_FILE_EXECUTION, []execution.ContainerBlueprint{
+	GinkgoIt("Should execute a single file in a Julia environment", ginkgo.Label("single_file", "2"), func() {
+		gomega.Expect(execution.Init(_var.PROJECT_EXECUTION, []execution.ContainerBlueprint{
 			{
 				WorkerNum:    1,
 				ContainerNum: 1,
@@ -64,7 +64,7 @@ var _ = GinkgoDescribe("Single file execution tests", func() {
 			},
 		})).Should(gomega.BeNil())
 
-		result := execution.Service(_var.SINGLE_FILE_EXECUTION).RunJob(execution.Job{
+		result := execution.Service(_var.PROJECT_EXECUTION).RunJob(execution.Job{
 			BuilderType:       "single_file",
 			ExecutionType:     "single_file",
 			EmulatorName:      string(repository.Julia.Name),
@@ -79,11 +79,11 @@ var _ = GinkgoDescribe("Single file execution tests", func() {
 
 		testExecutionDirEmpty()
 
-		execution.Service(_var.SINGLE_FILE_EXECUTION).Close()
+		execution.Service(_var.PROJECT_EXECUTION).Close()
 	})
 
-	GinkgoIt("Should execute a single file in a node LTS environment if an infinite loop with a timeout with imports", func() {
-		gomega.Expect(execution.Init(_var.SINGLE_FILE_EXECUTION, []execution.ContainerBlueprint{
+	GinkgoIt("Should execute a single file in a node LTS environment if an infinite loop with a timeout with imports", ginkgo.Label("single_file", "3"), func() {
+		gomega.Expect(execution.Init(_var.PROJECT_EXECUTION, []execution.ContainerBlueprint{
 			{
 				WorkerNum:    1,
 				ContainerNum: 1,
@@ -91,7 +91,7 @@ var _ = GinkgoDescribe("Single file execution tests", func() {
 			},
 		})).Should(gomega.BeNil())
 
-		result := execution.Service(_var.SINGLE_FILE_EXECUTION).RunJob(execution.Job{
+		result := execution.Service(_var.PROJECT_EXECUTION).RunJob(execution.Job{
 			BuilderType:       "single_file",
 			ExecutionType:     "single_file",
 			EmulatorName:      string(repository.NodeEsm.Name),
@@ -109,11 +109,11 @@ while(true) {
 
 		testExecutionDirEmpty()
 
-		execution.Service(_var.SINGLE_FILE_EXECUTION).Close()
+		execution.Service(_var.PROJECT_EXECUTION).Close()
 	})
 
-	GinkgoIt("Should gracefully fail to execute a single file in a node LTS environment because of a syntax error with imports", func() {
-		gomega.Expect(execution.Init(_var.SINGLE_FILE_EXECUTION, []execution.ContainerBlueprint{
+	GinkgoIt("Should gracefully fail to execute a single file in a node LTS environment because of a syntax error with imports", ginkgo.Label("single_file", "4"), func() {
+		gomega.Expect(execution.Init(_var.PROJECT_EXECUTION, []execution.ContainerBlueprint{
 			{
 				WorkerNum:    1,
 				ContainerNum: 1,
@@ -121,7 +121,7 @@ while(true) {
 			},
 		})).Should(gomega.BeNil())
 
-		result := execution.Service(_var.SINGLE_FILE_EXECUTION).RunJob(execution.Job{
+		result := execution.Service(_var.PROJECT_EXECUTION).RunJob(execution.Job{
 			BuilderType:       "single_file",
 			ExecutionType:     "single_file",
 			EmulatorName:      string(repository.NodeEsm.Name),
@@ -139,11 +139,11 @@ while(true {
 
 		testExecutionDirEmpty()
 
-		execution.Service(_var.SINGLE_FILE_EXECUTION).Close()
+		execution.Service(_var.PROJECT_EXECUTION).Close()
 	})
 
-	GinkgoIt("Should execute a single file in a node LTS environment", func() {
-		gomega.Expect(execution.Init(_var.SINGLE_FILE_EXECUTION, []execution.ContainerBlueprint{
+	GinkgoIt("Should execute a single file in a node LTS environment", ginkgo.Label("single_file", "5"), func() {
+		gomega.Expect(execution.Init(_var.PROJECT_EXECUTION, []execution.ContainerBlueprint{
 			{
 				WorkerNum:    1,
 				ContainerNum: 1,
@@ -151,7 +151,7 @@ while(true {
 			},
 		})).Should(gomega.BeNil())
 
-		result := execution.Service(_var.SINGLE_FILE_EXECUTION).RunJob(execution.Job{
+		result := execution.Service(_var.PROJECT_EXECUTION).RunJob(execution.Job{
 			BuilderType:       "single_file",
 			ExecutionType:     "single_file",
 			EmulatorName:      string(repository.NodeLts.Name),
@@ -166,11 +166,11 @@ while(true {
 
 		testExecutionDirEmpty()
 
-		execution.Service(_var.SINGLE_FILE_EXECUTION).Close()
+		execution.Service(_var.PROJECT_EXECUTION).Close()
 	})
 
-	GinkgoIt("Should execute a single file in a node LTS environment if an infinite loop with a timeout", func() {
-		gomega.Expect(execution.Init(_var.SINGLE_FILE_EXECUTION, []execution.ContainerBlueprint{
+	GinkgoIt("Should execute a single file in a node LTS environment if an infinite loop with a timeout", ginkgo.Label("single_file", "6"), func() {
+		gomega.Expect(execution.Init(_var.PROJECT_EXECUTION, []execution.ContainerBlueprint{
 			{
 				WorkerNum:    1,
 				ContainerNum: 1,
@@ -178,7 +178,7 @@ while(true {
 			},
 		})).Should(gomega.BeNil())
 
-		result := execution.Service(_var.SINGLE_FILE_EXECUTION).RunJob(execution.Job{
+		result := execution.Service(_var.PROJECT_EXECUTION).RunJob(execution.Job{
 			BuilderType:       "single_file",
 			ExecutionType:     "single_file",
 			EmulatorName:      string(repository.NodeLts.Name),
@@ -196,11 +196,11 @@ while(true) {
 
 		testExecutionDirEmpty()
 
-		execution.Service(_var.SINGLE_FILE_EXECUTION).Close()
+		execution.Service(_var.PROJECT_EXECUTION).Close()
 	})
 
-	GinkgoIt("Should gracefully fail to execute a single file in a node LTS environment because of a syntax error", func() {
-		gomega.Expect(execution.Init(_var.SINGLE_FILE_EXECUTION, []execution.ContainerBlueprint{
+	GinkgoIt("Should gracefully fail to execute a single file in a node LTS environment because of a syntax error", ginkgo.Label("single_file", "7"), func() {
+		gomega.Expect(execution.Init(_var.PROJECT_EXECUTION, []execution.ContainerBlueprint{
 			{
 				WorkerNum:    1,
 				ContainerNum: 1,
@@ -208,7 +208,7 @@ while(true) {
 			},
 		})).Should(gomega.BeNil())
 
-		result := execution.Service(_var.SINGLE_FILE_EXECUTION).RunJob(execution.Job{
+		result := execution.Service(_var.PROJECT_EXECUTION).RunJob(execution.Job{
 			BuilderType:       "single_file",
 			ExecutionType:     "single_file",
 			EmulatorName:      string(repository.NodeLts.Name),
@@ -226,11 +226,11 @@ while(true {
 
 		testExecutionDirEmpty()
 
-		execution.Service(_var.SINGLE_FILE_EXECUTION).Close()
+		execution.Service(_var.PROJECT_EXECUTION).Close()
 	})
 
-	GinkgoIt("Should execute code in Ruby environment", func() {
-		gomega.Expect(execution.Init(_var.SINGLE_FILE_EXECUTION, []execution.ContainerBlueprint{
+	GinkgoIt("Should execute code in Ruby environment", ginkgo.Label("single_file", "8"), func() {
+		gomega.Expect(execution.Init(_var.PROJECT_EXECUTION, []execution.ContainerBlueprint{
 			{
 				WorkerNum:    1,
 				ContainerNum: 1,
@@ -238,7 +238,7 @@ while(true {
 			},
 		})).Should(gomega.BeNil())
 
-		result := execution.Service(_var.SINGLE_FILE_EXECUTION).RunJob(execution.Job{
+		result := execution.Service(_var.PROJECT_EXECUTION).RunJob(execution.Job{
 			BuilderType:       "single_file",
 			ExecutionType:     "single_file",
 			EmulatorName:      string(repository.Ruby.Name),
@@ -253,11 +253,11 @@ while(true {
 
 		testExecutionDirEmpty()
 
-		execution.Service(_var.SINGLE_FILE_EXECUTION).Close()
+		execution.Service(_var.PROJECT_EXECUTION).Close()
 	})
 
-	GinkgoIt("Should execute code in Ruby environment that has a syntax error", func() {
-		gomega.Expect(execution.Init(_var.SINGLE_FILE_EXECUTION, []execution.ContainerBlueprint{
+	GinkgoIt("Should execute code in Ruby environment that has a syntax error", ginkgo.Label("single_file", "9"), func() {
+		gomega.Expect(execution.Init(_var.PROJECT_EXECUTION, []execution.ContainerBlueprint{
 			{
 				WorkerNum:    1,
 				ContainerNum: 1,
@@ -265,7 +265,7 @@ while(true {
 			},
 		})).Should(gomega.BeNil())
 
-		result := execution.Service(_var.SINGLE_FILE_EXECUTION).RunJob(execution.Job{
+		result := execution.Service(_var.PROJECT_EXECUTION).RunJob(execution.Job{
 			BuilderType:       "single_file",
 			ExecutionType:     "single_file",
 			EmulatorName:      string(repository.Ruby.Name),
@@ -280,11 +280,11 @@ while(true {
 
 		testExecutionDirEmpty()
 
-		execution.Service(_var.SINGLE_FILE_EXECUTION).Close()
+		execution.Service(_var.PROJECT_EXECUTION).Close()
 	})
 
-	GinkgoIt("Should execute code in Ruby environment with an infinite loop", func() {
-		gomega.Expect(execution.Init(_var.SINGLE_FILE_EXECUTION, []execution.ContainerBlueprint{
+	GinkgoIt("Should execute code in Ruby environment with an infinite loop", ginkgo.Label("single_file", "10"), func() {
+		gomega.Expect(execution.Init(_var.PROJECT_EXECUTION, []execution.ContainerBlueprint{
 			{
 				WorkerNum:    1,
 				ContainerNum: 1,
@@ -292,7 +292,7 @@ while(true {
 			},
 		})).Should(gomega.BeNil())
 
-		result := execution.Service(_var.SINGLE_FILE_EXECUTION).RunJob(execution.Job{
+		result := execution.Service(_var.PROJECT_EXECUTION).RunJob(execution.Job{
 			BuilderType:       "single_file",
 			ExecutionType:     "single_file",
 			EmulatorName:      string(repository.Ruby.Name),
@@ -310,11 +310,11 @@ end
 
 		testExecutionDirEmpty()
 
-		execution.Service(_var.SINGLE_FILE_EXECUTION).Close()
+		execution.Service(_var.PROJECT_EXECUTION).Close()
 	})
 
-	GinkgoIt("Should execute code in Rust environment", func() {
-		gomega.Expect(execution.Init(_var.SINGLE_FILE_EXECUTION, []execution.ContainerBlueprint{
+	GinkgoIt("Should execute code in Rust environment", ginkgo.Label("single_file", "11"), func() {
+		gomega.Expect(execution.Init(_var.PROJECT_EXECUTION, []execution.ContainerBlueprint{
 			{
 				WorkerNum:    1,
 				ContainerNum: 1,
@@ -322,7 +322,7 @@ end
 			},
 		})).Should(gomega.BeNil())
 
-		result := execution.Service(_var.SINGLE_FILE_EXECUTION).RunJob(execution.Job{
+		result := execution.Service(_var.PROJECT_EXECUTION).RunJob(execution.Job{
 			BuilderType:       "single_file",
 			ExecutionType:     "single_file",
 			EmulatorName:      string(repository.Rust.Name),
@@ -341,11 +341,11 @@ fn main() {
 
 		testExecutionDirEmpty()
 
-		execution.Service(_var.SINGLE_FILE_EXECUTION).Close()
+		execution.Service(_var.PROJECT_EXECUTION).Close()
 	})
 
-	GinkgoIt("Should execute code in Rust environment with a syntax error", func() {
-		gomega.Expect(execution.Init(_var.SINGLE_FILE_EXECUTION, []execution.ContainerBlueprint{
+	GinkgoIt("Should execute code in Rust environment with a syntax error", ginkgo.Label("single_file", "12"), func() {
+		gomega.Expect(execution.Init(_var.PROJECT_EXECUTION, []execution.ContainerBlueprint{
 			{
 				WorkerNum:    1,
 				ContainerNum: 1,
@@ -353,7 +353,7 @@ fn main() {
 			},
 		})).Should(gomega.BeNil())
 
-		result := execution.Service(_var.SINGLE_FILE_EXECUTION).RunJob(execution.Job{
+		result := execution.Service(_var.PROJECT_EXECUTION).RunJob(execution.Job{
 			BuilderType:       "single_file",
 			ExecutionType:     "single_file",
 			EmulatorName:      string(repository.Rust.Name),
@@ -372,11 +372,11 @@ fn main() {
 
 		testExecutionDirEmpty()
 
-		execution.Service(_var.SINGLE_FILE_EXECUTION).Close()
+		execution.Service(_var.PROJECT_EXECUTION).Close()
 	})
 
-	GinkgoIt("Should execute code in Rust environment with a syntax error", func() {
-		gomega.Expect(execution.Init(_var.SINGLE_FILE_EXECUTION, []execution.ContainerBlueprint{
+	GinkgoIt("Should execute code in Rust environment with a syntax error", ginkgo.Label("single_file", "13"), func() {
+		gomega.Expect(execution.Init(_var.PROJECT_EXECUTION, []execution.ContainerBlueprint{
 			{
 				WorkerNum:    1,
 				ContainerNum: 1,
@@ -384,7 +384,7 @@ fn main() {
 			},
 		})).Should(gomega.BeNil())
 
-		result := execution.Service(_var.SINGLE_FILE_EXECUTION).RunJob(execution.Job{
+		result := execution.Service(_var.PROJECT_EXECUTION).RunJob(execution.Job{
 			BuilderType:       "single_file",
 			ExecutionType:     "single_file",
 			EmulatorName:      string(repository.Rust.Name),
@@ -404,11 +404,11 @@ fn main() {
 
 		testExecutionDirEmpty()
 
-		execution.Service(_var.SINGLE_FILE_EXECUTION).Close()
+		execution.Service(_var.PROJECT_EXECUTION).Close()
 	})
 
-	GinkgoIt("Should execute code in Golang environment", func() {
-		gomega.Expect(execution.Init(_var.SINGLE_FILE_EXECUTION, []execution.ContainerBlueprint{
+	GinkgoIt("Should execute code in Golang environment", ginkgo.Label("single_file", "14"), func() {
+		gomega.Expect(execution.Init(_var.PROJECT_EXECUTION, []execution.ContainerBlueprint{
 			{
 				WorkerNum:    1,
 				ContainerNum: 1,
@@ -416,7 +416,7 @@ fn main() {
 			},
 		})).Should(gomega.BeNil())
 
-		result := execution.Service(_var.SINGLE_FILE_EXECUTION).RunJob(execution.Job{
+		result := execution.Service(_var.PROJECT_EXECUTION).RunJob(execution.Job{
 			BuilderType:       "single_file",
 			ExecutionType:     "single_file",
 			EmulatorName:      string(repository.GoLang.Name),
@@ -439,11 +439,11 @@ func main() {
 
 		testExecutionDirEmpty()
 
-		execution.Service(_var.SINGLE_FILE_EXECUTION).Close()
+		execution.Service(_var.PROJECT_EXECUTION).Close()
 	})
 
-	GinkgoIt("Should execute code in Golang environment with syntax error", func() {
-		gomega.Expect(execution.Init(_var.SINGLE_FILE_EXECUTION, []execution.ContainerBlueprint{
+	GinkgoIt("Should execute code in Golang environment with syntax error", ginkgo.Label("single_file", "15"), func() {
+		gomega.Expect(execution.Init(_var.PROJECT_EXECUTION, []execution.ContainerBlueprint{
 			{
 				WorkerNum:    1,
 				ContainerNum: 1,
@@ -451,7 +451,7 @@ func main() {
 			},
 		})).Should(gomega.BeNil())
 
-		result := execution.Service(_var.SINGLE_FILE_EXECUTION).RunJob(execution.Job{
+		result := execution.Service(_var.PROJECT_EXECUTION).RunJob(execution.Job{
 			BuilderType:       "single_file",
 			ExecutionType:     "single_file",
 			EmulatorName:      string(repository.GoLang.Name),
@@ -474,11 +474,11 @@ func main() {
 
 		testExecutionDirEmpty()
 
-		execution.Service(_var.SINGLE_FILE_EXECUTION).Close()
+		execution.Service(_var.PROJECT_EXECUTION).Close()
 	})
 
-	GinkgoIt("Should execute code in Golang environment with timeout", func() {
-		gomega.Expect(execution.Init(_var.SINGLE_FILE_EXECUTION, []execution.ContainerBlueprint{
+	GinkgoIt("Should execute code in Golang environment with timeout", ginkgo.Label("single_file", "16"), func() {
+		gomega.Expect(execution.Init(_var.PROJECT_EXECUTION, []execution.ContainerBlueprint{
 			{
 				WorkerNum:    1,
 				ContainerNum: 1,
@@ -486,7 +486,7 @@ func main() {
 			},
 		})).Should(gomega.BeNil())
 
-		result := execution.Service(_var.SINGLE_FILE_EXECUTION).RunJob(execution.Job{
+		result := execution.Service(_var.PROJECT_EXECUTION).RunJob(execution.Job{
 			BuilderType:       "single_file",
 			ExecutionType:     "single_file",
 			EmulatorName:      string(repository.GoLang.Name),
@@ -508,11 +508,11 @@ func main() {
 
 		testExecutionDirEmpty()
 
-		execution.Service(_var.SINGLE_FILE_EXECUTION).Close()
+		execution.Service(_var.PROJECT_EXECUTION).Close()
 	})
 
-	GinkgoIt("Should execute code in Mono environment", func() {
-		gomega.Expect(execution.Init(_var.SINGLE_FILE_EXECUTION, []execution.ContainerBlueprint{
+	GinkgoIt("Should execute code in Mono environment", ginkgo.Label("single_file", "17"), func() {
+		gomega.Expect(execution.Init(_var.PROJECT_EXECUTION, []execution.ContainerBlueprint{
 			{
 				WorkerNum:    1,
 				ContainerNum: 1,
@@ -520,7 +520,7 @@ func main() {
 			},
 		})).Should(gomega.BeNil())
 
-		result := execution.Service(_var.SINGLE_FILE_EXECUTION).RunJob(execution.Job{
+		result := execution.Service(_var.PROJECT_EXECUTION).RunJob(execution.Job{
 			BuilderType:       "single_file",
 			ExecutionType:     "single_file",
 			EmulatorName:      string(repository.CSharpMono.Name),
@@ -545,11 +545,11 @@ namespace HelloWorld
 
 		testExecutionDirEmpty()
 
-		execution.Service(_var.SINGLE_FILE_EXECUTION).Close()
+		execution.Service(_var.PROJECT_EXECUTION).Close()
 	})
 
-	GinkgoIt("Should execute code in Mono environment with syntax error", func() {
-		gomega.Expect(execution.Init(_var.SINGLE_FILE_EXECUTION, []execution.ContainerBlueprint{
+	GinkgoIt("Should execute code in Mono environment with syntax error", ginkgo.Label("single_file", "18"), func() {
+		gomega.Expect(execution.Init(_var.PROJECT_EXECUTION, []execution.ContainerBlueprint{
 			{
 				WorkerNum:    1,
 				ContainerNum: 1,
@@ -557,7 +557,7 @@ namespace HelloWorld
 			},
 		})).Should(gomega.BeNil())
 
-		result := execution.Service(_var.SINGLE_FILE_EXECUTION).RunJob(execution.Job{
+		result := execution.Service(_var.PROJECT_EXECUTION).RunJob(execution.Job{
 			BuilderType:       "single_file",
 			ExecutionType:     "single_file",
 			EmulatorName:      string(repository.CSharpMono.Name),
@@ -582,11 +582,11 @@ namespae HelloWorld
 
 		testExecutionDirEmpty()
 
-		execution.Service(_var.SINGLE_FILE_EXECUTION).Close()
+		execution.Service(_var.PROJECT_EXECUTION).Close()
 	})
 
-	GinkgoIt("Should execute code in Mono environment with infinite loop", func() {
-		gomega.Expect(execution.Init(_var.SINGLE_FILE_EXECUTION, []execution.ContainerBlueprint{
+	GinkgoIt("Should execute code in Mono environment with infinite loop", ginkgo.Label("single_file", "19"), func() {
+		gomega.Expect(execution.Init(_var.PROJECT_EXECUTION, []execution.ContainerBlueprint{
 			{
 				WorkerNum:    1,
 				ContainerNum: 1,
@@ -594,7 +594,7 @@ namespae HelloWorld
 			},
 		})).Should(gomega.BeNil())
 
-		result := execution.Service(_var.SINGLE_FILE_EXECUTION).RunJob(execution.Job{
+		result := execution.Service(_var.PROJECT_EXECUTION).RunJob(execution.Job{
 			BuilderType:       "single_file",
 			ExecutionType:     "single_file",
 			EmulatorName:      string(repository.CSharpMono.Name),
@@ -619,11 +619,11 @@ namespace HelloWorld
 
 		testExecutionDirEmpty()
 
-		execution.Service(_var.SINGLE_FILE_EXECUTION).Close()
+		execution.Service(_var.PROJECT_EXECUTION).Close()
 	})
 
-	GinkgoIt("Should execute code in C environment", func() {
-		gomega.Expect(execution.Init(_var.SINGLE_FILE_EXECUTION, []execution.ContainerBlueprint{
+	GinkgoIt("Should execute code in C environment", ginkgo.Label("single_file", "20"), func() {
+		gomega.Expect(execution.Init(_var.PROJECT_EXECUTION, []execution.ContainerBlueprint{
 			{
 				WorkerNum:    1,
 				ContainerNum: 1,
@@ -631,7 +631,7 @@ namespace HelloWorld
 			},
 		})).Should(gomega.BeNil())
 
-		result := execution.Service(_var.SINGLE_FILE_EXECUTION).RunJob(execution.Job{
+		result := execution.Service(_var.PROJECT_EXECUTION).RunJob(execution.Job{
 			BuilderType:       "single_file",
 			ExecutionType:     "single_file",
 			EmulatorName:      string(repository.CLang.Name),
@@ -654,11 +654,11 @@ int main() {
 
 		testExecutionDirEmpty()
 
-		execution.Service(_var.SINGLE_FILE_EXECUTION).Close()
+		execution.Service(_var.PROJECT_EXECUTION).Close()
 	})
 
-	GinkgoIt("Should execute code in C environment with syntax error", func() {
-		gomega.Expect(execution.Init(_var.SINGLE_FILE_EXECUTION, []execution.ContainerBlueprint{
+	GinkgoIt("Should execute code in C environment with syntax error", ginkgo.Label("single_file", "21"), func() {
+		gomega.Expect(execution.Init(_var.PROJECT_EXECUTION, []execution.ContainerBlueprint{
 			{
 				WorkerNum:    1,
 				ContainerNum: 1,
@@ -666,7 +666,7 @@ int main() {
 			},
 		})).Should(gomega.BeNil())
 
-		result := execution.Service(_var.SINGLE_FILE_EXECUTION).RunJob(execution.Job{
+		result := execution.Service(_var.PROJECT_EXECUTION).RunJob(execution.Job{
 			BuilderType:       "single_file",
 			ExecutionType:     "single_file",
 			EmulatorName:      string(repository.CLang.Name),
@@ -689,11 +689,11 @@ int man() {
 
 		testExecutionDirEmpty()
 
-		execution.Service(_var.SINGLE_FILE_EXECUTION).Close()
+		execution.Service(_var.PROJECT_EXECUTION).Close()
 	})
 
-	GinkgoIt("Should execute code in C environment with infinite loop", func() {
-		gomega.Expect(execution.Init(_var.SINGLE_FILE_EXECUTION, []execution.ContainerBlueprint{
+	GinkgoIt("Should execute code in C environment with infinite loop", ginkgo.Label("single_file", "22"), func() {
+		gomega.Expect(execution.Init(_var.PROJECT_EXECUTION, []execution.ContainerBlueprint{
 			{
 				WorkerNum:    1,
 				ContainerNum: 1,
@@ -701,7 +701,7 @@ int man() {
 			},
 		})).Should(gomega.BeNil())
 
-		result := execution.Service(_var.SINGLE_FILE_EXECUTION).RunJob(execution.Job{
+		result := execution.Service(_var.PROJECT_EXECUTION).RunJob(execution.Job{
 			BuilderType:       "single_file",
 			ExecutionType:     "single_file",
 			EmulatorName:      string(repository.CLang.Name),
@@ -722,11 +722,11 @@ int main() {
 
 		testExecutionDirEmpty()
 
-		execution.Service(_var.SINGLE_FILE_EXECUTION).Close()
+		execution.Service(_var.PROJECT_EXECUTION).Close()
 	})
 
-	GinkgoIt("Should execute code in C++ environment", func() {
-		gomega.Expect(execution.Init(_var.SINGLE_FILE_EXECUTION, []execution.ContainerBlueprint{
+	GinkgoIt("Should execute code in C++ environment", ginkgo.Label("single_file", "23"), func() {
+		gomega.Expect(execution.Init(_var.PROJECT_EXECUTION, []execution.ContainerBlueprint{
 			{
 				WorkerNum:    1,
 				ContainerNum: 1,
@@ -734,7 +734,7 @@ int main() {
 			},
 		})).Should(gomega.BeNil())
 
-		result := execution.Service(_var.SINGLE_FILE_EXECUTION).RunJob(execution.Job{
+		result := execution.Service(_var.PROJECT_EXECUTION).RunJob(execution.Job{
 			BuilderType:       "single_file",
 			ExecutionType:     "single_file",
 			EmulatorName:      string(repository.CPlus.Name),
@@ -756,11 +756,11 @@ int main() {
 
 		testExecutionDirEmpty()
 
-		execution.Service(_var.SINGLE_FILE_EXECUTION).Close()
+		execution.Service(_var.PROJECT_EXECUTION).Close()
 	})
 
-	GinkgoIt("Should execute code in C++ environment with syntax error", func() {
-		gomega.Expect(execution.Init(_var.SINGLE_FILE_EXECUTION, []execution.ContainerBlueprint{
+	GinkgoIt("Should execute code in C++ environment with syntax error", ginkgo.Label("single_file", "24"), func() {
+		gomega.Expect(execution.Init(_var.PROJECT_EXECUTION, []execution.ContainerBlueprint{
 			{
 				WorkerNum:    1,
 				ContainerNum: 1,
@@ -768,7 +768,7 @@ int main() {
 			},
 		})).Should(gomega.BeNil())
 
-		result := execution.Service(_var.SINGLE_FILE_EXECUTION).RunJob(execution.Job{
+		result := execution.Service(_var.PROJECT_EXECUTION).RunJob(execution.Job{
 			BuilderType:       "single_file",
 			ExecutionType:     "single_file",
 			EmulatorName:      string(repository.CPlus.Name),
@@ -790,11 +790,11 @@ int man() {
 
 		testExecutionDirEmpty()
 
-		execution.Service(_var.SINGLE_FILE_EXECUTION).Close()
+		execution.Service(_var.PROJECT_EXECUTION).Close()
 	})
 
-	GinkgoIt("Should execute code in C++ environment with infinite loop", func() {
-		gomega.Expect(execution.Init(_var.SINGLE_FILE_EXECUTION, []execution.ContainerBlueprint{
+	GinkgoIt("Should execute code in C++ environment with infinite loop", ginkgo.Label("single_file", "25"), func() {
+		gomega.Expect(execution.Init(_var.PROJECT_EXECUTION, []execution.ContainerBlueprint{
 			{
 				WorkerNum:    1,
 				ContainerNum: 1,
@@ -802,7 +802,7 @@ int man() {
 			},
 		})).Should(gomega.BeNil())
 
-		result := execution.Service(_var.SINGLE_FILE_EXECUTION).RunJob(execution.Job{
+		result := execution.Service(_var.PROJECT_EXECUTION).RunJob(execution.Job{
 			BuilderType:       "single_file",
 			ExecutionType:     "single_file",
 			EmulatorName:      string(repository.CPlus.Name),
@@ -823,11 +823,11 @@ int main() {
 
 		testExecutionDirEmpty()
 
-		execution.Service(_var.SINGLE_FILE_EXECUTION).Close()
+		execution.Service(_var.PROJECT_EXECUTION).Close()
 	})
 
-	GinkgoIt("Should execute code in Python2 environment", func() {
-		gomega.Expect(execution.Init(_var.SINGLE_FILE_EXECUTION, []execution.ContainerBlueprint{
+	GinkgoIt("Should execute code in Python2 environment", ginkgo.Label("single_file", "26"), func() {
+		gomega.Expect(execution.Init(_var.PROJECT_EXECUTION, []execution.ContainerBlueprint{
 			{
 				WorkerNum:    1,
 				ContainerNum: 1,
@@ -835,7 +835,7 @@ int main() {
 			},
 		})).Should(gomega.BeNil())
 
-		result := execution.Service(_var.SINGLE_FILE_EXECUTION).RunJob(execution.Job{
+		result := execution.Service(_var.PROJECT_EXECUTION).RunJob(execution.Job{
 			BuilderType:       "single_file",
 			ExecutionType:     "single_file",
 			EmulatorName:      string(repository.Python2.Name),
@@ -852,11 +852,11 @@ print("Hello world")
 
 		testExecutionDirEmpty()
 
-		execution.Service(_var.SINGLE_FILE_EXECUTION).Close()
+		execution.Service(_var.PROJECT_EXECUTION).Close()
 	})
 
-	GinkgoIt("Should execute code in Python3 environment", func() {
-		gomega.Expect(execution.Init(_var.SINGLE_FILE_EXECUTION, []execution.ContainerBlueprint{
+	GinkgoIt("Should execute code in Python3 environment", ginkgo.Label("single_file", "27"), func() {
+		gomega.Expect(execution.Init(_var.PROJECT_EXECUTION, []execution.ContainerBlueprint{
 			{
 				WorkerNum:    1,
 				ContainerNum: 1,
@@ -864,7 +864,7 @@ print("Hello world")
 			},
 		})).Should(gomega.BeNil())
 
-		result := execution.Service(_var.SINGLE_FILE_EXECUTION).RunJob(execution.Job{
+		result := execution.Service(_var.PROJECT_EXECUTION).RunJob(execution.Job{
 			BuilderType:       "single_file",
 			ExecutionType:     "single_file",
 			EmulatorName:      string(repository.Python3.Name),
@@ -881,11 +881,11 @@ print("Hello world")
 
 		testExecutionDirEmpty()
 
-		execution.Service(_var.SINGLE_FILE_EXECUTION).Close()
+		execution.Service(_var.PROJECT_EXECUTION).Close()
 	})
 
-	GinkgoIt("Should execute code in Python2 environment with syntax error", func() {
-		gomega.Expect(execution.Init(_var.SINGLE_FILE_EXECUTION, []execution.ContainerBlueprint{
+	GinkgoIt("Should execute code in Python2 environment with syntax error", ginkgo.Label("single_file", "28"), func() {
+		gomega.Expect(execution.Init(_var.PROJECT_EXECUTION, []execution.ContainerBlueprint{
 			{
 				WorkerNum:    1,
 				ContainerNum: 1,
@@ -893,7 +893,7 @@ print("Hello world")
 			},
 		})).Should(gomega.BeNil())
 
-		result := execution.Service(_var.SINGLE_FILE_EXECUTION).RunJob(execution.Job{
+		result := execution.Service(_var.PROJECT_EXECUTION).RunJob(execution.Job{
 			BuilderType:       "single_file",
 			ExecutionType:     "single_file",
 			EmulatorName:      string(repository.Python2.Name),
@@ -910,11 +910,11 @@ prit("Hello world")
 
 		testExecutionDirEmpty()
 
-		execution.Service(_var.SINGLE_FILE_EXECUTION).Close()
+		execution.Service(_var.PROJECT_EXECUTION).Close()
 	})
 
-	GinkgoIt("Should execute code in Python3 environment with syntax error", func() {
-		gomega.Expect(execution.Init(_var.SINGLE_FILE_EXECUTION, []execution.ContainerBlueprint{
+	GinkgoIt("Should execute code in Python3 environment with syntax error", ginkgo.Label("single_file", "29"), func() {
+		gomega.Expect(execution.Init(_var.PROJECT_EXECUTION, []execution.ContainerBlueprint{
 			{
 				WorkerNum:    1,
 				ContainerNum: 1,
@@ -922,7 +922,7 @@ prit("Hello world")
 			},
 		})).Should(gomega.BeNil())
 
-		result := execution.Service(_var.SINGLE_FILE_EXECUTION).RunJob(execution.Job{
+		result := execution.Service(_var.PROJECT_EXECUTION).RunJob(execution.Job{
 			BuilderType:       "single_file",
 			ExecutionType:     "single_file",
 			EmulatorName:      string(repository.Python3.Name),
@@ -939,11 +939,11 @@ prit("Hello world")
 
 		testExecutionDirEmpty()
 
-		execution.Service(_var.SINGLE_FILE_EXECUTION).Close()
+		execution.Service(_var.PROJECT_EXECUTION).Close()
 	})
 
-	GinkgoIt("Should execute code in Python2 environment with na infinite loop", func() {
-		gomega.Expect(execution.Init(_var.SINGLE_FILE_EXECUTION, []execution.ContainerBlueprint{
+	GinkgoIt("Should execute code in Python2 environment with na infinite loop", ginkgo.Label("single_file", "30"), func() {
+		gomega.Expect(execution.Init(_var.PROJECT_EXECUTION, []execution.ContainerBlueprint{
 			{
 				WorkerNum:    1,
 				ContainerNum: 1,
@@ -951,7 +951,7 @@ prit("Hello world")
 			},
 		})).Should(gomega.BeNil())
 
-		result := execution.Service(_var.SINGLE_FILE_EXECUTION).RunJob(execution.Job{
+		result := execution.Service(_var.PROJECT_EXECUTION).RunJob(execution.Job{
 			BuilderType:       "single_file",
 			ExecutionType:     "single_file",
 			EmulatorName:      string(repository.Python2.Name),
@@ -969,11 +969,11 @@ while True:
 
 		testExecutionDirEmpty()
 
-		execution.Service(_var.SINGLE_FILE_EXECUTION).Close()
+		execution.Service(_var.PROJECT_EXECUTION).Close()
 	})
 
-	GinkgoIt("Should execute code in Python3 environment with na infinite loop", func() {
-		gomega.Expect(execution.Init(_var.SINGLE_FILE_EXECUTION, []execution.ContainerBlueprint{
+	GinkgoIt("Should execute code in Python3 environment with na infinite loop", ginkgo.Label("single_file", "31"), func() {
+		gomega.Expect(execution.Init(_var.PROJECT_EXECUTION, []execution.ContainerBlueprint{
 			{
 				WorkerNum:    1,
 				ContainerNum: 1,
@@ -981,7 +981,7 @@ while True:
 			},
 		})).Should(gomega.BeNil())
 
-		result := execution.Service(_var.SINGLE_FILE_EXECUTION).RunJob(execution.Job{
+		result := execution.Service(_var.PROJECT_EXECUTION).RunJob(execution.Job{
 			BuilderType:       "single_file",
 			ExecutionType:     "single_file",
 			EmulatorName:      string(repository.Python3.Name),
@@ -999,11 +999,11 @@ while True:
 
 		testExecutionDirEmpty()
 
-		execution.Service(_var.SINGLE_FILE_EXECUTION).Close()
+		execution.Service(_var.PROJECT_EXECUTION).Close()
 	})
 
-	GinkgoIt("Should execute code in PHP environment", func() {
-		gomega.Expect(execution.Init(_var.SINGLE_FILE_EXECUTION, []execution.ContainerBlueprint{
+	GinkgoIt("Should execute code in PHP environment", ginkgo.Label("single_file", "32"), func() {
+		gomega.Expect(execution.Init(_var.PROJECT_EXECUTION, []execution.ContainerBlueprint{
 			{
 				WorkerNum:    1,
 				ContainerNum: 1,
@@ -1011,7 +1011,7 @@ while True:
 			},
 		})).Should(gomega.BeNil())
 
-		result := execution.Service(_var.SINGLE_FILE_EXECUTION).RunJob(execution.Job{
+		result := execution.Service(_var.PROJECT_EXECUTION).RunJob(execution.Job{
 			BuilderType:       "single_file",
 			ExecutionType:     "single_file",
 			EmulatorName:      string(repository.Php74.Name),
@@ -1030,11 +1030,11 @@ echo "Hello world";
 
 		testExecutionDirEmpty()
 
-		execution.Service(_var.SINGLE_FILE_EXECUTION).Close()
+		execution.Service(_var.PROJECT_EXECUTION).Close()
 	})
 
-	GinkgoIt("Should execute code in PHP environment with syntax error", func() {
-		gomega.Expect(execution.Init(_var.SINGLE_FILE_EXECUTION, []execution.ContainerBlueprint{
+	GinkgoIt("Should execute code in PHP environment with syntax error", ginkgo.Label("single_file", "33"), func() {
+		gomega.Expect(execution.Init(_var.PROJECT_EXECUTION, []execution.ContainerBlueprint{
 			{
 				WorkerNum:    1,
 				ContainerNum: 1,
@@ -1042,7 +1042,7 @@ echo "Hello world";
 			},
 		})).Should(gomega.BeNil())
 
-		result := execution.Service(_var.SINGLE_FILE_EXECUTION).RunJob(execution.Job{
+		result := execution.Service(_var.PROJECT_EXECUTION).RunJob(execution.Job{
 			BuilderType:       "single_file",
 			ExecutionType:     "single_file",
 			EmulatorName:      string(repository.Php74.Name),
@@ -1061,11 +1061,11 @@ ech "Hello world";
 
 		testExecutionDirEmpty()
 
-		execution.Service(_var.SINGLE_FILE_EXECUTION).Close()
+		execution.Service(_var.PROJECT_EXECUTION).Close()
 	})
 
-	GinkgoIt("Should execute code in PHP environment with infinite loop", func() {
-		gomega.Expect(execution.Init(_var.SINGLE_FILE_EXECUTION, []execution.ContainerBlueprint{
+	GinkgoIt("Should execute code in PHP environment with infinite loop", ginkgo.Label("single_file", "34"), func() {
+		gomega.Expect(execution.Init(_var.PROJECT_EXECUTION, []execution.ContainerBlueprint{
 			{
 				WorkerNum:    1,
 				ContainerNum: 1,
@@ -1073,7 +1073,7 @@ ech "Hello world";
 			},
 		})).Should(gomega.BeNil())
 
-		result := execution.Service(_var.SINGLE_FILE_EXECUTION).RunJob(execution.Job{
+		result := execution.Service(_var.PROJECT_EXECUTION).RunJob(execution.Job{
 			BuilderType:       "single_file",
 			ExecutionType:     "single_file",
 			EmulatorName:      string(repository.Php74.Name),
@@ -1093,11 +1093,11 @@ ech "Hello world";
 
 		testExecutionDirEmpty()
 
-		execution.Service(_var.SINGLE_FILE_EXECUTION).Close()
+		execution.Service(_var.PROJECT_EXECUTION).Close()
 	})
 
-	GinkgoIt("Should execute code in Haskell environment", func() {
-		gomega.Expect(execution.Init(_var.SINGLE_FILE_EXECUTION, []execution.ContainerBlueprint{
+	GinkgoIt("Should execute code in Haskell environment", ginkgo.Label("single_file", "35"), func() {
+		gomega.Expect(execution.Init(_var.PROJECT_EXECUTION, []execution.ContainerBlueprint{
 			{
 				WorkerNum:    1,
 				ContainerNum: 1,
@@ -1105,7 +1105,7 @@ ech "Hello world";
 			},
 		})).Should(gomega.BeNil())
 
-		result := execution.Service(_var.SINGLE_FILE_EXECUTION).RunJob(execution.Job{
+		result := execution.Service(_var.PROJECT_EXECUTION).RunJob(execution.Job{
 			BuilderType:       "single_file",
 			ExecutionType:     "single_file",
 			EmulatorName:      string(repository.Haskell.Name),
@@ -1123,11 +1123,11 @@ main = putStrLn "Hello world"
 
 		testExecutionDirEmpty()
 
-		execution.Service(_var.SINGLE_FILE_EXECUTION).Close()
+		execution.Service(_var.PROJECT_EXECUTION).Close()
 	})
 
-	GinkgoIt("Should execute code in Haskell environment with syntax error", func() {
-		gomega.Expect(execution.Init(_var.SINGLE_FILE_EXECUTION, []execution.ContainerBlueprint{
+	GinkgoIt("Should execute code in Haskell environment with syntax error", ginkgo.Label("single_file", "36"), func() {
+		gomega.Expect(execution.Init(_var.PROJECT_EXECUTION, []execution.ContainerBlueprint{
 			{
 				WorkerNum:    1,
 				ContainerNum: 1,
@@ -1135,7 +1135,7 @@ main = putStrLn "Hello world"
 			},
 		})).Should(gomega.BeNil())
 
-		result := execution.Service(_var.SINGLE_FILE_EXECUTION).RunJob(execution.Job{
+		result := execution.Service(_var.PROJECT_EXECUTION).RunJob(execution.Job{
 			BuilderType:       "single_file",
 			ExecutionType:     "single_file",
 			EmulatorName:      string(repository.Haskell.Name),
@@ -1153,11 +1153,11 @@ man = putStrLn "Hello world"
 
 		testExecutionDirEmpty()
 
-		execution.Service(_var.SINGLE_FILE_EXECUTION).Close()
+		execution.Service(_var.PROJECT_EXECUTION).Close()
 	})
 
-	GinkgoIt("Should execute code in Haskell environment with infinite loop", func() {
-		gomega.Expect(execution.Init(_var.SINGLE_FILE_EXECUTION, []execution.ContainerBlueprint{
+	GinkgoIt("Should execute code in Haskell environment with infinite loop", ginkgo.Label("single_file", "37"), func() {
+		gomega.Expect(execution.Init(_var.PROJECT_EXECUTION, []execution.ContainerBlueprint{
 			{
 				WorkerNum:    1,
 				ContainerNum: 1,
@@ -1165,7 +1165,7 @@ man = putStrLn "Hello world"
 			},
 		})).Should(gomega.BeNil())
 
-		result := execution.Service(_var.SINGLE_FILE_EXECUTION).RunJob(execution.Job{
+		result := execution.Service(_var.PROJECT_EXECUTION).RunJob(execution.Job{
 			BuilderType:       "single_file",
 			ExecutionType:     "single_file",
 			EmulatorName:      string(repository.Haskell.Name),
@@ -1189,11 +1189,11 @@ main =
 
 		testExecutionDirEmpty()
 
-		execution.Service(_var.SINGLE_FILE_EXECUTION).Close()
+		execution.Service(_var.PROJECT_EXECUTION).Close()
 	})
 
-	GinkgoIt("Should execute a single file in a Node latest environment", func() {
-		gomega.Expect(execution.Init(_var.SINGLE_FILE_EXECUTION, []execution.ContainerBlueprint{
+	GinkgoIt("Should execute a single file in a Node latest environment", ginkgo.Label("single_file", "38"), func() {
+		gomega.Expect(execution.Init(_var.PROJECT_EXECUTION, []execution.ContainerBlueprint{
 			{
 				WorkerNum:    1,
 				ContainerNum: 1,
@@ -1258,10 +1258,10 @@ main =
 		gomega.Expect(result.Success).Should(gomega.BeTrue())
 		gomega.Expect(result.Result).Should(gomega.Equal("mile\n"))
 
-		execution.Service(_var.SINGLE_FILE_EXECUTION).Close()
+		execution.Service(_var.PROJECT_EXECUTION).Close()
 	})
 
-	GinkgoIt("Should execute a single file in a PHP environment", func() {
+	GinkgoIt("Should execute a single file in a PHP environment", ginkgo.Label("single_file", "39"), func() {
 		gomega.Expect(execution.Init(_var.PROJECT_EXECUTION, []execution.ContainerBlueprint{
 			{
 				WorkerNum:    1,
@@ -1334,7 +1334,7 @@ echo "mile";
 		execution.Service(_var.PROJECT_EXECUTION).Close()
 	})
 
-	GinkgoIt("Should execute a single file in a Ruby environment", func() {
+	GinkgoIt("Should execute a single file in a Ruby environment", ginkgo.Label("single_file", "40"), func() {
 		gomega.Expect(execution.Init(_var.PROJECT_EXECUTION, []execution.ContainerBlueprint{
 			{
 				WorkerNum:    1,
@@ -1403,7 +1403,7 @@ echo "mile";
 		execution.Service(_var.PROJECT_EXECUTION).Close()
 	})
 
-	GinkgoIt("Should execute a single file in a Go environment", func() {
+	GinkgoIt("Should execute a single file in a Go environment", ginkgo.Label("single_file", "41"), func() {
 		gomega.Expect(execution.Init(_var.PROJECT_EXECUTION, []execution.ContainerBlueprint{
 			{
 				WorkerNum:    1,
@@ -1480,7 +1480,7 @@ func main() {
 		execution.Service(_var.PROJECT_EXECUTION).Close()
 	})
 
-	GinkgoIt("Should execute a single file in a C# (Mono) environment", func() {
+	GinkgoIt("Should execute a single file in a C# (Mono) environment", ginkgo.Label("single_file", "42"), func() {
 		gomega.Expect(execution.Init(_var.PROJECT_EXECUTION, []execution.ContainerBlueprint{
 			{
 				WorkerNum:    1,
@@ -1559,7 +1559,7 @@ public class HelloWorld
 		execution.Service(_var.PROJECT_EXECUTION).Close()
 	})
 
-	GinkgoIt("Should execute a single file in a Python2 environment", func() {
+	GinkgoIt("Should execute a single file in a Python2 environment", ginkgo.Label("single_file", "43"), func() {
 		gomega.Expect(execution.Init(_var.PROJECT_EXECUTION, []execution.ContainerBlueprint{
 			{
 				WorkerNum:    1,
@@ -1628,7 +1628,7 @@ public class HelloWorld
 		execution.Service(_var.PROJECT_EXECUTION).Close()
 	})
 
-	GinkgoIt("Should execute a single file in a Python3 environment", func() {
+	GinkgoIt("Should execute a single file in a Python3 environment", ginkgo.Label("single_file", "44"), func() {
 		gomega.Expect(execution.Init(_var.PROJECT_EXECUTION, []execution.ContainerBlueprint{
 			{
 				WorkerNum:    1,
@@ -1697,7 +1697,7 @@ public class HelloWorld
 		execution.Service(_var.PROJECT_EXECUTION).Close()
 	})
 
-	GinkgoIt("Should execute a single file in a Haskell environment", func() {
+	GinkgoIt("Should execute a single file in a Haskell environment", ginkgo.Label("single_file", "45"), func() {
 		gomega.Expect(execution.Init(_var.PROJECT_EXECUTION, []execution.ContainerBlueprint{
 			{
 				WorkerNum:    1,
@@ -1766,7 +1766,7 @@ public class HelloWorld
 		execution.Service(_var.PROJECT_EXECUTION).Close()
 	})
 
-	GinkgoIt("Should execute a single file in a C environment", func() {
+	GinkgoIt("Should execute a single file in a C environment", ginkgo.Label("single_file", "46"), func() {
 		gomega.Expect(execution.Init(_var.PROJECT_EXECUTION, []execution.ContainerBlueprint{
 			{
 				WorkerNum:    1,
@@ -1841,7 +1841,7 @@ int main() {
 		execution.Service(_var.PROJECT_EXECUTION).Close()
 	})
 
-	GinkgoIt("Should execute a single file in a C++ environment", func() {
+	GinkgoIt("Should execute a single file in a C++ environment", ginkgo.Label("single_file", "47"), func() {
 		gomega.Expect(execution.Init(_var.PROJECT_EXECUTION, []execution.ContainerBlueprint{
 			{
 				WorkerNum:    1,
@@ -1917,7 +1917,7 @@ int main() {
 		execution.Service(_var.PROJECT_EXECUTION).Close()
 	})
 
-	GinkgoIt("Should gracefully fail multiple concurrent requests and stop containers", func() {
+	GinkgoIt("Should gracefully fail multiple concurrent requests and stop containers", ginkgo.Label("single_file", "48"), func() {
 		gomega.Expect(execution.Init(_var.PROJECT_EXECUTION, []execution.ContainerBlueprint{
 			{
 				WorkerNum:    10,

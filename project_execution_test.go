@@ -5,12 +5,11 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/google/uuid"
-	"github.com/onsi/ginkgo"
+	"github.com/onsi/ginkgo/v2"
 	"github.com/onsi/gomega"
 	"net/http"
 	"net/http/httptest"
 	"os"
-	"os/exec"
 	"therebelsource/emulator/execution"
 	"therebelsource/emulator/httpUtil"
 	"therebelsource/emulator/logger"
@@ -28,16 +27,6 @@ var _ = GinkgoDescribe("Project execution tests", func() {
 
 	GinkgoAfterEach(func() {
 		gomega.Expect(os.RemoveAll(os.Getenv("EXECUTION_DIR"))).Should(gomega.BeNil())
-	})
-
-	GinkgoAfterAll(func() {
-		cmd := exec.Command("/usr/bin/docker", "rm", "-f", "$(docker ps -a -q)")
-
-		err := cmd.Start()
-
-		gomega.Expect(err).Should(gomega.BeNil())
-		err = cmd.Wait()
-		gomega.Expect(err).Should(gomega.BeNil())
 	})
 
 	GinkgoIt("Should run a project execution in NodeJS ESM environment", func() {

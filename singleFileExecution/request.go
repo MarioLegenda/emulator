@@ -22,6 +22,13 @@ type SnippetRequest struct {
 	validatedTemporarySession repository.ValidatedTemporarySession
 }
 
+type PublicSnippetRequest struct {
+	Uuid string `json:"uuid"`
+
+	snippet                   *repository.Snippet
+	validatedTemporarySession repository.ValidatedTemporarySession
+}
+
 type PublicSingleFileRunRequest struct {
 	Uuid string `json:"uuid"`
 	Text string `json:"text"`
@@ -54,13 +61,13 @@ func (l *SingleFileRunRequest) Validate() error {
 
 		repo := repository.InitRepository()
 
-		session, err := repo.ValidateTemporarySession(sessionUuid)
+		validatedSession, err := repo.ValidateTemporarySession(sessionUuid)
 
 		if err != nil {
 			return errors.New("Code block does not exist")
 		}
 
-		sessionData, err := repo.GetCodeBlock(sessionUuid)
+		sessionData, err := repo.GetCodeBlock(validatedSession.Session, sessionUuid)
 
 		if err != nil {
 			return errors.New("Code block does not exist")
@@ -69,7 +76,7 @@ func (l *SingleFileRunRequest) Validate() error {
 		go repo.InvalidateTemporarySession(sessionUuid)
 
 		l.codeBlock = sessionData
-		l.validatedTemporarySession = session
+		l.validatedTemporarySession = validatedSession
 
 		return nil
 	}
@@ -98,13 +105,13 @@ func (l *PublicSingleFileRunRequest) Validate() error {
 
 		repo := repository.InitRepository()
 
-		session, err := repo.ValidateTemporarySession(sessionUuid)
+		validatedSession, err := repo.ValidateTemporarySession(sessionUuid)
 
 		if err != nil {
 			return errors.New("Code block does not exist")
 		}
 
-		sessionData, err := repo.GetCodeBlock(sessionUuid)
+		sessionData, err := repo.GetAnonymousCodeBlock(sessionUuid)
 
 		if err != nil {
 			return errors.New("Code block does not exist")
@@ -115,7 +122,7 @@ func (l *PublicSingleFileRunRequest) Validate() error {
 		go repo.InvalidateTemporarySession(sessionUuid)
 
 		l.codeBlock = sessionData
-		l.validatedTemporarySession = session
+		l.validatedTemporarySession = validatedSession
 
 		return nil
 	}
@@ -155,7 +162,56 @@ func (l *SnippetRequest) Validate() error {
 			return errors.New("Snippet does not exist")
 		}
 
-		sessionData, err := repo.GetSnippet(sessionUuid)
+		sessionData, err := repo.GetAuthenticatedSnippet(session.Session, sessionUuid)
+
+		if err != nil {
+			return errors.New("Snippet does not exist")
+		}
+
+		go repo.InvalidateTemporarySession(sessionUuid)
+
+		l.snippet = sessionData
+		l.validatedTemporarySession = session
+
+		return nil
+	}
+
+	if err := validation.Validate(map[string]interface{}{
+		"blockExists": l.Uuid,
+	}, validation.Map(
+		validation.Key("blockExists", validation.By(blockExists)),
+	)); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (l *PublicSnippetRequest) Sanitize() {
+	p := bluemonday.StrictPolicy()
+
+	l.Uuid = p.Sanitize(l.Uuid)
+}
+
+func (l *PublicSnippetRequest) Validate() error {
+	if err := validation.ValidateStruct(l,
+		validation.Field(&l.Uuid, validation.Required, is.UUID),
+	); err != nil {
+		return err
+	}
+
+	blockExists := func(request interface{}) error {
+		sessionUuid := request.(string)
+
+		repo := repository.InitRepository()
+
+		session, err := repo.ValidateTemporarySession(sessionUuid)
+
+		if err != nil {
+			return errors.New("Snippet does not exist")
+		}
+
+		sessionData, err := repo.GetAnonymousSnippet(sessionUuid)
 
 		if err != nil {
 			return errors.New("Snippet does not exist")

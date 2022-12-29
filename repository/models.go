@@ -53,7 +53,8 @@ type TemporarySession struct {
 }
 
 type ValidatedTemporarySession struct {
-	Timeout int `json:"timeout"`
+	Timeout int    `json:"timeout"`
+	Session string `json:"session"`
 }
 
 type CodeBlock struct {

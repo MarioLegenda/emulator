@@ -29,8 +29,8 @@ type JsonRequest struct {
 }
 
 type RawResponse struct {
-	Status int
-	Body   []byte
+	Status  int
+	Body    []byte
 	Cookies []*http.Cookie
 }
 
@@ -114,7 +114,7 @@ func (ac *HttpClient) MakeJsonRequest(r *JsonRequest) (RawResponse, IClientError
 	request, err := http.NewRequest(r.Method, r.Url, bytes.NewBuffer(r.Body))
 
 	if r.Session != "" {
-		request.AddCookie(&http.Cookie{Name: "session", Value: r.Session, Path: "/", HttpOnly: true, Secure: true})
+		request.AddCookie(&http.Cookie{Name: "session", Value: r.Session, MaxAge: 3600, Path: "/", HttpOnly: true, Secure: true})
 	}
 
 	if err != nil {
@@ -160,8 +160,8 @@ func (ac *HttpClient) MakeJsonRequest(r *JsonRequest) (RawResponse, IClientError
 	}
 
 	return RawResponse{
-		Status: response.StatusCode,
-		Body:   body,
+		Status:  response.StatusCode,
+		Body:    body,
 		Cookies: response.Cookies(),
 	}, nil
 }

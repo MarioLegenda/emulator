@@ -40,7 +40,7 @@ func (l *ProjectRunRequest) Validate() error {
 			return errors.New("Project does not exist")
 		}
 
-		sessionData, err := repo.GetProjectSessionData(sessionUuid)
+		sessionData, err := repo.GetProjectSessionData(session.Session, sessionUuid)
 
 		if err != nil {
 			return errors.New("Project does not exists")
