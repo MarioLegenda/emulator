@@ -1,96 +1,56 @@
 package repository
 
 import (
-	"crypto/tls"
 	"encoding/json"
 	"fmt"
+	"net/http"
 	"os"
+	"strconv"
 	"therebelsource/emulator/appErrors"
-	"therebelsource/emulator/httpClient"
 	"therebelsource/emulator/logger"
+	newClient "therebelsource/emulator/repository/httpClient"
+	"time"
 )
-
-type Repository struct{}
-
-func InitRepository() Repository {
-	return Repository{}
-}
 
 func CreateApiUrl() string {
 	return fmt.Sprintf("%s://%s/%s/%s", os.Getenv("API_PROTOCOL"), os.Getenv("API_HOST"), os.Getenv("API_ENDPOINT"), os.Getenv("API_VERSION"))
 }
 
-func (r Repository) GetCodeBlock(authenticatedSession string, sessionUuid string) (*CodeBlock, *appErrors.Error) {
-	url := fmt.Sprintf("%s/session/single-file-data", CreateApiUrl())
+func createClient() (*http.Client, *appErrors.Error) {
+	var timeout, err = strconv.Atoi(os.Getenv("GLOBAL_REQUEST_TIMEOUT"))
 
-	client, err := httpClient.NewHttpClient(&tls.Config{
-		InsecureSkipVerify: true,
+	if err != nil {
+		logger.Warn(fmt.Sprintf("Failed creating client: %s", err.Error()))
+		return nil, appErrors.New(appErrors.ApplicationError, appErrors.ApplicationRuntimeError, err.Error())
+	}
+
+	client := newClient.NewClient(newClient.ClientParams{
+		Transport:     nil,
+		CheckRedirect: nil,
+		Jar:           nil,
+		Timeout:       time.Second * time.Duration(timeout),
 	})
 
-	if err != nil {
-		return nil, appErrors.New(appErrors.ApplicationError, appErrors.ApplicationRuntimeError, "Cannot create client to get environment data")
-	}
+	return client, nil
+}
 
-	bm := map[string]interface{}{
-		"uuid": sessionUuid,
-	}
-
-	body, err := json.Marshal(bm)
-
-	if err != nil {
-		return nil, appErrors.New(appErrors.ApplicationError, appErrors.ApplicationRuntimeError, "Cannot create client to get environment data")
-	}
-
-	response, clientError := client.MakeJsonRequest(&httpClient.JsonRequest{
+func createRequest(url string, method string, body []byte, headers map[string]string) (*http.Request, *appErrors.Error) {
+	r, err := newClient.NewRequest(newClient.Request{
+		Headers: headers,
 		Url:     url,
-		Method:  "POST",
+		Method:  method,
 		Body:    body,
-		Session: authenticatedSession,
 	})
 
-	if clientError != nil {
-		return nil, appErrors.New(appErrors.ApplicationError, appErrors.ApplicationRuntimeError, clientError.GetMessage())
-	}
-
-	if response.Status != 200 {
-		logger.Warn(fmt.Sprintf("Failed executing getting a code block: %v", string(response.Body)))
-		return nil, appErrors.New(appErrors.ApplicationError, appErrors.ApplicationRuntimeError, fmt.Sprintf("Request did not succeed with status: %d", response.Status))
-	}
-
-	var apiResponse map[string]interface{}
-	err = json.Unmarshal(response.Body, &apiResponse)
-
 	if err != nil {
+		logger.Warn(fmt.Sprintf("Failed creating request: %s", err.Error()))
 		return nil, appErrors.New(appErrors.ApplicationError, appErrors.ApplicationRuntimeError, err.Error())
 	}
 
-	d := apiResponse["data"]
-
-	b, err := json.Marshal(d)
-
-	if err != nil {
-		return nil, appErrors.New(appErrors.ApplicationError, appErrors.ApplicationRuntimeError, fmt.Sprintf("Cannot get code block: %s", err.Error()))
-	}
-
-	var codeBlock *CodeBlock
-	if err := json.Unmarshal(b, &codeBlock); err != nil {
-		return nil, appErrors.New(appErrors.ApplicationError, appErrors.ApplicationRuntimeError, fmt.Sprintf("Cannot get code block: %s", err.Error()))
-	}
-
-	return codeBlock, nil
+	return r, nil
 }
 
-func (r Repository) GetAnonymousCodeBlock(sessionUuid string) (*CodeBlock, *appErrors.Error) {
-	url := fmt.Sprintf("%s/session/anonymous/single-file-data", CreateApiUrl())
-
-	client, err := httpClient.NewHttpClient(&tls.Config{
-		InsecureSkipVerify: true,
-	})
-
-	if err != nil {
-		return nil, appErrors.New(appErrors.ApplicationError, appErrors.ApplicationRuntimeError, "Cannot create client to get environment data")
-	}
-
+func createBody(sessionUuid string) ([]byte, *appErrors.Error) {
 	bm := map[string]interface{}{
 		"uuid": sessionUuid,
 	}
@@ -101,554 +61,325 @@ func (r Repository) GetAnonymousCodeBlock(sessionUuid string) (*CodeBlock, *appE
 		return nil, appErrors.New(appErrors.ApplicationError, appErrors.ApplicationRuntimeError, "Cannot create client to get environment data")
 	}
 
-	response, clientError := client.MakeJsonRequest(&httpClient.JsonRequest{
-		Url:    url,
-		Method: "POST",
-		Body:   body,
-	})
+	return body, nil
+}
 
-	if clientError != nil {
-		return nil, appErrors.New(appErrors.ApplicationError, appErrors.ApplicationRuntimeError, clientError.GetMessage())
-	}
+func GetCodeBlock(authenticatedSession string, sessionUuid string) (*CodeBlock, *appErrors.Error) {
+	logger.Info(fmt.Sprintf("GetCodeBlock: Starting execution"))
 
-	if response.Status != 200 {
-		logger.Warn(fmt.Sprintf("Failed executing getting a code block: %v", string(response.Body)))
-		return nil, appErrors.New(appErrors.ApplicationError, appErrors.ApplicationRuntimeError, fmt.Sprintf("Request did not succeed with status: %d", response.Status))
-	}
-
-	var apiResponse map[string]interface{}
-	err = json.Unmarshal(response.Body, &apiResponse)
-
+	body, err := createBody(sessionUuid)
 	if err != nil {
+		logger.Warn(fmt.Sprintf("GetCodeBlock: Failed marshaling body to get code block: %s", err.Error()))
+		return nil, err
+	}
+
+	client, clientErr := createClient()
+	if clientErr != nil {
+		return nil, clientErr
+	}
+
+	r, err := createRequest(fmt.Sprintf("%s/session/single-file-data", CreateApiUrl()), "POST", body, nil)
+	if err != nil {
+		logger.Warn(fmt.Sprintf("GetCodeBlock: Failed creating request body: %s", err.Error()))
+		return nil, err
+	}
+
+	if authenticatedSession != "" {
+		r.AddCookie(&http.Cookie{Name: "session", Value: authenticatedSession, MaxAge: 3600, Path: "/", HttpOnly: true, Secure: true})
+	}
+
+	var codeBlock CodeBlock
+	if err := newClient.SendWithBackoff(r, client, &codeBlock); err != nil {
+		logger.Warn(fmt.Sprintf("GetCodeBlock: Failed sending request: %s", err.Error()))
 		return nil, appErrors.New(appErrors.ApplicationError, appErrors.ApplicationRuntimeError, err.Error())
 	}
 
-	d := apiResponse["data"]
+	logger.Info(fmt.Sprintf("GetCodeBlock: Finished execution"))
 
-	b, err := json.Marshal(d)
-
-	if err != nil {
-		return nil, appErrors.New(appErrors.ApplicationError, appErrors.ApplicationRuntimeError, fmt.Sprintf("Cannot get code block: %s", err.Error()))
-	}
-
-	var codeBlock *CodeBlock
-	if err := json.Unmarshal(b, &codeBlock); err != nil {
-		return nil, appErrors.New(appErrors.ApplicationError, appErrors.ApplicationRuntimeError, fmt.Sprintf("Cannot get code block: %s", err.Error()))
-	}
-
-	return codeBlock, nil
+	return &codeBlock, nil
 }
 
-func (r Repository) GetAuthenticatedSnippet(authenticatedSession string, sessionUuid string) (*Snippet, *appErrors.Error) {
-	url := fmt.Sprintf("%s/session/snippet-data", CreateApiUrl())
+func GetAnonymousCodeBlock(sessionUuid string) (*CodeBlock, *appErrors.Error) {
+	logger.Info(fmt.Sprintf("GetAnonymousCodeBlock: Starging execution"))
 
-	client, err := httpClient.NewHttpClient(&tls.Config{
-		InsecureSkipVerify: true,
-	})
-
+	body, err := createBody(sessionUuid)
 	if err != nil {
-		return nil, appErrors.New(appErrors.ApplicationError, appErrors.ApplicationRuntimeError, "Cannot create client to get environment data")
+		logger.Warn(fmt.Sprintf("GetAnonymousCodeBlock: Failed marshaling body to get code block: %s", err.Error()))
+		return nil, err
 	}
 
-	bm := map[string]interface{}{
-		"uuid": sessionUuid,
+	client, clientErr := createClient()
+	if clientErr != nil {
+		return nil, clientErr
 	}
 
-	body, err := json.Marshal(bm)
-
+	r, err := createRequest(fmt.Sprintf("%s/session/anonymous/single-file-data", CreateApiUrl()), "POST", body, nil)
 	if err != nil {
-		return nil, appErrors.New(appErrors.ApplicationError, appErrors.ApplicationRuntimeError, "Cannot create client to get environment data")
+		logger.Warn(fmt.Sprintf("GetAnonymousCodeBlock: Failed creating request body: %s", err.Error()))
+		return nil, err
 	}
 
-	response, clientError := client.MakeJsonRequest(&httpClient.JsonRequest{
-		Url:     url,
-		Method:  "POST",
-		Body:    body,
-		Session: authenticatedSession,
-	})
-
-	if clientError != nil {
-		return nil, appErrors.New(appErrors.ApplicationError, appErrors.ApplicationRuntimeError, clientError.GetMessage())
-	}
-
-	if response.Status != 200 {
-		logger.Warn(fmt.Sprintf("Failed executing getting a snippet: %v", string(response.Body)))
-		return nil, appErrors.New(appErrors.ApplicationError, appErrors.ApplicationRuntimeError, fmt.Sprintf("Request did not succeed with status: %d", response.Status))
-	}
-
-	var apiResponse map[string]interface{}
-	err = json.Unmarshal(response.Body, &apiResponse)
-
-	if err != nil {
+	var codeBlock CodeBlock
+	if err := newClient.SendWithBackoff(r, client, &codeBlock); err != nil {
+		logger.Warn(fmt.Sprintf("GetAnonymousCodeBlock: Failed sending request: %s", err.Error()))
 		return nil, appErrors.New(appErrors.ApplicationError, appErrors.ApplicationRuntimeError, err.Error())
 	}
 
-	d := apiResponse["data"]
+	logger.Info(fmt.Sprintf("GetAnonymousCodeBlock: Finished execution"))
 
-	b, err := json.Marshal(d)
-
-	if err != nil {
-		return nil, appErrors.New(appErrors.ApplicationError, appErrors.ApplicationRuntimeError, fmt.Sprintf("Cannot get code block: %s", err.Error()))
-	}
-
-	var snippet *Snippet
-	if err := json.Unmarshal(b, &snippet); err != nil {
-		return nil, appErrors.New(appErrors.ApplicationError, appErrors.ApplicationRuntimeError, fmt.Sprintf("Cannot get code block: %s", err.Error()))
-	}
-
-	return snippet, nil
+	return &codeBlock, nil
 }
 
-func (r Repository) GetAnonymousSnippet(sessionUuid string) (*Snippet, *appErrors.Error) {
-	url := fmt.Sprintf("%s/session/anonymous/snippet-data", CreateApiUrl())
+func GetAuthenticatedSnippet(authenticatedSession string, sessionUuid string) (*Snippet, *appErrors.Error) {
+	logger.Info(fmt.Sprintf("GetAnonymousCodeBlock: Starting execution"))
 
-	client, err := httpClient.NewHttpClient(&tls.Config{
-		InsecureSkipVerify: true,
-	})
-
+	body, err := createBody(sessionUuid)
 	if err != nil {
-		return nil, appErrors.New(appErrors.ApplicationError, appErrors.ApplicationRuntimeError, "Cannot create client to get environment data")
+		logger.Warn(fmt.Sprintf("GetAuthenticatedSnippet: Failed marshaling body to get code block: %s", err.Error()))
+		return nil, err
 	}
 
-	bm := map[string]interface{}{
-		"uuid": sessionUuid,
+	client, clientErr := createClient()
+	if clientErr != nil {
+		return nil, clientErr
 	}
 
-	body, err := json.Marshal(bm)
-
+	r, err := createRequest(fmt.Sprintf("%s/session/snippet-data", CreateApiUrl()), "POST", body, nil)
 	if err != nil {
-		return nil, appErrors.New(appErrors.ApplicationError, appErrors.ApplicationRuntimeError, "Cannot create client to get environment data")
+		logger.Warn(fmt.Sprintf("GetAuthenticatedSnippet: Failed creating request body: %s", err.Error()))
+		return nil, err
 	}
 
-	response, clientError := client.MakeJsonRequest(&httpClient.JsonRequest{
-		Url:    url,
-		Method: "POST",
-		Body:   body,
-	})
-
-	if clientError != nil {
-		return nil, appErrors.New(appErrors.ApplicationError, appErrors.ApplicationRuntimeError, clientError.GetMessage())
+	if authenticatedSession != "" {
+		r.AddCookie(&http.Cookie{Name: "session", Value: authenticatedSession, MaxAge: 3600, Path: "/", HttpOnly: true, Secure: true})
 	}
 
-	if response.Status != 200 {
-		logger.Warn(fmt.Sprintf("Failed executing getting a snippet: %v", string(response.Body)))
-		return nil, appErrors.New(appErrors.ApplicationError, appErrors.ApplicationRuntimeError, fmt.Sprintf("Request did not succeed with status: %d", response.Status))
-	}
-
-	var apiResponse map[string]interface{}
-	err = json.Unmarshal(response.Body, &apiResponse)
-
-	if err != nil {
+	var snippet Snippet
+	if err := newClient.SendWithBackoff(r, client, &snippet); err != nil {
+		logger.Warn(fmt.Sprintf("GetAuthenticatedSnippet: Failed sending request: %s", err.Error()))
 		return nil, appErrors.New(appErrors.ApplicationError, appErrors.ApplicationRuntimeError, err.Error())
 	}
 
-	d := apiResponse["data"]
+	logger.Info(fmt.Sprintf("GetAnonymousCodeBlock: Finished execution"))
 
-	b, err := json.Marshal(d)
-
-	if err != nil {
-		return nil, appErrors.New(appErrors.ApplicationError, appErrors.ApplicationRuntimeError, fmt.Sprintf("Cannot get code block: %s", err.Error()))
-	}
-
-	var snippet *Snippet
-	if err := json.Unmarshal(b, &snippet); err != nil {
-		return nil, appErrors.New(appErrors.ApplicationError, appErrors.ApplicationRuntimeError, fmt.Sprintf("Cannot get code block: %s", err.Error()))
-	}
-
-	return snippet, nil
+	return &snippet, nil
 }
 
-func (r Repository) GetProjectSessionData(authenticatedSession string, sessionUuid string) (*SessionCodeProjectData, *appErrors.Error) {
-	url := fmt.Sprintf("%s/session/project-data", CreateApiUrl())
+func GetAnonymousSnippet(sessionUuid string) (*Snippet, *appErrors.Error) {
+	logger.Info(fmt.Sprintf("GetAnonymousSnippet: Starting execution"))
 
-	client, err := httpClient.NewHttpClient(&tls.Config{
-		InsecureSkipVerify: true,
-	})
-
+	body, err := createBody(sessionUuid)
 	if err != nil {
-		return nil, appErrors.New(appErrors.ApplicationError, appErrors.ApplicationRuntimeError, "Cannot create client to get environment data")
+		logger.Warn(fmt.Sprintf("Failed marshaling body to get code block: %s", err.Error()))
+		return nil, err
 	}
 
-	bm := map[string]interface{}{
-		"uuid": sessionUuid,
+	client, clientErr := createClient()
+	if clientErr != nil {
+		return nil, clientErr
 	}
 
-	body, err := json.Marshal(bm)
-
+	r, err := createRequest(fmt.Sprintf("%s/session/anonymous/snippet-data", CreateApiUrl()), "POST", body, nil)
 	if err != nil {
-		return nil, appErrors.New(appErrors.ApplicationError, appErrors.ApplicationRuntimeError, "Cannot create client to get environment data")
+		logger.Warn(fmt.Sprintf("GetAnonymousSnippet: Failed creating request body: %s", err.Error()))
+		return nil, err
 	}
 
-	response, clientError := client.MakeJsonRequest(&httpClient.JsonRequest{
-		Url:     url,
-		Method:  "POST",
-		Body:    body,
-		Session: authenticatedSession,
-	})
-
-	if clientError != nil {
-		return nil, appErrors.New(appErrors.ApplicationError, appErrors.ApplicationRuntimeError, clientError.GetMessage())
-	}
-
-	if response.Status != 200 {
-		logger.Warn(fmt.Sprintf("Failed executing getting a project session data: %v", string(response.Body)))
-		return nil, appErrors.New(appErrors.ApplicationError, appErrors.ApplicationRuntimeError, fmt.Sprintf("Request did not succeed with status: %d", response.Status))
-	}
-
-	var apiResponse map[string]interface{}
-	err = json.Unmarshal(response.Body, &apiResponse)
-
-	if err != nil {
+	var snippet Snippet
+	if err := newClient.SendWithBackoff(r, client, &snippet); err != nil {
+		logger.Warn(fmt.Sprintf("GetAnonymousSnippet: Failed sending request: %s", err.Error()))
 		return nil, appErrors.New(appErrors.ApplicationError, appErrors.ApplicationRuntimeError, err.Error())
 	}
 
-	d := apiResponse["data"]
+	logger.Info(fmt.Sprintf("GetAnonymousSnippet: Finished execution"))
 
-	b, err := json.Marshal(d)
-
-	if err != nil {
-		return nil, appErrors.New(appErrors.ApplicationError, appErrors.ApplicationRuntimeError, fmt.Sprintf("Cannot get session data: %s", err.Error()))
-	}
-
-	var sessionData *SessionCodeProjectData
-	if err := json.Unmarshal(b, &sessionData); err != nil {
-		return nil, appErrors.New(appErrors.ApplicationError, appErrors.ApplicationRuntimeError, fmt.Sprintf("Cannot get session data: %s", err.Error()))
-	}
-
-	return sessionData, nil
+	return &snippet, nil
 }
 
-func (r Repository) GetLinkedSessionData(authenticatedSession string, sessionUuid string) (*LinkedSessionData, *appErrors.Error) {
-	url := fmt.Sprintf("%s/session/linked-data", CreateApiUrl())
+func GetProjectSessionData(authenticatedSession string, sessionUuid string) (*SessionCodeProjectData, *appErrors.Error) {
+	logger.Info(fmt.Sprintf("GetProjectSessionData: Starting execution"))
 
-	client, err := httpClient.NewHttpClient(&tls.Config{
-		InsecureSkipVerify: true,
-	})
-
+	body, err := createBody(sessionUuid)
 	if err != nil {
-		return nil, appErrors.New(appErrors.ApplicationError, appErrors.ApplicationRuntimeError, "Cannot create client to get environment data")
+		logger.Warn(fmt.Sprintf("GetProjectSessionData: Failed marshaling body to get code block: %s", err.Error()))
+		return nil, err
 	}
 
-	bm := map[string]interface{}{
-		"uuid": sessionUuid,
+	client, clientErr := createClient()
+	if clientErr != nil {
+		return nil, clientErr
 	}
 
-	body, err := json.Marshal(bm)
-
+	r, err := createRequest(fmt.Sprintf("%s/session/project-data", CreateApiUrl()), "POST", body, nil)
 	if err != nil {
-		return nil, appErrors.New(appErrors.ApplicationError, appErrors.ApplicationRuntimeError, "Cannot create client to get environment data")
+		logger.Warn(fmt.Sprintf("GetProjectSessionData: Failed creating request body: %s", err.Error()))
+		return nil, err
 	}
 
-	response, clientError := client.MakeJsonRequest(&httpClient.JsonRequest{
-		Url:     url,
-		Method:  "POST",
-		Body:    body,
-		Session: authenticatedSession,
-	})
-
-	if clientError != nil {
-		return nil, appErrors.New(appErrors.ApplicationError, appErrors.ApplicationRuntimeError, clientError.GetMessage())
+	if authenticatedSession != "" {
+		r.AddCookie(&http.Cookie{Name: "session", Value: authenticatedSession, MaxAge: 3600, Path: "/", HttpOnly: true, Secure: true})
 	}
 
-	if response.Status != 200 {
-		logger.Warn(fmt.Sprintf("Failed executing getting linked session data: %v", string(response.Body)))
-		return nil, appErrors.New(appErrors.ApplicationError, appErrors.ApplicationRuntimeError, fmt.Sprintf("Request did not succeed with status: %d", response.Status))
-	}
-
-	var apiResponse map[string]interface{}
-	err = json.Unmarshal(response.Body, &apiResponse)
-
-	if err != nil {
+	var model SessionCodeProjectData
+	if err := newClient.SendWithBackoff(r, client, &model); err != nil {
+		logger.Warn(fmt.Sprintf("GetProjectSessionData: Failed sending request: %s", err.Error()))
 		return nil, appErrors.New(appErrors.ApplicationError, appErrors.ApplicationRuntimeError, err.Error())
 	}
 
-	d := apiResponse["data"]
+	logger.Info(fmt.Sprintf("GetProjectSessionData: Finished execution"))
 
-	b, err := json.Marshal(d)
-
-	if err != nil {
-		return nil, appErrors.New(appErrors.ApplicationError, appErrors.ApplicationRuntimeError, fmt.Sprintf("Cannot get session data: %s", err.Error()))
-	}
-
-	var sessionData *LinkedSessionData
-	if err := json.Unmarshal(b, &sessionData); err != nil {
-		return nil, appErrors.New(appErrors.ApplicationError, appErrors.ApplicationRuntimeError, fmt.Sprintf("Cannot get session data: %s", err.Error()))
-	}
-
-	return sessionData, nil
+	return &model, nil
 }
 
-func (r Repository) GetAnonymousLinkedSessionData(sessionUuid string) (*LinkedSessionData, *appErrors.Error) {
-	url := fmt.Sprintf("%s/session/anonymous/linked-data", CreateApiUrl())
+func GetLinkedSessionData(authenticatedSession string, sessionUuid string) (*LinkedSessionData, *appErrors.Error) {
+	logger.Info(fmt.Sprintf("GetLinkedSessionData: Starting execution"))
 
-	client, err := httpClient.NewHttpClient(&tls.Config{
-		InsecureSkipVerify: true,
-	})
-
+	body, err := createBody(sessionUuid)
 	if err != nil {
-		return nil, appErrors.New(appErrors.ApplicationError, appErrors.ApplicationRuntimeError, "Cannot create client to get environment data")
+		logger.Warn(fmt.Sprintf("GetLinkedSessionData: Failed marshaling body to get code block: %s", err.Error()))
+		return nil, err
 	}
 
-	bm := map[string]interface{}{
-		"uuid": sessionUuid,
+	client, clientErr := createClient()
+	if clientErr != nil {
+		return nil, clientErr
 	}
 
-	body, err := json.Marshal(bm)
-
+	r, err := createRequest(fmt.Sprintf("%s/session/linked-data", CreateApiUrl()), "POST", body, nil)
 	if err != nil {
-		return nil, appErrors.New(appErrors.ApplicationError, appErrors.ApplicationRuntimeError, "Cannot create client to get environment data")
+		logger.Warn(fmt.Sprintf("GetLinkedSessionData: Failed creating request body: %s", err.Error()))
+		return nil, err
 	}
 
-	response, clientError := client.MakeJsonRequest(&httpClient.JsonRequest{
-		Url:    url,
-		Method: "POST",
-		Body:   body,
-	})
-
-	if clientError != nil {
-		return nil, appErrors.New(appErrors.ApplicationError, appErrors.ApplicationRuntimeError, clientError.GetMessage())
+	if authenticatedSession != "" {
+		r.AddCookie(&http.Cookie{Name: "session", Value: authenticatedSession, MaxAge: 3600, Path: "/", HttpOnly: true, Secure: true})
 	}
 
-	if response.Status != 200 {
-		logger.Warn(fmt.Sprintf("Failed executing getting linked session data: %v", string(response.Body)))
-		return nil, appErrors.New(appErrors.ApplicationError, appErrors.ApplicationRuntimeError, fmt.Sprintf("Request did not succeed with status: %d", response.Status))
-	}
-
-	var apiResponse map[string]interface{}
-	err = json.Unmarshal(response.Body, &apiResponse)
-
-	if err != nil {
+	var model LinkedSessionData
+	if err := newClient.SendWithBackoff(r, client, &model); err != nil {
+		logger.Warn(fmt.Sprintf("GetLinkedSessionData: Failed sending request: %s", err.Error()))
 		return nil, appErrors.New(appErrors.ApplicationError, appErrors.ApplicationRuntimeError, err.Error())
 	}
 
-	d := apiResponse["data"]
+	logger.Info(fmt.Sprintf("GetLinkedSessionData: Finished execution"))
 
-	b, err := json.Marshal(d)
-
-	if err != nil {
-		return nil, appErrors.New(appErrors.ApplicationError, appErrors.ApplicationRuntimeError, fmt.Sprintf("Cannot get session data: %s", err.Error()))
-	}
-
-	var sessionData *LinkedSessionData
-	if err := json.Unmarshal(b, &sessionData); err != nil {
-		return nil, appErrors.New(appErrors.ApplicationError, appErrors.ApplicationRuntimeError, fmt.Sprintf("Cannot get session data: %s", err.Error()))
-	}
-
-	return sessionData, nil
+	return &model, nil
 }
 
-func (r Repository) ValidateTemporarySession(sessionUuid string) (ValidatedTemporarySession, *appErrors.Error) {
-	url := fmt.Sprintf("%s/session/validate", CreateApiUrl())
+func GetAnonymousLinkedSessionData(sessionUuid string) (*LinkedSessionData, *appErrors.Error) {
+	logger.Info(fmt.Sprintf("GetAnonymousLinkedSessionData: Starting execution"))
 
-	client, err := httpClient.NewHttpClient(&tls.Config{
-		InsecureSkipVerify: true,
-	})
-
+	body, err := createBody(sessionUuid)
 	if err != nil {
-		return ValidatedTemporarySession{}, appErrors.New(appErrors.ApplicationError, appErrors.ApplicationRuntimeError, "Cannot create client to get environment data")
+		logger.Warn(fmt.Sprintf("GetAnonymousLinkedSessionData: Failed marshaling body to get code block: %s", err.Error()))
+		return nil, err
 	}
 
-	bm := map[string]interface{}{
-		"uuid": sessionUuid,
+	client, clientErr := createClient()
+	if clientErr != nil {
+		return nil, clientErr
 	}
 
-	body, err := json.Marshal(bm)
-
+	r, err := createRequest(fmt.Sprintf("%s/session/anonymous/linked-data", CreateApiUrl()), "POST", body, nil)
 	if err != nil {
-		return ValidatedTemporarySession{}, appErrors.New(appErrors.ApplicationError, appErrors.ApplicationRuntimeError, "Cannot create client to get environment data")
+		logger.Warn(fmt.Sprintf("GetAnonymousLinkedSessionData: Failed creating request body: %s", err.Error()))
+		return nil, err
 	}
 
-	response, clientError := client.MakeJsonRequest(&httpClient.JsonRequest{
-		Url:    url,
-		Method: "POST",
-		Body:   body,
-	})
-
-	if clientError != nil {
-		return ValidatedTemporarySession{}, appErrors.New(appErrors.ApplicationError, appErrors.ApplicationRuntimeError, clientError.GetMessage())
+	var model LinkedSessionData
+	if err := newClient.SendWithBackoff(r, client, &model); err != nil {
+		logger.Warn(fmt.Sprintf("GetAnonymousLinkedSessionData: Failed sending request: %s", err.Error()))
+		return nil, appErrors.New(appErrors.ApplicationError, appErrors.ApplicationRuntimeError, err.Error())
 	}
 
-	if response.Status != 200 {
-		logger.Warn(fmt.Sprintf("Failed executing validating temporary session: %v", string(response.Body)))
-		return ValidatedTemporarySession{}, appErrors.New(appErrors.ApplicationError, appErrors.ApplicationRuntimeError, fmt.Sprintf("Request did not succeed with status: %d", response.Status))
-	}
+	logger.Info(fmt.Sprintf("GetAnonymousLinkedSessionData: Finished execution"))
 
-	var apiResponse map[string]interface{}
-	err = json.Unmarshal(response.Body, &apiResponse)
+	return &model, nil
+}
 
+func ValidateTemporarySession(sessionUuid string) (ValidatedTemporarySession, *appErrors.Error) {
+	logger.Info(fmt.Sprintf("ValidateTemporarySession: Starting execution"))
+
+	body, err := createBody(sessionUuid)
 	if err != nil {
+		logger.Warn(fmt.Sprintf("Failed marshaling body to get code block: %s", err.Error()))
+		return ValidatedTemporarySession{}, err
+	}
+
+	client, clientErr := createClient()
+	if clientErr != nil {
+		return ValidatedTemporarySession{}, clientErr
+	}
+
+	r, err := createRequest(fmt.Sprintf("%s/session/validate", CreateApiUrl()), "POST", body, nil)
+	if err != nil {
+		logger.Warn(fmt.Sprintf("ValidateTemporarySession: Failed creating request body: %s", err.Error()))
+		return ValidatedTemporarySession{}, err
+	}
+
+	var model ValidatedTemporarySession
+	if err := newClient.SendWithBackoff(r, client, &model); err != nil {
+		logger.Warn(fmt.Sprintf("ValidateTemporarySession: Failed sending request: %s", err.Error()))
 		return ValidatedTemporarySession{}, appErrors.New(appErrors.ApplicationError, appErrors.ApplicationRuntimeError, err.Error())
 	}
 
-	d := apiResponse["data"]
+	logger.Info(fmt.Sprintf("ValidateTemporarySession: Finished execution"))
 
-	b, err := json.Marshal(d)
-
-	if err != nil {
-		return ValidatedTemporarySession{}, appErrors.New(appErrors.ApplicationError, appErrors.ApplicationRuntimeError, fmt.Sprintf("Cannot get code block: %s", err.Error()))
-	}
-
-	var validatedSession ValidatedTemporarySession
-	if err := json.Unmarshal(b, &validatedSession); err != nil {
-		return ValidatedTemporarySession{}, appErrors.New(appErrors.ApplicationError, appErrors.ApplicationRuntimeError, fmt.Sprintf("Cannot get code block: %s", err.Error()))
-	}
-
-	return validatedSession, nil
+	return model, nil
 }
 
-func (r Repository) InvalidateTemporarySession(sessionUuid string) *appErrors.Error {
-	url := fmt.Sprintf("%s/session/invalidate", CreateApiUrl())
+func InvalidateTemporarySession(sessionUuid string) *appErrors.Error {
+	logger.Info(fmt.Sprintf("InvalidateTemporarySession: Starting execution"))
 
-	client, err := httpClient.NewHttpClient(&tls.Config{
-		InsecureSkipVerify: true,
-	})
-
+	body, err := createBody(sessionUuid)
 	if err != nil {
-		return appErrors.New(appErrors.ApplicationError, appErrors.ApplicationRuntimeError, "Cannot create client to get environment data")
+		logger.Warn(fmt.Sprintf("InvalidateTemporarySession: Failed marshaling body to get code block: %s", err.Error()))
+		return err
 	}
 
-	bm := map[string]interface{}{
-		"uuid": sessionUuid,
+	client, clientErr := createClient()
+	if clientErr != nil {
+		return clientErr
 	}
 
-	body, err := json.Marshal(bm)
-
+	r, err := createRequest(fmt.Sprintf("%s/session/invalidate", CreateApiUrl()), "POST", body, nil)
 	if err != nil {
-		return appErrors.New(appErrors.ApplicationError, appErrors.ApplicationRuntimeError, "Cannot create client to get environment data")
+		logger.Warn(fmt.Sprintf("InvalidateTemporarySession: Failed creating request body: %s", err.Error()))
+		return err
 	}
 
-	response, clientError := client.MakeJsonRequest(&httpClient.JsonRequest{
-		Url:    url,
-		Method: "POST",
-		Body:   body,
-	})
-
-	if clientError != nil {
-		return appErrors.New(appErrors.ApplicationError, appErrors.ApplicationRuntimeError, clientError.GetMessage())
-	}
-
-	if response.Status != 200 {
-		logger.Warn(fmt.Sprintf("Failed executing invalidating temporary session: %v", string(response.Body)))
-		return appErrors.New(appErrors.ApplicationError, appErrors.ApplicationRuntimeError, fmt.Sprintf("Request did not succeed with status: %d", response.Status))
-	}
-
-	var apiResponse map[string]interface{}
-	err = json.Unmarshal(response.Body, &apiResponse)
-
-	if err != nil {
+	var model ValidatedTemporarySession
+	if err := newClient.SendWithBackoff(r, client, &model); err != nil {
+		logger.Warn(fmt.Sprintf("InvalidateTemporarySession: Failed sending request: %s", err.Error()))
 		return appErrors.New(appErrors.ApplicationError, appErrors.ApplicationRuntimeError, err.Error())
 	}
 
-	d := apiResponse["data"]
-
-	b, err := json.Marshal(d)
-
-	if err != nil {
-		return appErrors.New(appErrors.ApplicationError, appErrors.ApplicationRuntimeError, fmt.Sprintf("Cannot get code block: %s", err.Error()))
-	}
-
-	var codeBlock ValidatedTemporarySession
-	if err := json.Unmarshal(b, &codeBlock); err != nil {
-		return appErrors.New(appErrors.ApplicationError, appErrors.ApplicationRuntimeError, fmt.Sprintf("Cannot get code block: %s", err.Error()))
-	}
+	logger.Info(fmt.Sprintf("InvalidateTemporarySession: Finished execution"))
 
 	return nil
 }
 
-func (r Repository) GetCodeProject(codeProjectUuid string) (*CodeProject, *appErrors.Error) {
-	url := fmt.Sprintf("%s/code-project/%s", CreateApiUrl(), codeProjectUuid)
+func GetAllFileContent(codeProjectUuid string) ([]*FileContent, *appErrors.Error) {
+	logger.Info(fmt.Sprintf("GetAllFileContent: Starting execution"))
 
-	client, err := httpClient.NewHttpClient(&tls.Config{
-		InsecureSkipVerify: true,
-	})
+	client, clientErr := createClient()
+	if clientErr != nil {
+		return nil, clientErr
+	}
 
+	r, err := createRequest(fmt.Sprintf("%s/code-project/file/content/%s", CreateApiUrl(), codeProjectUuid), "GET", nil, nil)
 	if err != nil {
-		return nil, appErrors.New(appErrors.ApplicationError, appErrors.ApplicationRuntimeError, "Cannot create client to get environment data")
+		logger.Warn(fmt.Sprintf("GetAllFileContent: Failed creating request body: %s", err.Error()))
+		return nil, err
 	}
 
-	response, clientError := client.MakeJsonRequest(&httpClient.JsonRequest{
-		Url:    url,
-		Method: "GET",
-		Body:   nil,
-	})
-
-	if clientError != nil {
-		return nil, appErrors.New(appErrors.ApplicationError, appErrors.ApplicationRuntimeError, clientError.GetMessage())
-	}
-
-	if response.Status != 200 {
-		logger.Warn(fmt.Sprintf("Failed executing getting a code project: %v", string(response.Body)))
-		return nil, appErrors.New(appErrors.ApplicationError, appErrors.ApplicationRuntimeError, fmt.Sprintf("Request did not succeed with status: %d", response.Status))
-	}
-
-	var apiResponse map[string]interface{}
-	err = json.Unmarshal(response.Body, &apiResponse)
-
-	if err != nil {
+	var model []*FileContent
+	if err := newClient.SendWithBackoff(r, client, &model); err != nil {
+		logger.Warn(fmt.Sprintf("GetAllFileContent: Failed sending request: %s", err.Error()))
 		return nil, appErrors.New(appErrors.ApplicationError, appErrors.ApplicationRuntimeError, err.Error())
 	}
 
-	d := apiResponse["data"]
+	logger.Info(fmt.Sprintf("GetAllFileContent: Finished execution"))
 
-	b, err := json.Marshal(d)
-
-	if err != nil {
-		return nil, appErrors.New(appErrors.ApplicationError, appErrors.ApplicationRuntimeError, fmt.Sprintf("Cannot get code project: %s", err.Error()))
-	}
-
-	var codeProject *CodeProject
-	if err := json.Unmarshal(b, &codeProject); err != nil {
-		return nil, appErrors.New(appErrors.ApplicationError, appErrors.ApplicationRuntimeError, fmt.Sprintf("Cannot get code project: %s", err.Error()))
-	}
-
-	return codeProject, nil
-}
-
-func (r Repository) GetAllFileContent(codeProjectUuid string) ([]*FileContent, *appErrors.Error) {
-	url := fmt.Sprintf("%s/code-project/file/content/%s", CreateApiUrl(), codeProjectUuid)
-
-	client, err := httpClient.NewHttpClient(&tls.Config{
-		InsecureSkipVerify: true,
-	})
-
-	if err != nil {
-		return nil, appErrors.New(appErrors.ApplicationError, appErrors.ApplicationRuntimeError, "Cannot create client to get environment data")
-	}
-
-	response, clientError := client.MakeJsonRequest(&httpClient.JsonRequest{
-		Url:    url,
-		Method: "GET",
-		Body:   nil,
-	})
-
-	if clientError != nil {
-		return nil, appErrors.New(appErrors.ApplicationError, appErrors.ApplicationRuntimeError, clientError.GetMessage())
-	}
-
-	if response.Status != 200 {
-		logger.Warn(fmt.Sprintf("Failed executing getting all file content: %v", string(response.Body)))
-		return nil, appErrors.New(appErrors.ApplicationError, appErrors.ApplicationRuntimeError, fmt.Sprintf("Request did not succeed with status: %d", response.Status))
-	}
-
-	var apiResponse map[string]interface{}
-	err = json.Unmarshal(response.Body, &apiResponse)
-
-	if err != nil {
-		return nil, appErrors.New(appErrors.ApplicationError, appErrors.ApplicationRuntimeError, err.Error())
-	}
-
-	d := apiResponse["data"]
-
-	b, err := json.Marshal(d)
-
-	if err != nil {
-		return nil, appErrors.New(appErrors.ApplicationError, appErrors.ApplicationRuntimeError, fmt.Sprintf("Cannot get code projects file system contents: %s", err.Error()))
-	}
-
-	var contents []*FileContent
-	if err := json.Unmarshal(b, &contents); err != nil {
-		return nil, appErrors.New(appErrors.ApplicationError, appErrors.ApplicationRuntimeError, fmt.Sprintf("Cannot get code projects file system contents: %s", err.Error()))
-	}
-
-	return contents, nil
+	return model, nil
 }

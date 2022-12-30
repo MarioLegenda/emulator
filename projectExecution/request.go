@@ -32,21 +32,19 @@ func (l *ProjectRunRequest) Validate() error {
 	sessionValid := func(request interface{}) error {
 		sessionUuid := request.(string)
 
-		repo := repository.InitRepository()
-
-		session, err := repo.ValidateTemporarySession(sessionUuid)
+		session, err := repository.ValidateTemporarySession(sessionUuid)
 
 		if err != nil {
 			return errors.New("Project does not exist")
 		}
 
-		sessionData, err := repo.GetProjectSessionData(session.Session, sessionUuid)
+		sessionData, err := repository.GetProjectSessionData(session.Session, sessionUuid)
 
 		if err != nil {
 			return errors.New("Project does not exists")
 		}
 
-		go repo.InvalidateTemporarySession(sessionUuid)
+		go repository.InvalidateTemporarySession(sessionUuid)
 
 		l.validatedTemporarySession = session
 		l.sessionData = sessionData
