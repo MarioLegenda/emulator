@@ -130,6 +130,11 @@ func initExecutioners() {
 			Tag:          string(repository.CLang.Tag),
 		},
 		{
+			WorkerNum:    getEnvironmentWorkers("PERL"),
+			ContainerNum: getEnvironmentContainers("PERL"),
+			Tag:          string(repository.PerlLts.Tag),
+		},
+		{
 			WorkerNum:    getEnvironmentWorkers("C_SHARP"),
 			ContainerNum: getEnvironmentContainers("C_SHARP"),
 			Tag:          string(repository.CSharpMono.Tag),

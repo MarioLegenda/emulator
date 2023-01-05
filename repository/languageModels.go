@@ -26,6 +26,16 @@ var NodeLts = Language{
 	Extension:     "js",
 }
 
+var PerlLts = Language{
+	Name:          "perl",
+	Text:          "Perl (latest)",
+	Tag:           "perl:perl",
+	InDevelopment: false,
+	InMaintenance: false,
+	Language:      "perl",
+	Extension:     "pl",
+}
+
 var NodeEsm = Language{
 	Name:          "node_latest_esm",
 	Text:          "Javascript (Node ESM)",

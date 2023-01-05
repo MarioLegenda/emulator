@@ -28,7 +28,70 @@ var _ = GinkgoDescribe("Single file execution tests", func() {
 		gomega.Expect(os.RemoveAll(os.Getenv("EXECUTION_DIR"))).Should(gomega.BeNil())
 	})
 
-	GinkgoIt("Should execute a single file in a node LTS environment with imports", ginkgo.Label("single_file", "1"), func() {
+	GinkgoIt("Should execute a single file in a Perl environment", ginkgo.Label("single_file", "perl", "1"), func() {
+		gomega.Expect(execution.Init(_var.PROJECT_EXECUTION, []execution.ContainerBlueprint{
+			{
+				WorkerNum:    1,
+				ContainerNum: 1,
+				Tag:          string(repository.PerlLts.Tag),
+			},
+		})).Should(gomega.BeNil())
+
+		result := execution.Service(_var.PROJECT_EXECUTION).RunJob(execution.Job{
+			BuilderType:       "single_file",
+			ExecutionType:     "single_file",
+			EmulatorName:      string(repository.PerlLts.Name),
+			EmulatorExtension: repository.PerlLts.Extension,
+			EmulatorTag:       string(repository.PerlLts.Tag),
+			EmulatorText: `#!/usr/bin/perl
+  
+use strict;
+use warnings;
+  
+print("Hello World\n");
+`,
+		})
+
+		gomega.Expect(result.Result).Should(gomega.Equal("Hello World\n"))
+		gomega.Expect(result.Success).Should(gomega.BeTrue())
+		gomega.Expect(result.Error).Should(gomega.BeNil())
+
+		testExecutionDirEmpty()
+
+		execution.Service(_var.PROJECT_EXECUTION).Close()
+	})
+
+	GinkgoIt("Should execute a single file in a Perl environment with an infinite loop", ginkgo.Label("single_file", "perl", "1"), func() {
+		gomega.Expect(execution.Init(_var.PROJECT_EXECUTION, []execution.ContainerBlueprint{
+			{
+				WorkerNum:    1,
+				ContainerNum: 1,
+				Tag:          string(repository.PerlLts.Tag),
+			},
+		})).Should(gomega.BeNil())
+
+		result := execution.Service(_var.PROJECT_EXECUTION).RunJob(execution.Job{
+			BuilderType:       "single_file",
+			ExecutionType:     "single_file",
+			EmulatorName:      string(repository.PerlLts.Name),
+			EmulatorExtension: repository.PerlLts.Extension,
+			EmulatorTag:       string(repository.PerlLts.Tag),
+			EmulatorText: `#!/usr/bin/perl
+for( ; ; ) {
+}
+`,
+		})
+
+		gomega.Expect(result.Result).Should(gomega.Equal(""))
+		gomega.Expect(result.Success).Should(gomega.BeFalse())
+		gomega.Expect(result.Error).ShouldNot(gomega.BeNil())
+
+		testExecutionDirEmpty()
+
+		execution.Service(_var.PROJECT_EXECUTION).Close()
+	})
+
+	GinkgoIt("Should execute a single file in a node ESM environment with imports", ginkgo.Label("single_file", "1"), func() {
 		gomega.Expect(execution.Init(_var.PROJECT_EXECUTION, []execution.ContainerBlueprint{
 			{
 				WorkerNum:    1,
@@ -55,34 +118,7 @@ var _ = GinkgoDescribe("Single file execution tests", func() {
 		execution.Service(_var.PROJECT_EXECUTION).Close()
 	})
 
-	GinkgoIt("Should execute a single file in a Julia environment", ginkgo.Label("single_file", "2"), func() {
-		gomega.Expect(execution.Init(_var.PROJECT_EXECUTION, []execution.ContainerBlueprint{
-			{
-				WorkerNum:    1,
-				ContainerNum: 1,
-				Tag:          string(repository.Julia.Tag),
-			},
-		})).Should(gomega.BeNil())
-
-		result := execution.Service(_var.PROJECT_EXECUTION).RunJob(execution.Job{
-			BuilderType:       "single_file",
-			ExecutionType:     "single_file",
-			EmulatorName:      string(repository.Julia.Name),
-			EmulatorExtension: repository.Julia.Extension,
-			EmulatorTag:       string(repository.Julia.Tag),
-			EmulatorText:      "println(\"Hello World\")",
-		})
-
-		gomega.Expect(result.Result).Should(gomega.Equal("Hello World\n"))
-		gomega.Expect(result.Success).Should(gomega.BeTrue())
-		gomega.Expect(result.Error).Should(gomega.BeNil())
-
-		testExecutionDirEmpty()
-
-		execution.Service(_var.PROJECT_EXECUTION).Close()
-	})
-
-	GinkgoIt("Should execute a single file in a node LTS environment if an infinite loop with a timeout with imports", ginkgo.Label("single_file", "3"), func() {
+	GinkgoIt("Should execute a single file in a node ESM environment if an infinite loop with a timeout with imports", ginkgo.Label("single_file", "3"), func() {
 		gomega.Expect(execution.Init(_var.PROJECT_EXECUTION, []execution.ContainerBlueprint{
 			{
 				WorkerNum:    1,
@@ -112,7 +148,7 @@ while(true) {
 		execution.Service(_var.PROJECT_EXECUTION).Close()
 	})
 
-	GinkgoIt("Should gracefully fail to execute a single file in a node LTS environment because of a syntax error with imports", ginkgo.Label("single_file", "4"), func() {
+	GinkgoIt("Should gracefully fail to execute a single file in a node ESM environment because of a syntax error with imports", ginkgo.Label("single_file", "4"), func() {
 		gomega.Expect(execution.Init(_var.PROJECT_EXECUTION, []execution.ContainerBlueprint{
 			{
 				WorkerNum:    1,
@@ -134,6 +170,33 @@ while(true {
 		})
 
 		gomega.Expect(result.Result).ShouldNot(gomega.BeEmpty())
+		gomega.Expect(result.Success).Should(gomega.BeTrue())
+		gomega.Expect(result.Error).Should(gomega.BeNil())
+
+		testExecutionDirEmpty()
+
+		execution.Service(_var.PROJECT_EXECUTION).Close()
+	})
+
+	GinkgoIt("Should execute a single file in a Julia environment", ginkgo.Label("single_file", "2"), func() {
+		gomega.Expect(execution.Init(_var.PROJECT_EXECUTION, []execution.ContainerBlueprint{
+			{
+				WorkerNum:    1,
+				ContainerNum: 1,
+				Tag:          string(repository.Julia.Tag),
+			},
+		})).Should(gomega.BeNil())
+
+		result := execution.Service(_var.PROJECT_EXECUTION).RunJob(execution.Job{
+			BuilderType:       "single_file",
+			ExecutionType:     "single_file",
+			EmulatorName:      string(repository.Julia.Name),
+			EmulatorExtension: repository.Julia.Extension,
+			EmulatorTag:       string(repository.Julia.Tag),
+			EmulatorText:      "println(\"Hello World\")",
+		})
+
+		gomega.Expect(result.Result).Should(gomega.Equal("Hello World\n"))
 		gomega.Expect(result.Success).Should(gomega.BeTrue())
 		gomega.Expect(result.Error).Should(gomega.BeNil())
 

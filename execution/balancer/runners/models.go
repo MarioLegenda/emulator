@@ -18,6 +18,10 @@ var nodeLts = language{
 	name: "node_latest",
 }
 
+var perlLts = language{
+	name: "perl",
+}
+
 var nodeEsm = language{
 	name: "node_latest_esm",
 }

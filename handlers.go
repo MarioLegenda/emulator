@@ -28,6 +28,7 @@ func getEnvironmentsHandler(w http.ResponseWriter, r *http.Request) {
 	languages = append(languages, repository.Ruby)
 	languages = append(languages, repository.Php74)
 	languages = append(languages, repository.Rust)
+	languages = append(languages, repository.PerlLts)
 
 	apiResponse := httpUtil.CreateSuccessResponse(cr, staticTypes.RESPONSE_RESOURCE, languages, http.StatusOK, "An instance of file content")
 

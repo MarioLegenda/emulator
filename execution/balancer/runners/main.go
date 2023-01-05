@@ -49,6 +49,29 @@ func Run(params Params) Result {
 		})
 	}
 
+	if params.EmulatorName == string(perlLts.name) && params.BuilderType == "single_file" && params.ExecutionType == "single_file" {
+		build, err := single.PerlSingleFileBuild(single.InitPerlParams(
+			params.EmulatorExtension,
+			params.EmulatorText,
+			fmt.Sprintf("%s/%s", os.Getenv("EXECUTION_DIR"), params.ContainerName),
+		))
+
+		if err != nil {
+			return Result{
+				Result:  "",
+				Success: false,
+				Error:   err,
+			}
+		}
+
+		return perlRunner(PerlExecParams{
+			ExecutionDirectory: build.ExecutionDirectory,
+			ContainerDirectory: build.ContainerDirectory,
+			ExecutionFile:      build.FileName,
+			ContainerName:      params.ContainerName,
+		})
+	}
+
 	if params.EmulatorName == string(nodeEsm.name) && params.BuilderType == "single_file" && params.ExecutionType == "single_file" {
 		build, err := single.NodeSingleFileBuild(single.InitNodeParams(
 			params.EmulatorExtension,
