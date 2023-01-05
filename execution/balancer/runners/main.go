@@ -349,6 +349,30 @@ func Run(params Params) Result {
 		})
 	}
 
+	if params.EmulatorName == string(perlLts.name) && params.BuilderType == "project" && params.ExecutionType == "project" {
+		build, err := project.PerlProjectBuild(project.InitPerlParams(
+			params.CodeProject,
+			params.Contents,
+			fmt.Sprintf("%s/%s", os.Getenv("EXECUTION_DIR"), params.ContainerName),
+			params.ExecutingFile,
+		))
+
+		if err != nil {
+			return Result{
+				Result:  "",
+				Success: false,
+				Error:   err,
+			}
+		}
+
+		return perlRunner(PerlExecParams{
+			ExecutionDirectory: build.ExecutionDirectory,
+			ContainerDirectory: build.ContainerDirectory,
+			ExecutionFile:      build.FileName,
+			ContainerName:      params.ContainerName,
+		})
+	}
+
 	if params.EmulatorName == string(nodeEsm.name) && params.BuilderType == "project" && params.ExecutionType == "project" {
 		build, err := project.NodeProjectBuild(project.InitNodeParams(
 			params.CodeProject,
