@@ -76,6 +76,16 @@ var Python3 = Language{
 	Extension:     "py",
 }
 
+var Lua = Language{
+	Name:          "lua",
+	Text:          "Lua",
+	Tag:           "lua:lua",
+	InDevelopment: false,
+	InMaintenance: false,
+	Language:      "lua",
+	Extension:     "lua",
+}
+
 var Ruby = Language{
 	Name:          "ruby",
 	Text:          "Ruby",

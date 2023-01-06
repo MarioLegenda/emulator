@@ -91,6 +91,61 @@ for( ; ; ) {
 		execution.Service(_var.PROJECT_EXECUTION).Close()
 	})
 
+	GinkgoIt("Should execute a single file in a Lua environment", ginkgo.Label("single_file", "lua", "1"), func() {
+		gomega.Expect(execution.Init(_var.PROJECT_EXECUTION, []execution.ContainerBlueprint{
+			{
+				WorkerNum:    1,
+				ContainerNum: 1,
+				Tag:          string(repository.Lua.Tag),
+			},
+		})).Should(gomega.BeNil())
+
+		result := execution.Service(_var.PROJECT_EXECUTION).RunJob(execution.Job{
+			BuilderType:       "single_file",
+			ExecutionType:     "single_file",
+			EmulatorName:      string(repository.Lua.Name),
+			EmulatorExtension: repository.Lua.Extension,
+			EmulatorTag:       string(repository.Lua.Tag),
+			EmulatorText:      `print("Hello World")`,
+		})
+
+		gomega.Expect(result.Result).Should(gomega.Equal("Hello World\n"))
+		gomega.Expect(result.Success).Should(gomega.BeTrue())
+		gomega.Expect(result.Error).Should(gomega.BeNil())
+
+		testExecutionDirEmpty()
+
+		execution.Service(_var.PROJECT_EXECUTION).Close()
+	})
+
+	GinkgoIt("Should execute a single file in a Lua environment with infinite loop", ginkgo.Label("single_file", "lua", "1"), func() {
+		gomega.Expect(execution.Init(_var.PROJECT_EXECUTION, []execution.ContainerBlueprint{
+			{
+				WorkerNum:    1,
+				ContainerNum: 1,
+				Tag:          string(repository.Lua.Tag),
+			},
+		})).Should(gomega.BeNil())
+
+		result := execution.Service(_var.PROJECT_EXECUTION).RunJob(execution.Job{
+			BuilderType:       "single_file",
+			ExecutionType:     "single_file",
+			EmulatorName:      string(repository.Lua.Name),
+			EmulatorExtension: repository.Lua.Extension,
+			EmulatorTag:       string(repository.Lua.Tag),
+			EmulatorText: `while true do
+end`,
+		})
+
+		gomega.Expect(result.Result).Should(gomega.Equal(""))
+		gomega.Expect(result.Success).Should(gomega.BeFalse())
+		gomega.Expect(result.Error).ShouldNot(gomega.BeNil())
+
+		testExecutionDirEmpty()
+
+		execution.Service(_var.PROJECT_EXECUTION).Close()
+	})
+
 	GinkgoIt("Should execute a single file in a node ESM environment with imports", ginkgo.Label("single_file", "1"), func() {
 		gomega.Expect(execution.Init(_var.PROJECT_EXECUTION, []execution.ContainerBlueprint{
 			{

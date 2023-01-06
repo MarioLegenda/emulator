@@ -22,6 +22,10 @@ var perlLts = language{
 	name: "perl",
 }
 
+var luaLts = language{
+	name: "lua",
+}
+
 var nodeEsm = language{
 	name: "node_latest_esm",
 }

@@ -145,6 +145,11 @@ func initExecutioners() {
 			Tag:          string(repository.Python3.Tag),
 		},
 		{
+			WorkerNum:    getEnvironmentWorkers("LUA"),
+			ContainerNum: getEnvironmentContainers("LUA"),
+			Tag:          string(repository.Lua.Tag),
+		},
+		{
 			WorkerNum:    getEnvironmentWorkers("PYTHON2"),
 			ContainerNum: getEnvironmentContainers("PYTHON2"),
 			Tag:          string(repository.Python2.Tag),
