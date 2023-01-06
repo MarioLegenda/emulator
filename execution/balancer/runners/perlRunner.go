@@ -29,7 +29,7 @@ func perlRunner(params PerlExecParams) Result {
 	process := fmt.Sprintf("%s/%s", params.ContainerDirectory, params.ExecutionFile)
 
 	go func() {
-		cmd := exec.Command("docker", []string{"exec", params.ContainerName, "perl", process}...)
+		cmd := exec.Command("docker", []string{"exec", params.ContainerName, "perl", "-I", params.ContainerDirectory, process}...)
 
 		errPipe, err := cmd.StderrPipe()
 
