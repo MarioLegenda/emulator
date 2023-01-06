@@ -372,6 +372,30 @@ func Run(params Params) Result {
 		})
 	}
 
+	if params.EmulatorName == string(luaLts.name) && params.BuilderType == "project" && params.ExecutionType == "project" {
+		build, err := project.LuaProjectBuild(project.InitLuaParams(
+			params.CodeProject,
+			params.Contents,
+			fmt.Sprintf("%s/%s", os.Getenv("EXECUTION_DIR"), params.ContainerName),
+			params.ExecutingFile,
+		))
+
+		if err != nil {
+			return Result{
+				Result:  "",
+				Success: false,
+				Error:   err,
+			}
+		}
+
+		return luaRunner(LuaExecParams{
+			ExecutionDirectory: build.ExecutionDirectory,
+			ContainerDirectory: build.ContainerDirectory,
+			ExecutionFile:      build.FileName,
+			ContainerName:      params.ContainerName,
+		})
+	}
+
 	if params.EmulatorName == string(perlLts.name) && params.BuilderType == "project" && params.ExecutionType == "project" {
 		build, err := project.PerlProjectBuild(project.InitPerlParams(
 			params.CodeProject,
@@ -674,6 +698,30 @@ func Run(params Params) Result {
 		}
 
 		return rubyRunner(RubyExecParams{
+			ExecutionDirectory: build.ExecutionDirectory,
+			ContainerDirectory: build.ContainerDirectory,
+			ExecutionFile:      build.FileName,
+			ContainerName:      params.ContainerName,
+		})
+	}
+
+	if params.EmulatorName == string(luaLts.name) && params.BuilderType == "linked" && params.ExecutionType == "linked" {
+		build, err := linked.LuaProjectBuild(linked.InitLuaParams(
+			params.CodeProject,
+			params.Contents,
+			fmt.Sprintf("%s/%s", os.Getenv("EXECUTION_DIR"), params.ContainerName),
+			params.EmulatorText,
+		))
+
+		if err != nil {
+			return Result{
+				Result:  "",
+				Success: false,
+				Error:   err,
+			}
+		}
+
+		return luaRunner(LuaExecParams{
 			ExecutionDirectory: build.ExecutionDirectory,
 			ContainerDirectory: build.ContainerDirectory,
 			ExecutionFile:      build.FileName,
