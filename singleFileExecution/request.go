@@ -24,6 +24,7 @@ type SnippetRequest struct {
 
 type PublicSnippetRequest struct {
 	Uuid string `json:"uuid"`
+	Text string `json:"text"`
 
 	snippet                   *repository.Snippet
 	validatedTemporarySession repository.ValidatedTemporarySession

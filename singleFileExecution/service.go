@@ -74,7 +74,7 @@ func (s Service) RunPublicSnippet(model *PublicSnippetRequest) (repository.RunRe
 		EmulatorName:      string(model.snippet.SnippetCodeBlock.Emulator.Name),
 		EmulatorTag:       string(model.snippet.SnippetCodeBlock.Emulator.Tag),
 		EmulatorExtension: model.snippet.SnippetCodeBlock.Emulator.Extension,
-		EmulatorText:      model.snippet.SnippetCodeBlock.Text,
+		EmulatorText:      model.Text,
 	})
 
 	result := res.Result
