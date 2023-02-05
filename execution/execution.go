@@ -189,15 +189,31 @@ func (e *execution) init(name string, blueprints []ContainerBlueprint) *appError
 	containers := containerFactory.Service(name).Containers()
 
 	for _, c := range containers {
-		workerNum := workers[c.Tag]
-		b := balancer.NewBalancer(c.Name, workerNum)
-		b.StartWorkers()
-		e.balancers[c.Tag] = make([]balancer.Balancer, 0)
-		e.balancers[c.Tag] = append(e.balancers[c.Tag], b)
-
-		e.controller[c.Tag] = make([]int32, 0)
-		e.controller[c.Tag] = append(e.controller[c.Tag], 0)
+		e.createBalancer(c.Name, c.Tag, c.WorkerNum)
 	}
 
 	return nil
+}
+
+func (e *execution) createBalancer(containerName string, tag string, workerNum int) {
+	b := balancer.NewBalancer(containerName, workerNum)
+	b.StartWorkers()
+
+	_, ok := e.balancers[tag]
+
+	if ok {
+		e.balancers[tag] = append(e.balancers[tag], b)
+	} else {
+		e.balancers[tag] = make([]balancer.Balancer, 0)
+		e.balancers[tag] = append(e.balancers[tag], b)
+	}
+
+	_, ok = e.controller[tag]
+
+	if ok {
+		e.controller[tag] = append(e.controller[tag], 0)
+	} else {
+		e.controller[tag] = make([]int32, 0)
+		e.controller[tag] = append(e.controller[tag], 0)
+	}
 }
