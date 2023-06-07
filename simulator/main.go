@@ -2,7 +2,6 @@ package main
 
 import (
 	"emulator/cmd/http"
-	"emulator/cmd/http/rateLimiter"
 	errorHandler "emulator/pkg/appErrors"
 	execution2 "emulator/pkg/execution"
 	"emulator/pkg/logger"
@@ -15,6 +14,7 @@ import (
 	"log"
 	"os"
 	"strconv"
+	"sync"
 	"time"
 )
 
@@ -129,17 +129,38 @@ func initExecutioners() {
 	}
 }
 
-func App() {
+func main() {
 	loadEnv()
 	logger.BuildLoggers()
 	initRequiredDirectories(true)
-
-	rateLimiter.InitRateLimiter()
 
 	singleFileExecution.InitService()
 	projectExecution.InitService()
 
 	initExecutioners()
 
-	http.WatchServerShutdown(http.InitServer(http.RegisterRoutes()))
+	time.Sleep(2 * time.Second)
+
+	wg := &sync.WaitGroup{}
+	for i := 0; i < 10; i++ {
+		wg.Add(1)
+		go func(current int) {
+			res := execution2.Service(_var.PROJECT_EXECUTION).RunJob(execution2.Job{
+				BuilderType:       "single_file",
+				ExecutionType:     "single_file",
+				EmulatorName:      string(repository.NodeLts.Name),
+				EmulatorTag:       string(repository.NodeLts.Tag),
+				EmulatorExtension: string(repository.NodeLts.Extension),
+				EmulatorText:      fmt.Sprintf("console.log('Hello World -> %d')", current),
+			})
+
+			fmt.Println(res)
+
+			wg.Done()
+		}(i)
+	}
+
+	wg.Wait()
+
+	http.CloseExecutioners()
 }

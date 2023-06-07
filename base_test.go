@@ -3,10 +3,13 @@ package main
 import (
 	"context"
 	"crypto/tls"
+	"emulator/pkg/appErrors"
+	"emulator/pkg/httpClient"
+	"emulator/pkg/logger"
+	repository2 "emulator/pkg/repository"
 	"encoding/json"
 	"fmt"
 	"github.com/google/uuid"
-	"github.com/onsi/ginkgo/v2"
 	"github.com/onsi/gomega"
 	"io"
 	"io/ioutil"
@@ -16,10 +19,6 @@ import (
 	"os/exec"
 	"strings"
 	"testing"
-	"therebelsource/emulator/appErrors"
-	"therebelsource/emulator/httpClient"
-	"therebelsource/emulator/logger"
-	"therebelsource/emulator/repository"
 	"time"
 )
 
@@ -104,8 +103,8 @@ func testCleanup() {
 	}
 }
 
-func testCreateEmptyPage(activeSession repository.ActiveSession) map[string]interface{} {
-	url := fmt.Sprintf("%s/page", repository.CreateApiUrl())
+func testCreateEmptyPage(activeSession repository2.ActiveSession) map[string]interface{} {
+	url := fmt.Sprintf("%s/page", repository2.CreateApiUrl())
 
 	client, err := httpClient.NewHttpClient(&tls.Config{
 		InsecureSkipVerify: true,
@@ -151,8 +150,8 @@ func testCreateEmptyPage(activeSession repository.ActiveSession) map[string]inte
 	return data
 }
 
-func testCreateBlog(activeSession repository.ActiveSession) map[string]interface{} {
-	url := fmt.Sprintf("%s/knowledge-source/blog", repository.CreateApiUrl())
+func testCreateBlog(activeSession repository2.ActiveSession) map[string]interface{} {
+	url := fmt.Sprintf("%s/knowledge-source/blog", repository2.CreateApiUrl())
 
 	client, err := httpClient.NewHttpClient(&tls.Config{
 		InsecureSkipVerify: true,
@@ -198,8 +197,8 @@ func testCreateBlog(activeSession repository.ActiveSession) map[string]interface
 	return data
 }
 
-func testCreateTemporarySession(activeSession repository.ActiveSession, pageUuid string, blockUuid string, t string) string {
-	url := fmt.Sprintf("%s/session/single-file", repository.CreateApiUrl())
+func testCreateTemporarySession(activeSession repository2.ActiveSession, pageUuid string, blockUuid string, t string) string {
+	url := fmt.Sprintf("%s/session/single-file", repository2.CreateApiUrl())
 
 	client, err := httpClient.NewHttpClient(&tls.Config{
 		InsecureSkipVerify: true,
@@ -245,8 +244,8 @@ func testCreateTemporarySession(activeSession repository.ActiveSession, pageUuid
 	return apiResponse["data"].(string)
 }
 
-func testCreateLinkedSession(activeSession repository.ActiveSession, pageUuid string, codeBlockUuid string) string {
-	url := fmt.Sprintf("%s/session/linked", repository.CreateApiUrl())
+func testCreateLinkedSession(activeSession repository2.ActiveSession, pageUuid string, codeBlockUuid string) string {
+	url := fmt.Sprintf("%s/session/linked", repository2.CreateApiUrl())
 
 	client, err := httpClient.NewHttpClient(&tls.Config{
 		InsecureSkipVerify: true,
@@ -290,8 +289,8 @@ func testCreateLinkedSession(activeSession repository.ActiveSession, pageUuid st
 	return apiResponse["data"].(string)
 }
 
-func testCreateProjectTemporarySession(activeSession repository.ActiveSession, codeProjectUuid string, executingFile string) string {
-	url := fmt.Sprintf("%s/auth/temp-session/project", repository.CreateApiUrl())
+func testCreateProjectTemporarySession(activeSession repository2.ActiveSession, codeProjectUuid string, executingFile string) string {
+	url := fmt.Sprintf("%s/auth/temp-session/project", repository2.CreateApiUrl())
 
 	client, err := httpClient.NewHttpClient(&tls.Config{
 		InsecureSkipVerify: true,
@@ -340,8 +339,8 @@ func testGetEmail() string {
 	return fmt.Sprintf("%s@gmail.com", strings.Split(uuid.New().String(), "-")[0])
 }
 
-func testCreateAccount() repository.ActiveSession {
-	url := fmt.Sprintf("%s/user", repository.CreateApiUrl())
+func testCreateAccount() repository2.ActiveSession {
+	url := fmt.Sprintf("%s/user", repository2.CreateApiUrl())
 
 	client, err := httpClient.NewHttpClient(&tls.Config{
 		InsecureSkipVerify: true,
@@ -387,8 +386,8 @@ func testCreateAccount() repository.ActiveSession {
 	return testLogin(email)
 }
 
-func testLogin(email string) repository.ActiveSession {
-	url := fmt.Sprintf("%s/auth/login", repository.CreateApiUrl())
+func testLogin(email string) repository2.ActiveSession {
+	url := fmt.Sprintf("%s/auth/login", repository2.CreateApiUrl())
 
 	client, err := httpClient.NewHttpClient(&tls.Config{
 		InsecureSkipVerify: true,
@@ -436,14 +435,14 @@ func testLogin(email string) repository.ActiveSession {
 		appErrors.TerminateWithMessage(fmt.Sprintf("Cannot login: %s", err.Error()))
 	}
 
-	var data repository.ActiveSession
+	var data repository2.ActiveSession
 	gomega.Expect(json.Unmarshal(b, &data)).Should(gomega.BeNil())
 
 	return data
 }
 
-func testCreateCodeBlock(pageUuid string, activeSession repository.ActiveSession) map[string]interface{} {
-	url := fmt.Sprintf("%s/page/code-block", repository.CreateApiUrl())
+func testCreateCodeBlock(pageUuid string, activeSession repository2.ActiveSession) map[string]interface{} {
+	url := fmt.Sprintf("%s/page/code-block", repository2.CreateApiUrl())
 
 	client, err := httpClient.NewHttpClient(&tls.Config{
 		InsecureSkipVerify: true,
@@ -497,8 +496,8 @@ func testCreateCodeBlock(pageUuid string, activeSession repository.ActiveSession
 	return data
 }
 
-func testUpdateCodeBlock(activeSession repository.ActiveSession, pageUuid string, codeBlockUuid string, text string) map[string]interface{} {
-	url := fmt.Sprintf("%s/page/code-block", repository.CreateApiUrl())
+func testUpdateCodeBlock(activeSession repository2.ActiveSession, pageUuid string, codeBlockUuid string, text string) map[string]interface{} {
+	url := fmt.Sprintf("%s/page/code-block", repository2.CreateApiUrl())
 
 	client, err := httpClient.NewHttpClient(&tls.Config{
 		InsecureSkipVerify: true,
@@ -555,8 +554,8 @@ func testUpdateCodeBlock(activeSession repository.ActiveSession, pageUuid string
 	return data
 }
 
-func testLinkCodeProject(activeSession repository.ActiveSession, codeProjectUuid string, pageUuid string, blockUuid string, blogUuid string) map[string]interface{} {
-	url := fmt.Sprintf("%s/code-project/link-project", repository.CreateApiUrl())
+func testLinkCodeProject(activeSession repository2.ActiveSession, codeProjectUuid string, pageUuid string, blockUuid string, blogUuid string) map[string]interface{} {
+	url := fmt.Sprintf("%s/code-project/link-project", repository2.CreateApiUrl())
 
 	client, err := httpClient.NewHttpClient(&tls.Config{
 		InsecureSkipVerify: true,
@@ -612,8 +611,8 @@ func testLinkCodeProject(activeSession repository.ActiveSession, codeProjectUuid
 	return data
 }
 
-func testAddEmulatorToCodeBlock(pageUuid string, blockUuid string, code string, lang repository.Language, activeSession repository.ActiveSession) map[string]interface{} {
-	url := fmt.Sprintf("%s/page/code-block", repository.CreateApiUrl())
+func testAddEmulatorToCodeBlock(pageUuid string, blockUuid string, code string, lang repository2.Language, activeSession repository2.ActiveSession) map[string]interface{} {
+	url := fmt.Sprintf("%s/page/code-block", repository2.CreateApiUrl())
 
 	client, err := httpClient.NewHttpClient(&tls.Config{
 		InsecureSkipVerify: true,
@@ -682,8 +681,8 @@ func testAddEmulatorToCodeBlock(pageUuid string, blockUuid string, code string, 
 	return data
 }
 
-func testCreateCodeProject(activeSession repository.ActiveSession, name string, lang repository.Language) map[string]interface{} {
-	url := fmt.Sprintf("%s/code-project", repository.CreateApiUrl())
+func testCreateCodeProject(activeSession repository2.ActiveSession, name string, lang repository2.Language) map[string]interface{} {
+	url := fmt.Sprintf("%s/code-project", repository2.CreateApiUrl())
 
 	client, err := httpClient.NewHttpClient(&tls.Config{
 		InsecureSkipVerify: true,
@@ -739,8 +738,8 @@ func testCreateCodeProject(activeSession repository.ActiveSession, name string, 
 	return data
 }
 
-func testCreateFile(activeSession repository.ActiveSession, isFile bool, parent string, cpUuid string, name string) map[string]interface{} {
-	url := fmt.Sprintf("%s/code-project/file", repository.CreateApiUrl())
+func testCreateFile(activeSession repository2.ActiveSession, isFile bool, parent string, cpUuid string, name string) map[string]interface{} {
+	url := fmt.Sprintf("%s/code-project/file", repository2.CreateApiUrl())
 
 	client, err := httpClient.NewHttpClient(&tls.Config{
 		InsecureSkipVerify: true,
@@ -797,8 +796,8 @@ func testCreateFile(activeSession repository.ActiveSession, isFile bool, parent 
 	return data
 }
 
-func testUpdateFileContent(activeSession repository.ActiveSession, cpUuid string, fileUuid string, content string) map[string]interface{} {
-	url := fmt.Sprintf("%s/code-project/file/update-content", repository.CreateApiUrl())
+func testUpdateFileContent(activeSession repository2.ActiveSession, cpUuid string, fileUuid string, content string) map[string]interface{} {
+	url := fmt.Sprintf("%s/code-project/file/update-content", repository2.CreateApiUrl())
 
 	client, err := httpClient.NewHttpClient(&tls.Config{
 		InsecureSkipVerify: true,
@@ -857,11 +856,11 @@ func testUpdateFileContent(activeSession repository.ActiveSession, cpUuid string
 func testCreateCodeProjectStub(
 	name string,
 	packageName string,
-	structure []*repository.File,
-	rootDirectory *repository.File,
-	environment *repository.Language,
-) repository.CodeProject {
-	return repository.CodeProject{
+	structure []*repository2.File,
+	rootDirectory *repository2.File,
+	environment *repository2.Language,
+) repository2.CodeProject {
+	return repository2.CodeProject{
 		Uuid:           uuid.New().String(),
 		ShortId:        uuid.New().String(),
 		Name:           name,
@@ -876,8 +875,8 @@ func testCreateCodeProjectStub(
 	}
 }
 
-func testCreateFileStub(name string, isRoot bool, depth int, isFile bool, parent *string, children []string) repository.File {
-	return repository.File{
+func testCreateFileStub(name string, isRoot bool, depth int, isFile bool, parent *string, children []string) repository2.File {
+	return repository2.File{
 		Name:      name,
 		IsRoot:    isRoot,
 		Depth:     depth,
@@ -890,8 +889,8 @@ func testCreateFileStub(name string, isRoot bool, depth int, isFile bool, parent
 	}
 }
 
-func testCreateFileContent(codeProjectUuid string, fileUuid string, content string) repository.FileContent {
-	return repository.FileContent{
+func testCreateFileContent(codeProjectUuid string, fileUuid string, content string) repository2.FileContent {
+	return repository2.FileContent{
 		CodeProjectUuid: codeProjectUuid,
 		Uuid:            fileUuid,
 		Content:         content,

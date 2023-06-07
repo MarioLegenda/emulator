@@ -2,20 +2,20 @@ package main
 
 import (
 	"bytes"
+	http2 "emulator/cmd/http"
+	"emulator/pkg/execution"
+	"emulator/pkg/httpUtil"
+	"emulator/pkg/logger"
+	repository2 "emulator/pkg/repository"
+	"emulator/pkg/staticTypes"
+	_var "emulator/var"
 	"encoding/json"
 	"fmt"
 	"github.com/google/uuid"
-	"github.com/onsi/ginkgo/v2"
 	"github.com/onsi/gomega"
 	"net/http"
 	"net/http/httptest"
 	"os"
-	"therebelsource/emulator/execution"
-	"therebelsource/emulator/httpUtil"
-	"therebelsource/emulator/logger"
-	"therebelsource/emulator/repository"
-	"therebelsource/emulator/staticTypes"
-	_var "therebelsource/emulator/var"
 )
 
 var _ = GinkgoDescribe("Project execution tests", func() {
@@ -30,12 +30,12 @@ var _ = GinkgoDescribe("Project execution tests", func() {
 	})
 
 	GinkgoIt("Should run a project execution in NodeJS ESM environment", func() {
-		environment := repository.NodeEsm
+		environment := repository2.NodeEsm
 		gomega.Expect(execution.Init(_var.PROJECT_EXECUTION, []execution.ContainerBlueprint{
 			{
 				WorkerNum:    1,
 				ContainerNum: 1,
-				Tag:          string(repository.NodeEsm.Tag),
+				Tag:          string(repository2.NodeEsm.Tag),
 			},
 		})).Should(gomega.BeNil())
 
@@ -58,7 +58,7 @@ var _ = GinkgoDescribe("Project execution tests", func() {
 		subDir.Children = append(subDir.Children, subSubDir.Uuid)
 		subSubDir.Children = append(subSubDir.Children, subSubDirFile.Uuid)
 
-		codeProject := testCreateCodeProjectStub(projectName, "", []*repository.File{
+		codeProject := testCreateCodeProjectStub(projectName, "", []*repository2.File{
 			&root,
 			&rootFile1,
 			&rootFile2,
@@ -111,7 +111,7 @@ export {subDirDirFileExecute}
 			EmulatorText:      "",
 			PackageName:       "",
 			CodeProject:       &codeProject,
-			Contents: []*repository.FileContent{
+			Contents: []*repository2.FileContent{
 				&content1,
 				&content2,
 				&content3,
@@ -127,12 +127,12 @@ export {subDirDirFileExecute}
 	})
 
 	GinkgoIt("Should run a project execution in Julia environment", func() {
-		environment := repository.Julia
+		environment := repository2.Julia
 		gomega.Expect(execution.Init(_var.PROJECT_EXECUTION, []execution.ContainerBlueprint{
 			{
 				WorkerNum:    1,
 				ContainerNum: 1,
-				Tag:          string(repository.Julia.Tag),
+				Tag:          string(repository2.Julia.Tag),
 			},
 		})).Should(gomega.BeNil())
 
@@ -155,7 +155,7 @@ export {subDirDirFileExecute}
 		subDir.Children = append(subDir.Children, subSubDir.Uuid)
 		subSubDir.Children = append(subSubDir.Children, subSubDirFile.Uuid)
 
-		codeProject := testCreateCodeProjectStub(projectName, "", []*repository.File{
+		codeProject := testCreateCodeProjectStub(projectName, "", []*repository2.File{
 			&root,
 			&rootFile1,
 			&rootFile2,
@@ -202,7 +202,7 @@ end
 			EmulatorText:      "",
 			PackageName:       "",
 			CodeProject:       &codeProject,
-			Contents: []*repository.FileContent{
+			Contents: []*repository2.FileContent{
 				&content1,
 				&content2,
 				&content3,
@@ -218,12 +218,12 @@ end
 	})
 
 	GinkgoIt("Should run a project execution in NodeJS latest environment", func() {
-		environment := repository.NodeLts
+		environment := repository2.NodeLts
 		gomega.Expect(execution.Init(_var.PROJECT_EXECUTION, []execution.ContainerBlueprint{
 			{
 				WorkerNum:    1,
 				ContainerNum: 1,
-				Tag:          string(repository.NodeLts.Tag),
+				Tag:          string(repository2.NodeLts.Tag),
 			},
 		})).Should(gomega.BeNil())
 
@@ -246,7 +246,7 @@ end
 		subDir.Children = append(subDir.Children, subSubDir.Uuid)
 		subSubDir.Children = append(subSubDir.Children, subSubDirFile.Uuid)
 
-		codeProject := testCreateCodeProjectStub(projectName, "", []*repository.File{
+		codeProject := testCreateCodeProjectStub(projectName, "", []*repository2.File{
 			&root,
 			&rootFile1,
 			&rootFile2,
@@ -305,7 +305,7 @@ module.exports = {
 			EmulatorText:      "",
 			PackageName:       "",
 			CodeProject:       &codeProject,
-			Contents: []*repository.FileContent{
+			Contents: []*repository2.FileContent{
 				&content1,
 				&content2,
 				&content3,
@@ -321,12 +321,12 @@ module.exports = {
 	})
 
 	GinkgoIt("Should run a project execution in C# environment", func() {
-		environment := repository.CSharpMono
+		environment := repository2.CSharpMono
 		gomega.Expect(execution.Init(_var.PROJECT_EXECUTION, []execution.ContainerBlueprint{
 			{
 				WorkerNum:    1,
 				ContainerNum: 1,
-				Tag:          string(repository.CSharpMono.Tag),
+				Tag:          string(repository2.CSharpMono.Tag),
 			},
 		})).Should(gomega.BeNil())
 
@@ -342,7 +342,7 @@ module.exports = {
 		root.Children = append(root.Children, rootFile1.Uuid)
 		subDir.Children = append(subDir.Children, subDirFile1.Uuid)
 
-		codeProject := testCreateCodeProjectStub(projectName, "", []*repository.File{
+		codeProject := testCreateCodeProjectStub(projectName, "", []*repository2.File{
 			&root,
 			&rootFile1,
 			&subDir,
@@ -378,7 +378,7 @@ public class NewClass {
 			EmulatorText:      "",
 			PackageName:       "",
 			CodeProject:       &codeProject,
-			Contents: []*repository.FileContent{
+			Contents: []*repository2.FileContent{
 				&content1,
 				&content3,
 			},
@@ -392,12 +392,12 @@ public class NewClass {
 	})
 
 	GinkgoIt("Should run a project execution in Go environment", func() {
-		environment := repository.GoLang
+		environment := repository2.GoLang
 		gomega.Expect(execution.Init(_var.PROJECT_EXECUTION, []execution.ContainerBlueprint{
 			{
 				WorkerNum:    1,
 				ContainerNum: 1,
-				Tag:          string(repository.GoLang.Tag),
+				Tag:          string(repository2.GoLang.Tag),
 			},
 		})).Should(gomega.BeNil())
 
@@ -413,7 +413,7 @@ public class NewClass {
 		root.Children = append(root.Children, rootFile1.Uuid)
 		subDir.Children = append(subDir.Children, subDirFile1.Uuid)
 
-		codeProject := testCreateCodeProjectStub(projectName, "mySuperPackage", []*repository.File{
+		codeProject := testCreateCodeProjectStub(projectName, "mySuperPackage", []*repository2.File{
 			&root,
 			&rootFile1,
 			&subDir,
@@ -449,7 +449,7 @@ func MyFunc() {
 			EmulatorText:      "",
 			PackageName:       codeProject.PackageName,
 			CodeProject:       &codeProject,
-			Contents: []*repository.FileContent{
+			Contents: []*repository2.FileContent{
 				&content1,
 				&content3,
 			},
@@ -464,12 +464,12 @@ func MyFunc() {
 	})
 
 	GinkgoIt("Should run a project execution in Rust environment", func() {
-		environment := repository.Rust
+		environment := repository2.Rust
 		gomega.Expect(execution.Init(_var.PROJECT_EXECUTION, []execution.ContainerBlueprint{
 			{
 				WorkerNum:    1,
 				ContainerNum: 1,
-				Tag:          string(repository.Rust.Tag),
+				Tag:          string(repository2.Rust.Tag),
 			},
 		})).Should(gomega.BeNil())
 
@@ -485,7 +485,7 @@ func MyFunc() {
 		root.Children = append(root.Children, rootFile1.Uuid)
 		subDir.Children = append(subDir.Children, modRs.Uuid)
 
-		codeProject := testCreateCodeProjectStub(projectName, "", []*repository.File{
+		codeProject := testCreateCodeProjectStub(projectName, "", []*repository2.File{
 			&root,
 			&rootFile1,
 			&subDir,
@@ -515,7 +515,7 @@ pub fn my_func() {
 			EmulatorText:      "",
 			PackageName:       codeProject.PackageName,
 			CodeProject:       &codeProject,
-			Contents: []*repository.FileContent{
+			Contents: []*repository2.FileContent{
 				&content1,
 				&modContent,
 			},
@@ -536,7 +536,7 @@ pub fn my_func() {
 		defer testCleanup()
 
 		activeSession := testCreateAccount()
-		cp := testCreateCodeProject(activeSession, uuid.New().String(), repository.CLang)
+		cp := testCreateCodeProject(activeSession, uuid.New().String(), repository2.CLang)
 		cpUuid := cp["uuid"].(string)
 
 		var rootDirectory map[string]interface{}
@@ -551,7 +551,7 @@ pub fn my_func() {
 
 		testCreateFile(activeSession, true, rootDirectory["uuid"].(string), cpUuid, "rootDirectoryFile2.c")
 
-		sessionUuid := testCreateProjectTemporarySession(repository.ActiveSession{}, cp["uuid"].(string), rootDirectoryFile1["uuid"].(string))
+		sessionUuid := testCreateProjectTemporarySession(repository2.ActiveSession{}, cp["uuid"].(string), rootDirectoryFile1["uuid"].(string))
 		bm := map[string]interface{}{
 			"uuid":     sessionUuid,
 			"fileUuid": rootDirectoryFile1["uuid"].(string),
@@ -570,7 +570,7 @@ pub fn my_func() {
 		}
 
 		rr := httptest.NewRecorder()
-		handler := http.HandlerFunc(executeProjectHandler)
+		handler := http.HandlerFunc(http2.executeProjectHandler)
 
 		handler.ServeHTTP(rr, req)
 
@@ -596,7 +596,7 @@ pub fn my_func() {
 
 		gomega.Expect(err).To(gomega.BeNil())
 
-		var result repository.RunResult
+		var result repository2.RunResult
 		gomega.Expect(json.Unmarshal(b, &result)).To(gomega.BeNil())
 
 		gomega.Expect(result.Timeout).Should(gomega.Equal(5))
@@ -611,7 +611,7 @@ pub fn my_func() {
 		defer testCleanup()
 
 		activeSession := testCreateAccount()
-		cp := testCreateCodeProject(activeSession, uuid.New().String(), repository.CPlus)
+		cp := testCreateCodeProject(activeSession, uuid.New().String(), repository2.CPlus)
 		cpUuid := cp["uuid"].(string)
 
 		var rootDirectory map[string]interface{}
@@ -626,7 +626,7 @@ pub fn my_func() {
 
 		testCreateFile(activeSession, true, rootDirectory["uuid"].(string), cpUuid, "rootDirectoryFile2.cpp")
 
-		sessionUuid := testCreateProjectTemporarySession(repository.ActiveSession{}, cp["uuid"].(string), rootDirectoryFile1["uuid"].(string))
+		sessionUuid := testCreateProjectTemporarySession(repository2.ActiveSession{}, cp["uuid"].(string), rootDirectoryFile1["uuid"].(string))
 		bm := map[string]interface{}{
 			"uuid":     sessionUuid,
 			"fileUuid": rootDirectoryFile1["uuid"].(string),
@@ -645,7 +645,7 @@ pub fn my_func() {
 		}
 
 		rr := httptest.NewRecorder()
-		handler := http.HandlerFunc(executeProjectHandler)
+		handler := http.HandlerFunc(http2.executeProjectHandler)
 
 		handler.ServeHTTP(rr, req)
 
@@ -671,7 +671,7 @@ pub fn my_func() {
 
 		gomega.Expect(err).To(gomega.BeNil())
 
-		var result repository.RunResult
+		var result repository2.RunResult
 		gomega.Expect(json.Unmarshal(b, &result)).To(gomega.BeNil())
 
 		gomega.Expect(result.Timeout).Should(gomega.Equal(5))
@@ -686,10 +686,10 @@ pub fn my_func() {
 		defer testCleanup()
 
 		activeSession := testCreateAccount()
-		cp := testCreateCodeProject(activeSession, uuid.New().String(), repository.Haskell)
+		cp := testCreateCodeProject(activeSession, uuid.New().String(), repository2.Haskell)
 		cpUuid := cp["uuid"].(string)
 
-		var rootDirectory *repository.File
+		var rootDirectory *repository2.File
 		s, err := json.Marshal(cp["rootDirectory"])
 		gomega.Expect(err).Should(gomega.BeNil())
 		gomega.Expect(json.Unmarshal(s, &rootDirectory)).Should(gomega.BeNil())
@@ -713,7 +713,7 @@ module Foo where
 module Bar.FooBar where
 `))
 
-		sessionUuid := testCreateProjectTemporarySession(repository.ActiveSession{}, cp["uuid"].(string), rootDirectoryFile1["uuid"].(string))
+		sessionUuid := testCreateProjectTemporarySession(repository2.ActiveSession{}, cp["uuid"].(string), rootDirectoryFile1["uuid"].(string))
 		bm := map[string]interface{}{
 			"uuid":     sessionUuid,
 			"fileUuid": rootDirectoryFile1["uuid"].(string),
@@ -732,7 +732,7 @@ module Bar.FooBar where
 		}
 
 		rr := httptest.NewRecorder()
-		handler := http.HandlerFunc(executeProjectHandler)
+		handler := http.HandlerFunc(http2.executeProjectHandler)
 
 		handler.ServeHTTP(rr, req)
 
@@ -758,7 +758,7 @@ module Bar.FooBar where
 
 		gomega.Expect(err).To(gomega.BeNil())
 
-		var result repository.RunResult
+		var result repository2.RunResult
 		gomega.Expect(json.Unmarshal(b, &result)).To(gomega.BeNil())
 
 		gomega.Expect(result.Timeout).Should(gomega.Equal(5))
@@ -773,10 +773,10 @@ module Bar.FooBar where
 		defer testCleanup()
 
 		activeSession := testCreateAccount()
-		cp := testCreateCodeProject(activeSession, uuid.New().String(), repository.Ruby)
+		cp := testCreateCodeProject(activeSession, uuid.New().String(), repository2.Ruby)
 		cpUuid := cp["uuid"].(string)
 
-		var rootDirectory *repository.File
+		var rootDirectory *repository2.File
 		s, err := json.Marshal(cp["rootDirectory"])
 		gomega.Expect(err).Should(gomega.BeNil())
 		gomega.Expect(json.Unmarshal(s, &rootDirectory)).Should(gomega.BeNil())
@@ -797,7 +797,7 @@ require "./foo.rb"
 puts "Hello world!"
 `))
 
-		sessionUuid := testCreateProjectTemporarySession(repository.ActiveSession{}, cp["uuid"].(string), bar["uuid"].(string))
+		sessionUuid := testCreateProjectTemporarySession(repository2.ActiveSession{}, cp["uuid"].(string), bar["uuid"].(string))
 		bm := map[string]interface{}{
 			"uuid":     sessionUuid,
 			"fileUuid": bar["uuid"].(string),
@@ -816,7 +816,7 @@ puts "Hello world!"
 		}
 
 		rr := httptest.NewRecorder()
-		handler := http.HandlerFunc(executeProjectHandler)
+		handler := http.HandlerFunc(http2.executeProjectHandler)
 
 		handler.ServeHTTP(rr, req)
 
@@ -842,7 +842,7 @@ puts "Hello world!"
 
 		gomega.Expect(err).To(gomega.BeNil())
 
-		var result repository.RunResult
+		var result repository2.RunResult
 		gomega.Expect(json.Unmarshal(b, &result)).To(gomega.BeNil())
 
 		gomega.Expect(result.Timeout).Should(gomega.Equal(5))
@@ -857,10 +857,10 @@ puts "Hello world!"
 		defer testCleanup()
 
 		activeSession := testCreateAccount()
-		cp := testCreateCodeProject(activeSession, uuid.New().String(), repository.Php74)
+		cp := testCreateCodeProject(activeSession, uuid.New().String(), repository2.Php74)
 		cpUuid := cp["uuid"].(string)
 
-		var rootDirectory *repository.File
+		var rootDirectory *repository2.File
 		s, err := json.Marshal(cp["rootDirectory"])
 		gomega.Expect(err).Should(gomega.BeNil())
 		gomega.Expect(json.Unmarshal(s, &rootDirectory)).Should(gomega.BeNil())
@@ -878,7 +878,7 @@ require(__DIR__."/foo.php");
 echo "Hello world!";
 `))
 
-		sessionUuid := testCreateProjectTemporarySession(repository.ActiveSession{}, cp["uuid"].(string), bar["uuid"].(string))
+		sessionUuid := testCreateProjectTemporarySession(repository2.ActiveSession{}, cp["uuid"].(string), bar["uuid"].(string))
 		bm := map[string]interface{}{
 			"uuid":     sessionUuid,
 			"fileUuid": bar["uuid"].(string),
@@ -897,7 +897,7 @@ echo "Hello world!";
 		}
 
 		rr := httptest.NewRecorder()
-		handler := http.HandlerFunc(executeProjectHandler)
+		handler := http.HandlerFunc(http2.executeProjectHandler)
 
 		handler.ServeHTTP(rr, req)
 
@@ -923,7 +923,7 @@ echo "Hello world!";
 
 		gomega.Expect(err).To(gomega.BeNil())
 
-		var result repository.RunResult
+		var result repository2.RunResult
 		gomega.Expect(json.Unmarshal(b, &result)).To(gomega.BeNil())
 
 		gomega.Expect(result.Timeout).Should(gomega.Equal(5))
@@ -938,10 +938,10 @@ echo "Hello world!";
 		defer testCleanup()
 
 		activeSession := testCreateAccount()
-		cp := testCreateCodeProject(activeSession, uuid.New().String(), repository.Python2)
+		cp := testCreateCodeProject(activeSession, uuid.New().String(), repository2.Python2)
 		cpUuid := cp["uuid"].(string)
 
-		var rootDirectory *repository.File
+		var rootDirectory *repository2.File
 		s, err := json.Marshal(cp["rootDirectory"])
 		gomega.Expect(err).Should(gomega.BeNil())
 		gomega.Expect(json.Unmarshal(s, &rootDirectory)).Should(gomega.BeNil())
@@ -962,7 +962,7 @@ def greeting(name):
   print("Hello, " + name) 
 `))
 
-		sessionUuid := testCreateProjectTemporarySession(repository.ActiveSession{}, cp["uuid"].(string), foo["uuid"].(string))
+		sessionUuid := testCreateProjectTemporarySession(repository2.ActiveSession{}, cp["uuid"].(string), foo["uuid"].(string))
 		bm := map[string]interface{}{
 			"uuid":     sessionUuid,
 			"fileUuid": foo["uuid"].(string),
@@ -981,7 +981,7 @@ def greeting(name):
 		}
 
 		rr := httptest.NewRecorder()
-		handler := http.HandlerFunc(executeProjectHandler)
+		handler := http.HandlerFunc(http2.executeProjectHandler)
 
 		handler.ServeHTTP(rr, req)
 
@@ -1007,7 +1007,7 @@ def greeting(name):
 
 		gomega.Expect(err).To(gomega.BeNil())
 
-		var result repository.RunResult
+		var result repository2.RunResult
 		gomega.Expect(json.Unmarshal(b, &result)).To(gomega.BeNil())
 
 		gomega.Expect(result.Timeout).Should(gomega.Equal(5))
@@ -1022,10 +1022,10 @@ def greeting(name):
 		defer testCleanup()
 
 		activeSession := testCreateAccount()
-		cp := testCreateCodeProject(activeSession, uuid.New().String(), repository.Python3)
+		cp := testCreateCodeProject(activeSession, uuid.New().String(), repository2.Python3)
 		cpUuid := cp["uuid"].(string)
 
-		var rootDirectory *repository.File
+		var rootDirectory *repository2.File
 		s, err := json.Marshal(cp["rootDirectory"])
 		gomega.Expect(err).Should(gomega.BeNil())
 		gomega.Expect(json.Unmarshal(s, &rootDirectory)).Should(gomega.BeNil())
@@ -1046,7 +1046,7 @@ def greeting(name):
   print("Hello, " + name) 
 `))
 
-		sessionUuid := testCreateProjectTemporarySession(repository.ActiveSession{}, cp["uuid"].(string), foo["uuid"].(string))
+		sessionUuid := testCreateProjectTemporarySession(repository2.ActiveSession{}, cp["uuid"].(string), foo["uuid"].(string))
 		bm := map[string]interface{}{
 			"uuid":     sessionUuid,
 			"fileUuid": foo["uuid"].(string),
@@ -1065,7 +1065,7 @@ def greeting(name):
 		}
 
 		rr := httptest.NewRecorder()
-		handler := http.HandlerFunc(executeProjectHandler)
+		handler := http.HandlerFunc(http2.executeProjectHandler)
 
 		handler.ServeHTTP(rr, req)
 
@@ -1091,7 +1091,7 @@ def greeting(name):
 
 		gomega.Expect(err).To(gomega.BeNil())
 
-		var result repository.RunResult
+		var result repository2.RunResult
 		gomega.Expect(json.Unmarshal(b, &result)).To(gomega.BeNil())
 
 		gomega.Expect(result.Timeout).Should(gomega.Equal(5))

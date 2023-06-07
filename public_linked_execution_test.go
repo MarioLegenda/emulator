@@ -2,16 +2,16 @@ package main
 
 import (
 	"bytes"
+	http2 "emulator/cmd/http"
+	"emulator/pkg/httpUtil"
+	repository2 "emulator/pkg/repository"
+	"emulator/pkg/staticTypes"
 	"encoding/json"
 	"fmt"
 	"github.com/google/uuid"
-	"github.com/onsi/ginkgo/v2"
 	"github.com/onsi/gomega"
 	"net/http"
 	"net/http/httptest"
-	"therebelsource/emulator/httpUtil"
-	"therebelsource/emulator/repository"
-	"therebelsource/emulator/staticTypes"
 )
 
 var _ = GinkgoDescribe("Linked project execution tests", func() {
@@ -26,7 +26,7 @@ var _ = GinkgoDescribe("Linked project execution tests", func() {
 		pageUuid := link["page"].(map[string]interface{})["uuid"].(string)
 		blogUuid := link["blog"].(map[string]interface{})["uuid"].(string)
 
-		cp := testCreateCodeProject(activeSession, uuid.New().String(), repository.CLang)
+		cp := testCreateCodeProject(activeSession, uuid.New().String(), repository2.CLang)
 
 		cpUuid := cp["uuid"].(string)
 		cb := testCreateCodeBlock(pageUuid, activeSession)
@@ -78,7 +78,7 @@ int main() {
 		}
 
 		rr := httptest.NewRecorder()
-		handler := http.HandlerFunc(executePublicLinkedProjectHandler)
+		handler := http.HandlerFunc(http2.executePublicLinkedProjectHandler)
 
 		handler.ServeHTTP(rr, req)
 
@@ -104,7 +104,7 @@ int main() {
 
 		gomega.Expect(err).To(gomega.BeNil())
 
-		var result repository.RunResult
+		var result repository2.RunResult
 		gomega.Expect(json.Unmarshal(b, &result)).To(gomega.BeNil())
 
 		gomega.Expect(result.Timeout).Should(gomega.Equal(5))
@@ -123,7 +123,7 @@ int main() {
 		pageUuid := link["page"].(map[string]interface{})["uuid"].(string)
 		blogUuid := link["blog"].(map[string]interface{})["uuid"].(string)
 
-		cp := testCreateCodeProject(activeSession, uuid.New().String(), repository.CPlus)
+		cp := testCreateCodeProject(activeSession, uuid.New().String(), repository2.CPlus)
 		cpUuid := cp["uuid"].(string)
 		cb := testCreateCodeBlock(pageUuid, activeSession)
 		testUpdateCodeBlock(activeSession, pageUuid, cb["uuid"].(string), `
@@ -176,7 +176,7 @@ int main() {
 		}
 
 		rr := httptest.NewRecorder()
-		handler := http.HandlerFunc(executePublicLinkedProjectHandler)
+		handler := http.HandlerFunc(http2.executePublicLinkedProjectHandler)
 
 		handler.ServeHTTP(rr, req)
 
@@ -202,7 +202,7 @@ int main() {
 
 		gomega.Expect(err).To(gomega.BeNil())
 
-		var result repository.RunResult
+		var result repository2.RunResult
 		gomega.Expect(json.Unmarshal(b, &result)).To(gomega.BeNil())
 
 		gomega.Expect(result.Timeout).Should(gomega.Equal(5))
@@ -221,7 +221,7 @@ int main() {
 		pageUuid := link["page"].(map[string]interface{})["uuid"].(string)
 		blogUuid := link["blog"].(map[string]interface{})["uuid"].(string)
 
-		cp := testCreateCodeProject(activeSession, "my_cool_name", repository.GoLang)
+		cp := testCreateCodeProject(activeSession, "my_cool_name", repository2.GoLang)
 		cpUuid := cp["uuid"].(string)
 		cb := testCreateCodeBlock(pageUuid, activeSession)
 		testUpdateCodeBlock(activeSession, pageUuid, cb["uuid"].(string), fmt.Sprintf(`
@@ -238,7 +238,7 @@ func main() {
 `, cp["packageName"].(string), "myPackage"))
 		cbLink := testLinkCodeProject(activeSession, cp["uuid"].(string), pageUuid, cb["uuid"].(string), blogUuid)
 
-		var rootDirectory *repository.File
+		var rootDirectory *repository2.File
 		s, err := json.Marshal(cp["rootDirectory"])
 		gomega.Expect(err).Should(gomega.BeNil())
 		gomega.Expect(json.Unmarshal(s, &rootDirectory)).Should(gomega.BeNil())
@@ -287,7 +287,7 @@ func main() {
 		}
 
 		rr := httptest.NewRecorder()
-		handler := http.HandlerFunc(executePublicLinkedProjectHandler)
+		handler := http.HandlerFunc(http2.executePublicLinkedProjectHandler)
 
 		handler.ServeHTTP(rr, req)
 
@@ -313,7 +313,7 @@ func main() {
 
 		gomega.Expect(err).To(gomega.BeNil())
 
-		var result repository.RunResult
+		var result repository2.RunResult
 		gomega.Expect(json.Unmarshal(b, &result)).To(gomega.BeNil())
 
 		gomega.Expect(result.Timeout).Should(gomega.Equal(5))
@@ -332,7 +332,7 @@ func main() {
 		pageUuid := link["page"].(map[string]interface{})["uuid"].(string)
 		blogUuid := link["blog"].(map[string]interface{})["uuid"].(string)
 
-		cp := testCreateCodeProject(activeSession, uuid.New().String(), repository.NodeLts)
+		cp := testCreateCodeProject(activeSession, uuid.New().String(), repository2.NodeLts)
 		cpUuid := cp["uuid"].(string)
 		cb := testCreateCodeBlock(pageUuid, activeSession)
 		testUpdateCodeBlock(activeSession, pageUuid, cb["uuid"].(string), `
@@ -415,7 +415,7 @@ console.log('shit');
 		}
 
 		rr := httptest.NewRecorder()
-		handler := http.HandlerFunc(executePublicLinkedProjectHandler)
+		handler := http.HandlerFunc(http2.executePublicLinkedProjectHandler)
 
 		handler.ServeHTTP(rr, req)
 
@@ -441,7 +441,7 @@ console.log('shit');
 
 		gomega.Expect(err).To(gomega.BeNil())
 
-		var result repository.RunResult
+		var result repository2.RunResult
 		gomega.Expect(json.Unmarshal(b, &result)).To(gomega.BeNil())
 
 		gomega.Expect(result.Timeout).Should(gomega.Equal(5))
@@ -460,7 +460,7 @@ console.log('shit');
 		pageUuid := link["page"].(map[string]interface{})["uuid"].(string)
 		blogUuid := link["blog"].(map[string]interface{})["uuid"].(string)
 
-		cp := testCreateCodeProject(activeSession, uuid.New().String(), repository.NodeEsm)
+		cp := testCreateCodeProject(activeSession, uuid.New().String(), repository2.NodeEsm)
 		cpUuid := cp["uuid"].(string)
 		cb := testCreateCodeBlock(pageUuid, activeSession)
 		testUpdateCodeBlock(activeSession, pageUuid, cb["uuid"].(string), `
@@ -537,7 +537,7 @@ console.log('shit');
 		}
 
 		rr := httptest.NewRecorder()
-		handler := http.HandlerFunc(executePublicLinkedProjectHandler)
+		handler := http.HandlerFunc(http2.executePublicLinkedProjectHandler)
 
 		handler.ServeHTTP(rr, req)
 
@@ -563,7 +563,7 @@ console.log('shit');
 
 		gomega.Expect(err).To(gomega.BeNil())
 
-		var result repository.RunResult
+		var result repository2.RunResult
 		gomega.Expect(json.Unmarshal(b, &result)).To(gomega.BeNil())
 
 		gomega.Expect(result.Timeout).Should(gomega.Equal(5))
@@ -582,7 +582,7 @@ console.log('shit');
 		pageUuid := link["page"].(map[string]interface{})["uuid"].(string)
 		blogUuid := link["blog"].(map[string]interface{})["uuid"].(string)
 
-		cp := testCreateCodeProject(activeSession, uuid.New().String(), repository.CSharpMono)
+		cp := testCreateCodeProject(activeSession, uuid.New().String(), repository2.CSharpMono)
 		cpUuid := cp["uuid"].(string)
 		cb := testCreateCodeBlock(pageUuid, activeSession)
 		testUpdateCodeBlock(activeSession, pageUuid, cb["uuid"].(string), `
@@ -643,7 +643,7 @@ public class HelloWorld
 		}
 
 		rr := httptest.NewRecorder()
-		handler := http.HandlerFunc(executePublicLinkedProjectHandler)
+		handler := http.HandlerFunc(http2.executePublicLinkedProjectHandler)
 
 		handler.ServeHTTP(rr, req)
 
@@ -669,7 +669,7 @@ public class HelloWorld
 
 		gomega.Expect(err).To(gomega.BeNil())
 
-		var result repository.RunResult
+		var result repository2.RunResult
 		gomega.Expect(json.Unmarshal(b, &result)).To(gomega.BeNil())
 
 		gomega.Expect(result.Timeout).Should(gomega.Equal(5))

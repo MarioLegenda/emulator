@@ -2,16 +2,16 @@ package main
 
 import (
 	"bytes"
+	http2 "emulator/cmd/http"
+	"emulator/pkg/httpUtil"
+	repository2 "emulator/pkg/repository"
+	"emulator/pkg/staticTypes"
 	"encoding/json"
-	"github.com/onsi/ginkgo/v2"
 	"github.com/onsi/gomega"
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
 	"os"
-	"therebelsource/emulator/httpUtil"
-	"therebelsource/emulator/repository"
-	"therebelsource/emulator/staticTypes"
 )
 
 var _ = GinkgoDescribe("Single file public execution tests", func() {
@@ -25,7 +25,7 @@ var _ = GinkgoDescribe("Single file public execution tests", func() {
 
 		pg := testCreateEmptyPage(activeSession)
 		cb := testCreateCodeBlock(pg["uuid"].(string), activeSession)
-		testAddEmulatorToCodeBlock(pg["uuid"].(string), cb["uuid"].(string), `console.log("mile")`, repository.NodeLts, activeSession)
+		testAddEmulatorToCodeBlock(pg["uuid"].(string), cb["uuid"].(string), `console.log("mile")`, repository2.NodeLts, activeSession)
 		sessionUuid := testCreateTemporarySession(activeSession, pg["uuid"].(string), cb["uuid"].(string), "single_file")
 
 		bm := map[string]interface{}{
@@ -48,7 +48,7 @@ console.log('mile');
 		}
 
 		rr := httptest.NewRecorder()
-		handler := http.HandlerFunc(executePublicSingleFileRunResult)
+		handler := http.HandlerFunc(http2.executePublicSingleFileRunResult)
 
 		handler.ServeHTTP(rr, req)
 
@@ -74,7 +74,7 @@ console.log('mile');
 
 		gomega.Expect(err).To(gomega.BeNil())
 
-		var result repository.RunResult
+		var result repository2.RunResult
 		gomega.Expect(json.Unmarshal(b, &result)).To(gomega.BeNil())
 
 		gomega.Expect(result.Timeout).Should(gomega.Equal(5))
@@ -92,7 +92,7 @@ console.log('mile');
 
 		pg := testCreateEmptyPage(activeSession)
 		cb := testCreateCodeBlock(pg["uuid"].(string), activeSession)
-		testAddEmulatorToCodeBlock(pg["uuid"].(string), cb["uuid"].(string), `console.log("mile")`, repository.NodeEsm, activeSession)
+		testAddEmulatorToCodeBlock(pg["uuid"].(string), cb["uuid"].(string), `console.log("mile")`, repository2.NodeEsm, activeSession)
 		sessionUuid := testCreateTemporarySession(activeSession, pg["uuid"].(string), cb["uuid"].(string), "single_file")
 
 		bm := map[string]interface{}{
@@ -115,7 +115,7 @@ console.log('mile');
 		}
 
 		rr := httptest.NewRecorder()
-		handler := http.HandlerFunc(executePublicSingleFileRunResult)
+		handler := http.HandlerFunc(http2.executePublicSingleFileRunResult)
 
 		handler.ServeHTTP(rr, req)
 
@@ -141,7 +141,7 @@ console.log('mile');
 
 		gomega.Expect(err).To(gomega.BeNil())
 
-		var result repository.RunResult
+		var result repository2.RunResult
 		gomega.Expect(json.Unmarshal(b, &result)).To(gomega.BeNil())
 
 		gomega.Expect(result.Timeout).Should(gomega.Equal(5))
@@ -159,7 +159,7 @@ console.log('mile');
 
 		pg := testCreateEmptyPage(activeSession)
 		cb := testCreateCodeBlock(pg["uuid"].(string), activeSession)
-		testAddEmulatorToCodeBlock(pg["uuid"].(string), cb["uuid"].(string), ``, repository.CSharpMono, activeSession)
+		testAddEmulatorToCodeBlock(pg["uuid"].(string), cb["uuid"].(string), ``, repository2.CSharpMono, activeSession)
 		sessionUuid := testCreateTemporarySession(activeSession, pg["uuid"].(string), cb["uuid"].(string), "single_file")
 
 		bm := map[string]interface{}{
@@ -190,7 +190,7 @@ public class HelloWorld
 		}
 
 		rr := httptest.NewRecorder()
-		handler := http.HandlerFunc(executePublicSingleFileRunResult)
+		handler := http.HandlerFunc(http2.executePublicSingleFileRunResult)
 
 		handler.ServeHTTP(rr, req)
 
@@ -216,7 +216,7 @@ public class HelloWorld
 
 		gomega.Expect(err).To(gomega.BeNil())
 
-		var result repository.RunResult
+		var result repository2.RunResult
 		gomega.Expect(json.Unmarshal(b, &result)).To(gomega.BeNil())
 
 		gomega.Expect(result.Timeout).Should(gomega.Equal(5))
@@ -234,7 +234,7 @@ public class HelloWorld
 
 		pg := testCreateEmptyPage(activeSession)
 		cb := testCreateCodeBlock(pg["uuid"].(string), activeSession)
-		testAddEmulatorToCodeBlock(pg["uuid"].(string), cb["uuid"].(string), `console.log("mile")`, repository.NodeLts, activeSession)
+		testAddEmulatorToCodeBlock(pg["uuid"].(string), cb["uuid"].(string), `console.log("mile")`, repository2.NodeLts, activeSession)
 		sessionUuid := testCreateTemporarySession(activeSession, pg["uuid"].(string), cb["uuid"].(string), "single_file")
 
 		bm := map[string]interface{}{
@@ -257,7 +257,7 @@ console.log('mile');
 		}
 
 		rr := httptest.NewRecorder()
-		handler := http.HandlerFunc(executePublicSingleFileRunResult)
+		handler := http.HandlerFunc(http2.executePublicSingleFileRunResult)
 
 		handler.ServeHTTP(rr, req)
 
@@ -283,7 +283,7 @@ console.log('mile');
 
 		gomega.Expect(err).To(gomega.BeNil())
 
-		var result repository.RunResult
+		var result repository2.RunResult
 		gomega.Expect(json.Unmarshal(b, &result)).To(gomega.BeNil())
 
 		gomega.Expect(result.Timeout).Should(gomega.Equal(5))
@@ -305,7 +305,7 @@ console.log('mile');
 <?php
 
 echo "mile";
-`, repository.Php74, activeSession)
+`, repository2.Php74, activeSession)
 		sessionUuid := testCreateTemporarySession(activeSession, pg["uuid"].(string), cb["uuid"].(string), "single_file")
 
 		bm := map[string]interface{}{
@@ -330,7 +330,7 @@ echo "mile";
 		}
 
 		rr := httptest.NewRecorder()
-		handler := http.HandlerFunc(executePublicSingleFileRunResult)
+		handler := http.HandlerFunc(http2.executePublicSingleFileRunResult)
 
 		handler.ServeHTTP(rr, req)
 
@@ -356,7 +356,7 @@ echo "mile";
 
 		gomega.Expect(err).To(gomega.BeNil())
 
-		var result repository.RunResult
+		var result repository2.RunResult
 		gomega.Expect(json.Unmarshal(b, &result)).To(gomega.BeNil())
 
 		gomega.Expect(result.Timeout).Should(gomega.Equal(5))
@@ -374,7 +374,7 @@ echo "mile";
 
 		pg := testCreateEmptyPage(activeSession)
 		cb := testCreateCodeBlock(pg["uuid"].(string), activeSession)
-		testAddEmulatorToCodeBlock(pg["uuid"].(string), cb["uuid"].(string), `puts "mile"`, repository.Ruby, activeSession)
+		testAddEmulatorToCodeBlock(pg["uuid"].(string), cb["uuid"].(string), `puts "mile"`, repository2.Ruby, activeSession)
 		sessionUuid := testCreateTemporarySession(activeSession, pg["uuid"].(string), cb["uuid"].(string), "single_file")
 
 		bm := map[string]interface{}{
@@ -397,7 +397,7 @@ print "mile"
 		}
 
 		rr := httptest.NewRecorder()
-		handler := http.HandlerFunc(executePublicSingleFileRunResult)
+		handler := http.HandlerFunc(http2.executePublicSingleFileRunResult)
 
 		handler.ServeHTTP(rr, req)
 
@@ -423,7 +423,7 @@ print "mile"
 
 		gomega.Expect(err).To(gomega.BeNil())
 
-		var result repository.RunResult
+		var result repository2.RunResult
 		gomega.Expect(json.Unmarshal(b, &result)).To(gomega.BeNil())
 
 		gomega.Expect(result.Timeout).Should(gomega.Equal(5))
@@ -449,7 +449,7 @@ import "fmt"
 func main() {
 	fmt.Println("mile")
 }
-`, repository.GoLang, activeSession)
+`, repository2.GoLang, activeSession)
 		sessionUuid := testCreateTemporarySession(activeSession, pg["uuid"].(string), cb["uuid"].(string), "single_file")
 
 		bm := map[string]interface{}{
@@ -478,7 +478,7 @@ func main() {
 		}
 
 		rr := httptest.NewRecorder()
-		handler := http.HandlerFunc(executePublicSingleFileRunResult)
+		handler := http.HandlerFunc(http2.executePublicSingleFileRunResult)
 
 		handler.ServeHTTP(rr, req)
 
@@ -504,7 +504,7 @@ func main() {
 
 		gomega.Expect(err).To(gomega.BeNil())
 
-		var result repository.RunResult
+		var result repository2.RunResult
 		gomega.Expect(json.Unmarshal(b, &result)).To(gomega.BeNil())
 
 		gomega.Expect(result.Timeout).Should(gomega.Equal(5))
@@ -522,7 +522,7 @@ func main() {
 
 		pg := testCreateEmptyPage(activeSession)
 		cb := testCreateCodeBlock(pg["uuid"].(string), activeSession)
-		testAddEmulatorToCodeBlock(pg["uuid"].(string), cb["uuid"].(string), `print("mile")`, repository.Python2, activeSession)
+		testAddEmulatorToCodeBlock(pg["uuid"].(string), cb["uuid"].(string), `print("mile")`, repository2.Python2, activeSession)
 		sessionUuid := testCreateTemporarySession(activeSession, pg["uuid"].(string), cb["uuid"].(string), "single_file")
 
 		bm := map[string]interface{}{
@@ -545,7 +545,7 @@ print("This line will be printed.")
 		}
 
 		rr := httptest.NewRecorder()
-		handler := http.HandlerFunc(executePublicSingleFileRunResult)
+		handler := http.HandlerFunc(http2.executePublicSingleFileRunResult)
 
 		handler.ServeHTTP(rr, req)
 
@@ -571,7 +571,7 @@ print("This line will be printed.")
 
 		gomega.Expect(err).To(gomega.BeNil())
 
-		var result repository.RunResult
+		var result repository2.RunResult
 		gomega.Expect(json.Unmarshal(b, &result)).To(gomega.BeNil())
 
 		gomega.Expect(result.Timeout).Should(gomega.Equal(5))
@@ -589,7 +589,7 @@ print("This line will be printed.")
 
 		pg := testCreateEmptyPage(activeSession)
 		cb := testCreateCodeBlock(pg["uuid"].(string), activeSession)
-		testAddEmulatorToCodeBlock(pg["uuid"].(string), cb["uuid"].(string), `print("mile")`, repository.Python2, activeSession)
+		testAddEmulatorToCodeBlock(pg["uuid"].(string), cb["uuid"].(string), `print("mile")`, repository2.Python2, activeSession)
 		sessionUuid := testCreateTemporarySession(activeSession, pg["uuid"].(string), cb["uuid"].(string), "single_file")
 
 		bm := map[string]interface{}{
@@ -612,7 +612,7 @@ print("This line will be printed.")
 		}
 
 		rr := httptest.NewRecorder()
-		handler := http.HandlerFunc(executePublicSingleFileRunResult)
+		handler := http.HandlerFunc(http2.executePublicSingleFileRunResult)
 
 		handler.ServeHTTP(rr, req)
 
@@ -638,7 +638,7 @@ print("This line will be printed.")
 
 		gomega.Expect(err).To(gomega.BeNil())
 
-		var result repository.RunResult
+		var result repository2.RunResult
 		gomega.Expect(json.Unmarshal(b, &result)).To(gomega.BeNil())
 
 		gomega.Expect(result.Timeout).Should(gomega.Equal(5))
@@ -656,7 +656,7 @@ print("This line will be printed.")
 
 		pg := testCreateEmptyPage(activeSession)
 		cb := testCreateCodeBlock(pg["uuid"].(string), activeSession)
-		testAddEmulatorToCodeBlock(pg["uuid"].(string), cb["uuid"].(string), `main = putStrLn "mile"`, repository.Haskell, activeSession)
+		testAddEmulatorToCodeBlock(pg["uuid"].(string), cb["uuid"].(string), `main = putStrLn "mile"`, repository2.Haskell, activeSession)
 		sessionUuid := testCreateTemporarySession(activeSession, pg["uuid"].(string), cb["uuid"].(string), "single_file")
 
 		bm := map[string]interface{}{
@@ -679,7 +679,7 @@ main = putStrLn "mile"
 		}
 
 		rr := httptest.NewRecorder()
-		handler := http.HandlerFunc(executePublicSingleFileRunResult)
+		handler := http.HandlerFunc(http2.executePublicSingleFileRunResult)
 
 		handler.ServeHTTP(rr, req)
 
@@ -705,7 +705,7 @@ main = putStrLn "mile"
 
 		gomega.Expect(err).To(gomega.BeNil())
 
-		var result repository.RunResult
+		var result repository2.RunResult
 		gomega.Expect(json.Unmarshal(b, &result)).To(gomega.BeNil())
 
 		gomega.Expect(result.Timeout).Should(gomega.Equal(5))
@@ -729,7 +729,7 @@ int main() {
    printf("mile");
    return 0;
 }
-`, repository.CLang, activeSession)
+`, repository2.CLang, activeSession)
 		sessionUuid := testCreateTemporarySession(activeSession, pg["uuid"].(string), cb["uuid"].(string), "single_file")
 
 		bm := map[string]interface{}{
@@ -756,7 +756,7 @@ int main() {
 		}
 
 		rr := httptest.NewRecorder()
-		handler := http.HandlerFunc(executePublicSingleFileRunResult)
+		handler := http.HandlerFunc(http2.executePublicSingleFileRunResult)
 
 		handler.ServeHTTP(rr, req)
 
@@ -782,7 +782,7 @@ int main() {
 
 		gomega.Expect(err).To(gomega.BeNil())
 
-		var result repository.RunResult
+		var result repository2.RunResult
 		gomega.Expect(json.Unmarshal(b, &result)).To(gomega.BeNil())
 
 		gomega.Expect(result.Timeout).Should(gomega.Equal(5))
@@ -807,7 +807,7 @@ int main() {
     std::cout << "mile";
     return 0;
 }
-`, repository.CPlus, activeSession)
+`, repository2.CPlus, activeSession)
 		sessionUuid := testCreateTemporarySession(activeSession, pg["uuid"].(string), cb["uuid"].(string), "single_file")
 
 		bm := map[string]interface{}{
@@ -835,7 +835,7 @@ int main() {
 		}
 
 		rr := httptest.NewRecorder()
-		handler := http.HandlerFunc(executePublicSingleFileRunResult)
+		handler := http.HandlerFunc(http2.executePublicSingleFileRunResult)
 
 		handler.ServeHTTP(rr, req)
 
@@ -861,7 +861,7 @@ int main() {
 
 		gomega.Expect(err).To(gomega.BeNil())
 
-		var result repository.RunResult
+		var result repository2.RunResult
 		gomega.Expect(json.Unmarshal(b, &result)).To(gomega.BeNil())
 
 		gomega.Expect(result.Timeout).Should(gomega.Equal(5))
