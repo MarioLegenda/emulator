@@ -1,4 +1,4 @@
-package repository
+package types
 
 type Name string
 type Text string

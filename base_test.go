@@ -7,6 +7,7 @@ import (
 	"emulator/pkg/httpClient"
 	"emulator/pkg/logger"
 	repository2 "emulator/pkg/repository"
+	"emulator/pkg/types"
 	"encoding/json"
 	"fmt"
 	"github.com/google/uuid"
@@ -611,7 +612,7 @@ func testLinkCodeProject(activeSession repository2.ActiveSession, codeProjectUui
 	return data
 }
 
-func testAddEmulatorToCodeBlock(pageUuid string, blockUuid string, code string, lang repository2.Language, activeSession repository2.ActiveSession) map[string]interface{} {
+func testAddEmulatorToCodeBlock(pageUuid string, blockUuid string, code string, lang types.Language, activeSession repository2.ActiveSession) map[string]interface{} {
 	url := fmt.Sprintf("%s/page/code-block", repository2.CreateApiUrl())
 
 	client, err := httpClient.NewHttpClient(&tls.Config{
@@ -681,7 +682,7 @@ func testAddEmulatorToCodeBlock(pageUuid string, blockUuid string, code string, 
 	return data
 }
 
-func testCreateCodeProject(activeSession repository2.ActiveSession, name string, lang repository2.Language) map[string]interface{} {
+func testCreateCodeProject(activeSession repository2.ActiveSession, name string, lang types.Language) map[string]interface{} {
 	url := fmt.Sprintf("%s/code-project", repository2.CreateApiUrl())
 
 	client, err := httpClient.NewHttpClient(&tls.Config{
@@ -858,7 +859,7 @@ func testCreateCodeProjectStub(
 	packageName string,
 	structure []*repository2.File,
 	rootDirectory *repository2.File,
-	environment *repository2.Language,
+	environment *types.Language,
 ) repository2.CodeProject {
 	return repository2.CodeProject{
 		Uuid:           uuid.New().String(),

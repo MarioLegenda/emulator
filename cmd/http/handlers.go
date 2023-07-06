@@ -4,32 +4,32 @@ import (
 	httpUtil2 "emulator/pkg/httpUtil"
 	"emulator/pkg/linkedProjectExecution"
 	"emulator/pkg/projectExecution"
-	"emulator/pkg/repository"
 	"emulator/pkg/singleFileExecution"
 	"emulator/pkg/staticTypes"
+	"emulator/pkg/types"
 	"net/http"
 )
 
 func getEnvironmentsHandler(w http.ResponseWriter, r *http.Request) {
 	cr := httpUtil2.InitCurrentRequest(w, r)
 
-	var languages []repository.Language
+	var languages []types.Language
 
-	languages = append(languages, repository.CSharpMono)
-	languages = append(languages, repository.NodeEsm)
-	languages = append(languages, repository.NodeLts)
-	languages = append(languages, repository.Haskell)
-	languages = append(languages, repository.CLang)
-	languages = append(languages, repository.CPlus)
-	languages = append(languages, repository.GoLang)
-	languages = append(languages, repository.Python2)
-	languages = append(languages, repository.Python3)
-	languages = append(languages, repository.Julia)
-	languages = append(languages, repository.Ruby)
-	languages = append(languages, repository.Php74)
-	languages = append(languages, repository.Rust)
-	languages = append(languages, repository.PerlLts)
-	languages = append(languages, repository.Lua)
+	languages = append(languages, types.CSharpMono)
+	languages = append(languages, types.NodeEsm)
+	languages = append(languages, types.NodeLts)
+	languages = append(languages, types.Haskell)
+	languages = append(languages, types.CLang)
+	languages = append(languages, types.CPlus)
+	languages = append(languages, types.GoLang)
+	languages = append(languages, types.Python2)
+	languages = append(languages, types.Python3)
+	languages = append(languages, types.Julia)
+	languages = append(languages, types.Ruby)
+	languages = append(languages, types.Php74)
+	languages = append(languages, types.Rust)
+	languages = append(languages, types.PerlLts)
+	languages = append(languages, types.Lua)
 
 	apiResponse := httpUtil2.CreateSuccessResponse(cr, staticTypes.RESPONSE_RESOURCE, languages, http.StatusOK, "An instance of file content")
 

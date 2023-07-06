@@ -92,10 +92,10 @@ func makeBlocks(num int, delimiter int) [][]int {
 	return blocks
 }
 
-func containersToSlice(containers map[string]container) []container {
+func containersToSlice(containers map[string][]container) []container {
 	s := make([]container, 0)
 	for _, v := range containers {
-		s = append(s, v)
+		s = append(s, v...)
 	}
 
 	return s

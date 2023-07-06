@@ -16,13 +16,13 @@ import (
 var services map[string]Container
 
 type Container interface {
-	CreateContainers(string, int) []*appErrors.Error
+	CreateContainers(string, string, int) []*appErrors.Error
 	Close()
-	Containers() map[string]container
+	Containers(tagName string) []container
 }
 
 type service struct {
-	containers map[string]container
+	containers map[string][]container
 	lock       sync.Mutex
 }
 
@@ -36,13 +36,8 @@ type container struct {
 	pid    chan int
 	dir    string
 
-	Tag       string
-	Name      string
-	WorkerNum int
-}
-
-func New() Container {
-	return &service{containers: make(map[string]container)}
+	Tag  string
+	Name string
 }
 
 func Init(name string) {
@@ -50,7 +45,7 @@ func Init(name string) {
 		services = make(map[string]Container)
 	}
 
-	s := &service{containers: make(map[string]container)}
+	s := &service{containers: make(map[string][]container)}
 
 	services[name] = s
 }
@@ -59,14 +54,14 @@ func Service(name string) Container {
 	return services[name]
 }
 
-func (d *service) Containers() map[string]container {
-	return d.containers
+func (d *service) Containers(tagName string) []container {
+	return d.containers[tagName]
 }
 
-func (d *service) CreateContainers(tag string, workerNum int) []*appErrors.Error {
-	logger.Info(fmt.Sprintf("Creating %d container(s) for %s", workerNum, tag))
+func (d *service) CreateContainers(executionDir, tag string, containerNum int) []*appErrors.Error {
+	logger.Info(fmt.Sprintf("Creating %d container(s) for %s", containerNum, tag))
 
-	blocks := makeBlocks(workerNum, 5)
+	blocks := makeBlocks(containerNum, 5)
 
 	errs := make([]*appErrors.Error, 0)
 	for _, block := range blocks {
@@ -77,7 +72,7 @@ func (d *service) CreateContainers(tag string, workerNum int) []*appErrors.Error
 			go func(wg *sync.WaitGroup) {
 				name := uuid.New().String()
 
-				containerDir := fmt.Sprintf("%s/%s", os.Getenv("EXECUTION_DIR"), name)
+				containerDir := fmt.Sprintf("%s/%s", executionDir, name)
 				fsErr := os.Mkdir(containerDir, os.ModePerm)
 
 				if fsErr != nil {
@@ -88,40 +83,42 @@ func (d *service) CreateContainers(tag string, workerNum int) []*appErrors.Error
 					return
 				}
 
-				container := container{
+				newContainer := container{
 					output: make(chan message),
 					pid:    make(chan int),
 					dir:    containerDir,
-
-					Tag:       tag,
-					Name:      name,
-					WorkerNum: workerNum,
+					Tag:    tag,
+					Name:   name,
 				}
 
-				createContainer(container)
+				createContainer(newContainer)
 
 				select {
 				case <-time.After(1 * time.Second):
 					if !isContainerRunning(name) {
-						errs = append(errs, appErrors.New(appErrors.ApplicationError, appErrors.ApplicationRuntimeError, fmt.Sprintf("Container startup timeout: Tag: %s, Name: %s", container.Tag, container.Name)))
+						errs = append(errs, appErrors.New(appErrors.ApplicationError, appErrors.ApplicationRuntimeError, fmt.Sprintf("Container startup timeout: Tag: %s, Name: %s", newContainer.Tag, newContainer.Name)))
 
 						wg.Done()
 
 						return
 					}
 
-					close(container.output)
+					close(newContainer.output)
 					d.lock.Lock()
-					d.containers[name] = container
+					if _, ok := d.containers[tag]; !ok {
+						d.containers[tag] = make([]container, 0)
+					}
+
+					d.containers[tag] = append(d.containers[tag], newContainer)
 					d.lock.Unlock()
 
 					wg.Done()
-				case msg := <-container.output:
+				case msg := <-newContainer.output:
 					if msg.messageType == "error" {
 						err := msg.data.(error)
-						close(container.output)
+						close(newContainer.output)
 
-						errs = append(errs, appErrors.New(appErrors.ApplicationError, appErrors.ApplicationRuntimeError, fmt.Sprintf("Could not start container; Name: %s, Tag: %s: %s", container.Name, container.Tag, err.Error())))
+						errs = append(errs, appErrors.New(appErrors.ApplicationError, appErrors.ApplicationRuntimeError, fmt.Sprintf("Could not start container; Name: %s, Tag: %s: %s", newContainer.Name, newContainer.Tag, err.Error())))
 
 						wg.Done()
 					}
@@ -133,6 +130,8 @@ func (d *service) CreateContainers(tag string, workerNum int) []*appErrors.Error
 	}
 
 	time.Sleep(2 * time.Second)
+
+	logger.Info(fmt.Sprintf("Containers created for %s!", tag))
 
 	return errs
 }

@@ -39,8 +39,8 @@ func wrapLumberjack(level zapcore.Level, fileName string) func(core zapcore.Core
 	}
 }
 
-func buildBaseLogger(level zapcore.Level, fileName string) *zap.SugaredLogger {
-	logFile := fmt.Sprintf("%s/%s", os.Getenv("LOG_DIRECTORY"), fileName)
+func buildBaseLogger(level zapcore.Level, fileName string, logDirectory string) *zap.SugaredLogger {
+	logFile := fmt.Sprintf("%s/%s", logDirectory, fileName)
 
 	cfg := zap.NewProductionConfig()
 	cfg.OutputPaths = []string{logFile}
@@ -65,52 +65,40 @@ func buildBaseLogger(level zapcore.Level, fileName string) *zap.SugaredLogger {
 	return createdLogger
 }
 
-func buildInfoLogger() {
-	infoLogger = buildBaseLogger(zap.InfoLevel, "info.log")
+func buildInfoLogger(logDirectory string) {
+	infoLogger = buildBaseLogger(zap.InfoLevel, "info.log", logDirectory)
 }
 
-func buildErrorLogger() {
-	errorLogger = buildBaseLogger(zap.ErrorLevel, "error.log")
+func buildErrorLogger(logDirectory string) {
+	errorLogger = buildBaseLogger(zap.ErrorLevel, "error.log", logDirectory)
 }
 
-func buildWarningLogger() {
-	warningLogger = buildBaseLogger(zap.WarnLevel, "warn.log")
+func buildWarningLogger(logDirectory string) {
+	warningLogger = buildBaseLogger(zap.WarnLevel, "warn.log", logDirectory)
 }
 
-func BuildLoggers() {
-	if _, err := os.Stat(os.Getenv("LOG_DIRECTORY")); os.IsNotExist(err) {
-		err := os.MkdirAll(os.Getenv("LOG_DIRECTORY"), os.ModePerm)
+func BuildLoggers(logDirectory string) {
+	if _, err := os.Stat(logDirectory); os.IsNotExist(err) {
+		err := os.MkdirAll(logDirectory, os.ModePerm)
 
 		if err != nil {
 			appErrors.TerminateWithMessage(fmt.Sprintf("Cannot create log directory: %s", err.Error()))
 		}
 	}
 
-	buildInfoLogger()
-	buildErrorLogger()
-	buildWarningLogger()
+	buildInfoLogger(logDirectory)
+	buildErrorLogger(logDirectory)
+	buildWarningLogger(logDirectory)
 }
 
 func Info(msg ...interface{}) {
-	if os.Getenv("APP_ENV") != "prod" && os.Getenv("APP_ENV") != "staging" {
-		fmt.Println(fmt.Sprintf("INFO: %v", msg))
-	}
-
 	infoLogger.Info(msg)
 }
 
 func Error(msg ...interface{}) {
-	if os.Getenv("APP_ENV") != "prod" && os.Getenv("APP_ENV") != "staging" {
-		fmt.Println(fmt.Sprintf("ERROR: %v", msg))
-	}
-
 	errorLogger.Error(msg)
 }
 
 func Warn(msg ...interface{}) {
-	if os.Getenv("APP_ENV") != "prod" && os.Getenv("APP_ENV") != "staging" {
-		fmt.Println(fmt.Sprintf("WARNING: %v", msg))
-	}
-
 	warningLogger.Warn(msg)
 }

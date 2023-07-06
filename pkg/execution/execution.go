@@ -11,13 +11,11 @@ import (
 	"fmt"
 	"os"
 	"runtime"
+	"strings"
 	"sync"
 )
 
 var services map[string]Execution
-
-type ProjectExecutionData struct {
-}
 
 type Job struct {
 	BuilderType   string
@@ -54,7 +52,7 @@ type ContainerBlueprint struct {
 	Tag          string
 }
 
-func Init(name string, blueprints []ContainerBlueprint) *appErrors.Error {
+func Init(executionDir, name string, blueprints []ContainerBlueprint) *appErrors.Error {
 	blueprints = sdk.Filter(blueprints, func(idx int, value ContainerBlueprint) bool {
 		return value.ContainerNum != 0
 	})
@@ -72,7 +70,7 @@ func Init(name string, blueprints []ContainerBlueprint) *appErrors.Error {
 
 	services[name] = s
 
-	err := s.init(name, blueprints)
+	err := s.init(executionDir, name, blueprints)
 
 	if err != nil {
 		return err
@@ -93,7 +91,7 @@ func (e *execution) RunJob(j Job) runners.Result {
 	defer func() {
 		if err := recover(); err != nil {
 			buf := make([]byte, 2048)
-			n := runtime.Stack(buf, false)
+			n := runtime.Stack(buf, true)
 			buf = buf[:n]
 
 			logger.Error(fmt.Sprintf("A panic occurred while running a job. The server will close right away and you have to clean up after it. Error: %v", err))
@@ -170,32 +168,39 @@ func (e *execution) Close() {
 	containerFactory.Service(e.name).Close()
 }
 
-func (e *execution) init(name string, blueprints []ContainerBlueprint) *appErrors.Error {
+func (e *execution) init(executionDir, name string, blueprints []ContainerBlueprint) *appErrors.Error {
 	workers := make(map[string]int)
 	for _, blueprint := range blueprints {
-		errs := containerFactory.Service(name).CreateContainers(blueprint.Tag, blueprint.ContainerNum)
+		errs := containerFactory.Service(name).CreateContainers(executionDir, blueprint.Tag, blueprint.ContainerNum)
 
 		if len(errs) != 0 {
 			e.Close()
 
-			logger.Error(fmt.Sprintf("Cannot boot container for tag %s: %v", blueprint.Tag, errs))
+			log := ""
+			for _, err := range errs {
+				log += fmt.Sprintf("%s,", err.Error())
+			}
+
+			logger.Error(fmt.Sprintf("Cannot boot container for tag %s. The following errors have occurred: %s", blueprint.Tag, log))
+
+			fmt.Println(fmt.Sprintf("Cannot boot container for tag %s. The following errors have occurred: %s", blueprint.Tag, strings.Replace(log, ",", "\n", -1)))
 
 			return appErrors.New(appErrors.ServerError, appErrors.ApplicationRuntimeError, fmt.Sprintf("Cannot boot container for tag %s", blueprint.Tag))
 		}
 
 		workers[blueprint.Tag] = blueprint.WorkerNum
-	}
 
-	containers := containerFactory.Service(name).Containers()
+		containers := containerFactory.Service(name).Containers(blueprint.Tag)
 
-	for _, c := range containers {
-		e.createBalancer(c.Name, c.Tag, c.WorkerNum)
+		for _, c := range containers {
+			e.createBalancer(c.Name, c.Tag, blueprint.WorkerNum)
+		}
 	}
 
 	return nil
 }
 
-func (e *execution) createBalancer(containerName string, tag string, workerNum int) {
+func (e *execution) createBalancer(containerName, tag string, workerNum int) {
 	b := balancer.NewBalancer(containerName, workerNum)
 	b.StartWorkers()
 

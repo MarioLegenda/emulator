@@ -1,5 +1,7 @@
 package repository
 
+import "emulator/pkg/types"
+
 type RunResult struct {
 	Success bool   `json:"success"`
 	Result  string `json:"result"`
@@ -72,8 +74,8 @@ type CodeBlock struct {
 	Readonly    bool   `json:"readonly"`
 	PackageName string `json:"packageName"`
 
-	GistData *GistData `json:"gistData"`
-	Emulator *Language `json:"emulator"`
+	GistData *GistData       `json:"gistData"`
+	Emulator *types.Language `json:"emulator"`
 
 	CodeProjectUuid *string `json:"codeProjectUuid"`
 	CodeResult      *string `json:"codeResult"`
@@ -85,14 +87,14 @@ type GistData struct {
 }
 
 type CodeProject struct {
-	Uuid           string    `json:"uuid"`
-	ShortId        string    `json:"shortId"`
-	Name           string    `json:"name"`
-	Description    string    `json:"description"`
-	Environment    *Language `json:"environment"`
-	Structure      []*File   `json:"structure"`
-	StructureCount int       `json:"structureCount"`
-	PackageName    string    `json:"packageName"`
+	Uuid           string          `json:"uuid"`
+	ShortId        string          `json:"shortId"`
+	Name           string          `json:"name"`
+	Description    string          `json:"description"`
+	Environment    *types.Language `json:"environment"`
+	Structure      []*File         `json:"structure"`
+	StructureCount int             `json:"structureCount"`
+	PackageName    string          `json:"packageName"`
 
 	RootDirectory *File `json:"rootDirectory"`
 
@@ -165,8 +167,8 @@ type SnippetCodeBlock struct {
 	IsCode   bool `json:"isCode" bson:"isCode"`
 	Readonly bool `json:"readonly" bson:"readonly"`
 
-	GistData *GistData `json:"gistData" bson:"gistData"`
-	Emulator *Language `json:"emulator" bson:"emulator"`
+	GistData *GistData       `json:"gistData" bson:"gistData"`
+	Emulator *types.Language `json:"emulator" bson:"emulator"`
 
 	CodeProjectUuid string  `json:"codeProjectUuid" bson:"codeProjectUuid"`
 	CodeResult      *string `json:"codeResult" bson:"codeResult"`

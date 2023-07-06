@@ -52,7 +52,7 @@ func NewBalancer(name string, initialWorkers int) Balancer {
 
 	for i := 0; i < initialWorkers; i++ {
 		b.workers = append(b.workers, worker{
-			input: make(chan Job),
+			input: make(chan Job, 1),
 			name:  name,
 			index: i,
 		})
@@ -69,9 +69,7 @@ func (b *balancer) StartWorkers() {
 		go func(worker worker, wg *sync.WaitGroup) {
 			wg.Done()
 
-			for {
-				job := <-worker.input
-
+			for job := range worker.input {
 				if b.closing {
 					job.Output <- runners2.Result{
 						Result:  "",

@@ -35,12 +35,12 @@ func makeBlocks(num int, delimiter int) [][]int {
 }
 
 func FinalCleanup(log bool) {
-	stopAll := exec.Command("/bin/bash", []string{"-c", "docker stop $(docker ps -a -q)"}...)
+	stopAll := exec.Command("docker", "stop", "$(docker ps -a -q)")
 	err := stopAll.Run()
 
 	if err != nil {
 		if log {
-			logger.Warn(fmt.Sprintf("Cannot stop all containers with error: %s", err.Error()))
+			logger.Warn(fmt.Sprintf("Cannot stop all containers with docker stop command with error: %s. Containers were probably already been stopped. Continuing...", err.Error()))
 		}
 	}
 
@@ -49,7 +49,10 @@ func FinalCleanup(log bool) {
 
 	if err != nil {
 		if log {
-			logger.Warn(fmt.Sprintf("Cannot remove all containers with error: %s", err.Error()))
+			logger.Warn(fmt.Sprintf("Cannot remove all containers with error: %s. Containers were probably already removed. Continuing...", err.Error()))
 		}
 	}
+
+	logger.Info("Emulator closed!")
+
 }
