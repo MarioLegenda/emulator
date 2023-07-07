@@ -15,7 +15,7 @@ func loadEnv() {
 }
 
 func App() {
-	pkg.NewEmulator(pkg.Options{
+	emulator := pkg.NewEmulator(pkg.Options{
 		GoLang: pkg.GoLang{
 			Workers:    10,
 			Containers: 10,
@@ -28,7 +28,9 @@ func App() {
 			Workers:    10,
 			Containers: 10,
 		},
-		LogDirectory:       "/home/mario/go/go-emulator/var/log",
+		LogDirectory:       "/home/mario/go/emulator/var/log",
 		ExecutionDirectory: "/home/mario/go/go-emulator/var/execution",
 	})
+
+	emulator.Close()
 }

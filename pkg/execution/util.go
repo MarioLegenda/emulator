@@ -52,7 +52,4 @@ func FinalCleanup(log bool) {
 			logger.Warn(fmt.Sprintf("Cannot remove all containers with error: %s. Containers were probably already removed. Continuing...", err.Error()))
 		}
 	}
-
-	logger.Info("Emulator closed!")
-
 }

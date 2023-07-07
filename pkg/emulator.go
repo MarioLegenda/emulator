@@ -12,7 +12,7 @@ import (
 	"fmt"
 	"log"
 	"os"
-	"strconv"
+	"sync"
 	"time"
 )
 
@@ -99,6 +99,7 @@ type GoLang struct {
 
 type Emulator interface {
 	RunJob(language string, content string) Result
+	Close()
 }
 
 type emulator struct{}
@@ -122,18 +123,6 @@ type Options struct {
 
 	ExecutionDirectory string
 	LogDirectory       string
-}
-
-func getEnvironmentWorkers(part string) int {
-	workers, _ := strconv.Atoi(os.Getenv(fmt.Sprintf("%s_WORKERS", part)))
-
-	return workers
-}
-
-func getEnvironmentContainers(part string) int {
-	containers, _ := strconv.Atoi(os.Getenv(fmt.Sprintf("%s_CONTAINERS", part)))
-
-	return containers
 }
 
 func selectProgrammingLanguage(name string) (types.Language, error) {
@@ -312,4 +301,25 @@ func (e emulator) RunJob(language, content string) Result {
 	}
 
 	return realResult
+}
+
+func (e emulator) Close() {
+	logger.Info("Closing...")
+	wg := sync.WaitGroup{}
+	for _, e := range []string{_var.PROJECT_EXECUTION} {
+		wg.Add(1)
+
+		go func(name string, wg *sync.WaitGroup) {
+			if !execution2.Service(name).Closed() {
+				execution2.Service(name).Close()
+			}
+			wg.Done()
+		}(e, &wg)
+	}
+	wg.Wait()
+
+	time.Sleep(5 * time.Second)
+	execution2.FinalCleanup(true)
+
+	logger.Info("Emulator successfully closed. Please, check that all container have been removed with docker container ls just in case.")
 }

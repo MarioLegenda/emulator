@@ -14,6 +14,9 @@ var infoLogger *zap.SugaredLogger
 var errorLogger *zap.SugaredLogger
 var warningLogger *zap.SugaredLogger
 
+var stdOut = true
+var logDir = ""
+
 func wrapLumberjack(level zapcore.Level, fileName string) func(core zapcore.Core) zapcore.Core {
 	// lumberjack.Logger is already safe for concurrent use, so we don't need to
 	// lock it.
@@ -39,8 +42,8 @@ func wrapLumberjack(level zapcore.Level, fileName string) func(core zapcore.Core
 	}
 }
 
-func buildBaseLogger(level zapcore.Level, fileName string, logDirectory string) *zap.SugaredLogger {
-	logFile := fmt.Sprintf("%s/%s", logDirectory, fileName)
+func buildBaseLogger(level zapcore.Level, fileName string) *zap.SugaredLogger {
+	logFile := fmt.Sprintf("%s/%s", logDir, fileName)
 
 	cfg := zap.NewProductionConfig()
 	cfg.OutputPaths = []string{logFile}
@@ -65,40 +68,53 @@ func buildBaseLogger(level zapcore.Level, fileName string, logDirectory string) 
 	return createdLogger
 }
 
-func buildInfoLogger(logDirectory string) {
-	infoLogger = buildBaseLogger(zap.InfoLevel, "info.log", logDirectory)
+func buildInfoLogger() {
+	infoLogger = buildBaseLogger(zap.InfoLevel, "info.log")
 }
 
-func buildErrorLogger(logDirectory string) {
-	errorLogger = buildBaseLogger(zap.ErrorLevel, "error.log", logDirectory)
+func buildErrorLogger() {
+	errorLogger = buildBaseLogger(zap.ErrorLevel, "error.log")
 }
 
-func buildWarningLogger(logDirectory string) {
-	warningLogger = buildBaseLogger(zap.WarnLevel, "warn.log", logDirectory)
+func buildWarningLogger() {
+	warningLogger = buildBaseLogger(zap.WarnLevel, "warn.log")
 }
 
 func BuildLoggers(logDirectory string) {
-	if _, err := os.Stat(logDirectory); os.IsNotExist(err) {
-		err := os.MkdirAll(logDirectory, os.ModePerm)
+	logDir = logDirectory
+	if _, err := os.Stat(logDir); os.IsNotExist(err) {
+		err := os.MkdirAll(logDir, os.ModePerm)
 
 		if err != nil {
 			appErrors.TerminateWithMessage(fmt.Sprintf("Cannot create log directory: %s", err.Error()))
 		}
 	}
 
-	buildInfoLogger(logDirectory)
-	buildErrorLogger(logDirectory)
-	buildWarningLogger(logDirectory)
+	buildInfoLogger()
+	buildErrorLogger()
+	buildWarningLogger()
 }
 
 func Info(msg ...interface{}) {
+	if stdOut {
+		fmt.Println(msg)
+	}
+
 	infoLogger.Info(msg)
 }
 
 func Error(msg ...interface{}) {
+	if stdOut {
+		fmt.Println(msg)
+	}
+
 	errorLogger.Error(msg)
 }
 
 func Warn(msg ...interface{}) {
+	if stdOut {
+		fmt.Println(msg)
+	}
+
 	warningLogger.Warn(msg)
 }
