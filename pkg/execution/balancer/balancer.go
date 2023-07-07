@@ -14,6 +14,8 @@ type Balancer interface {
 }
 
 type Job struct {
+	ExecutionDir string
+
 	BuilderType   string
 	ExecutionType string
 
@@ -81,6 +83,8 @@ func (b *balancer) StartWorkers() {
 				}
 
 				res := runners2.Run(runners2.Params{
+					ExecutionDir: job.ExecutionDir,
+
 					BuilderType:       job.BuilderType,
 					ExecutionType:     job.ExecutionType,
 					ContainerName:     worker.name,

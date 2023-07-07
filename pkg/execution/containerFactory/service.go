@@ -91,7 +91,7 @@ func (d *service) CreateContainers(executionDir, tag string, containerNum int) [
 					Name:   name,
 				}
 
-				createContainer(newContainer)
+				createContainer(newContainer, executionDir)
 
 				select {
 				case <-time.After(1 * time.Second):
@@ -196,7 +196,7 @@ func (d service) Close() {
 	cmd.Run()
 }
 
-func createContainer(c container) {
+func createContainer(c container, executionDir string) {
 	go func(c container) {
 		args := []string{
 			"run",
@@ -204,7 +204,7 @@ func createContainer(c container) {
 			"-t",
 			"--network=none",
 			"-v",
-			fmt.Sprintf("%s:/app:rw", getVolumeDirectory(c.Name)),
+			fmt.Sprintf("%s:/app:rw", fmt.Sprintf("%s/%s", executionDir, c.Name)),
 			"--name",
 			c.Name,
 			"--init",

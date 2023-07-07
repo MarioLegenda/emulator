@@ -18,6 +18,8 @@ import (
 var services map[string]Execution
 
 type Job struct {
+	ExecutionDir string
+
 	BuilderType   string
 	ExecutionType string
 
@@ -130,6 +132,7 @@ func (e *execution) RunJob(j Job) runners.Result {
 
 	output := make(chan runners.Result)
 	b.AddJob(balancer.Job{
+		ExecutionDir:      j.ExecutionDir,
 		BuilderType:       j.BuilderType,
 		ExecutionType:     j.ExecutionType,
 		EmulatorName:      j.EmulatorName,

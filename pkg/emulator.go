@@ -102,7 +102,9 @@ type Emulator interface {
 	Close()
 }
 
-type emulator struct{}
+type emulator struct {
+	executionDir string
+}
 
 type Options struct {
 	NodeLts
@@ -268,7 +270,9 @@ func NewEmulator(options Options) Emulator {
 
 	initExecutioners(options)
 
-	return emulator{}
+	return emulator{
+		executionDir: options.ExecutionDirectory,
+	}
 }
 
 func (e emulator) RunJob(language, content string) Result {
@@ -282,6 +286,7 @@ func (e emulator) RunJob(language, content string) Result {
 	}
 
 	res := execution2.Service(_var.PROJECT_EXECUTION).RunJob(execution2.Job{
+		ExecutionDir:      e.executionDir,
 		BuilderType:       "single_file",
 		ExecutionType:     "single_file",
 		EmulatorName:      string(lang.Name),
@@ -316,6 +321,7 @@ func (e emulator) Close() {
 			wg.Done()
 		}(e, &wg)
 	}
+
 	wg.Wait()
 
 	time.Sleep(5 * time.Second)
